@@ -14,8 +14,10 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Worklets } from "react-native-worklets-core";
 import { useIsFocused, useNavigationState } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
-import BottomSheet from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { useReducedMotion } from "react-native-reanimated";
+import ScanSearchBottomSheet from "../components/ScanSearchBottomSheet";
+import ScannerOverlay from "../components/ScannerOverlay";
 
 //TO-DO
 // Check if the code is the correct type or if it exists and show alert if not
@@ -40,19 +42,18 @@ export const Scan = ({ navigation }) => {
   const isFocused = useIsFocused();
   const state = useNavigationState((state) => state);
   const currentRouteName = state.routes[state.index].name;
-  const isActive = isFocused || currentRouteName === "ModalScreen";
+  const isActive = isFocused || currentRouteName === "FoodDetails";
 
   //Bottom sheet setup
-  const bottomSheetRef = useRef(null);
-  const snapPoints = useMemo(() => ["25%", "50%", "70%"], []);
 
-  useEffect(() => {
-    if (!isFocused) {
-      bottomSheetRef.current.close();
-    } else {
-      bottomSheetRef.current.collapse();
-    }
-  }, [isFocused]);
+  //IF NEED IT TO ANIMATE EVERY TIME
+  // useEffect(() => {
+  //   if (!isFocused) {
+  //     bottomSheetRef.current.close();
+  //   } else {
+  //     bottomSheetRef.current.collapse();
+  //   }
+  // }, [isFocused]);
 
   useEffect(() => {
     if (!hasPermission) {
@@ -63,22 +64,22 @@ export const Scan = ({ navigation }) => {
   // What to do when barcode detected
   const onBarcodeDetected = Worklets.createRunInJsFn((barcodes) => {
     // If already scanned dont fetch again...
+    //OR COULD JUST ADD A DEBOUNCE OF LIKE 2 seconds
     if (barcodes["0"].value === lastScannedBarcode.current) {
       console.log("already scanned!");
       return;
     }
-
     // Update the ref with the new scanned barcode
     lastScannedBarcode.current = barcodes["0"].value;
     Haptics.selectionAsync(); // Vibration
 
-    // navigation.navigate("ModalScreen", { barcodeId: barcodes["0"].value });
+    navigation.navigate("FoodDetails", { barcodeId: barcodes["0"].value });
   });
 
   // Barcode scanner hook from frame plugin
   const { props: cameraProps, highlights } = useBarcodeScanner({
     fps: 5,
-    barcodeTypes: ["ean-13"],
+    barcodeTypes: ["ean-13", 'ean-8'], //NEED TO ADD MORE CODES
     scanMode: "continuous",
     onBarcodeScanned: (barcodes) => {
       "worklet";
@@ -116,8 +117,9 @@ export const Scan = ({ navigation }) => {
           />
           <CameraHighlights highlights={highlights} color="peachpuff" />
           {/* <CameraOverlay/> */}
-          <View style={styles.boxOverlay}></View>
-          <View style={styles.leftButtonRow}>
+          <ScannerOverlay />
+          {/* <View style={styles.boxOverlay}></View> */}
+          {/* <View style={styles.leftButtonRow}>
             <Pressable
               style={styles.torchbutton}
               onPress={() => setTorch(!torch)}
@@ -129,21 +131,8 @@ export const Scan = ({ navigation }) => {
                 size={40}
               />
             </Pressable>
-          </View>
-          <BottomSheet
-            ref={bottomSheetRef}
-            index={0}
-            animateOnMount={!reducedMotion}
-            snapPoints={snapPoints}
-            // onChange={handleSheetChanges}
-            onChange={(index) => {
-              console.log("BottomSheet index:", index);
-            }}
-          >
-            <View style={styles.contentContainer}>
-              <Text>Awesome 🎉</Text>
-            </View>
-          </BottomSheet>
+          </View> */}
+          <ScanSearchBottomSheet />
         </>
       )}
     </View>
@@ -180,7 +169,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     justifySelf: "start",
     alignSelf: "center",
-    zIndex: 9999,
+    
   },
   permissionContainer: {
     alignItems: "center",

@@ -1,12 +1,22 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
 const openFoodFactsAPI = axios.create({
-  baseURL: "https://world.openfoodfacts.org",
+  baseURL: "http://192.168.0.145:3000/api/v1/open-food-facts/",
+});
+
+openFoodFactsAPI.interceptors.request.use(async(config) => {
+  const token = await AsyncStorage.getItem("firebaseToken");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export const fetchFoodWithBarcode = async (barcode) => {
+  console.log(barcode, 'FROM API');
   try {
-    const res = await openFoodFactsAPI.get(`/api/v2/product/${barcode}`);
+    const res = await openFoodFactsAPI.get(`products/${barcode}`);
     return res.data;
   } catch {
     //else jsut show we dont have that product in DB

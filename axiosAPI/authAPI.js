@@ -1,6 +1,7 @@
 import axios from "axios";
 import { signInWithCustomToken } from "firebase/auth";
 import { auth } from "../firebaseConfig";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const authAPI = axios.create({
   baseURL: "http://192.168.0.145:3000/api/v1/auth/",
@@ -39,8 +40,11 @@ export const signUp = async ({ email, password }) => {
     const data = response.data;
 
     if (data.token) {
-      await signInWithCustomToken(auth, data.token);
-      console.log("User signed in with custom token");
+      const userCredential = await signInWithCustomToken(auth, data.token);
+      const user = userCredential.user;
+      const token = await user.getIdToken(); // Get Firebase token
+      await AsyncStorage.setItem('firebaseToken', token); // Store token
+      return { user, token };
     }
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
@@ -50,6 +54,4 @@ export const signUp = async ({ email, password }) => {
   }
 };
 
-export const loginUser = async (userData) => {
-  return authAPI.post("/login", userData);
-};
+

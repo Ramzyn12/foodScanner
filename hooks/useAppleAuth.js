@@ -4,6 +4,7 @@ import * as AppleAuthentication from "expo-apple-authentication";
 import { auth } from "../firebaseConfig";
 import { signUpApple } from "../axiosAPI/authAPI";
 import { useMutation } from "@tanstack/react-query";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const useAppleAuth = () => {
   const signUpAppleMutation = useMutation({
@@ -38,9 +39,12 @@ export const useAppleAuth = () => {
         provider.addScope("name");
         const authCredential = provider.credential({ idToken: identityToken });
         signInWithCredential(auth, authCredential)
-          .then((userCredential) => {
+          .then(async (userCredential) => {
             // User is signed in
             const user = userCredential.user;
+            const token = await user.getIdToken(); // Get Firebase token
+            // console.log(token) Worked
+            await AsyncStorage.setItem("firebaseToken", token); // Store token
             signUpAppleMutation.mutate({
               email: user.email,
               uid: user.uid,

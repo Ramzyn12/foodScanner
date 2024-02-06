@@ -3,18 +3,8 @@ const admin = require("../firebase-server");
 const jwt = require("jsonwebtoken");
 const jwksClient = require("jwks-rsa");
 const axios = require("axios");
-const verifyAppleToken = require('../utils/verifyAppleToken')
-// const applePublicKeyURL = "https://appleid.apple.com/auth/keys";
-// const client = jwksClient({
-//   jwksUri: applePublicKeyURL,
-// });
-
-// function getKey(header, callback) {
-//   client.getSigningKey(header.kid, function (err, key) {
-//     var signingKey = key.publicKey || key.rsaPublicKey;
-//     callback(null, signingKey);
-//   });
-// }
+const verifyAppleToken = require("../utils/verifyAppleToken");
+const { BadRequestError } = require("../utils/error");
 
 const signUpUser = async (req, res) => {
   const { email, password } = req.body;
@@ -61,32 +51,26 @@ const signUpUserApple = async (req, res) => {
   const { email, uid, idToken } = req.body;
 
   if (!email) {
-    return res.status(400).json({
-      error: "Invalid request body. Must contain email for user.",
-    });
+    throw new BadRequestError(
+      "Invalid request body. Must contain email for user."
+    );
   }
-
   //ALSO NEED TO VALIDATE A NONCE TO HELP AVOID REPLAY ATTACKS
   //Implement rate limiting
 
-  try {
-    // Verify the idToken
-    await verifyAppleToken(idToken);
+  // Verify the idToken
+  await verifyAppleToken(idToken);
 
-    const user = await User.findOne({
+  const user = await User.findOne({
+    email,
+    firebaseId: uid,
+  });
+
+  if (!user) {
+    user = await User.create({
       email,
       firebaseId: uid,
     });
-
-    if (!user) {
-      user = await User.create({
-        email,
-        firebaseId: uid,
-      });
-    }
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({ error: "Server error. Please try again" });
   }
 };
 

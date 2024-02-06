@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
 
-import ScanTwo from "./screens/ScanTwo";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import ScanStack from "./navigation/ScanStack";
@@ -13,6 +12,7 @@ import { useDispatch } from "react-redux";
 
 import { setToken } from "./redux/authSlice";
 import { SafeAreaView } from "react-native-safe-area-context";
+import MainTabsStack from "./navigation/MainTabsStack";
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
@@ -50,16 +50,16 @@ function MainComponent() {
   return (
     <NavigationContainer>
       {loggedIn && (
-        <Tab.Navigator
-         
+        <Stack.Navigator
+        initialRouteName="MainTabsStack"
         >
-          <Tab.Screen
-            name="ScanOne"
+          <Stack.Screen
+            name="ScanStack"
             options={{ headerShown: false }}
             component={ScanStack}
           />
-          <Tab.Screen name="ScanTwo" component={ScanTwo} />
-        </Tab.Navigator>
+          <Stack.Screen name="MainTabsStack" options={{headerShown: false}} component={MainTabsStack} />
+        </Stack.Navigator>
       )}
       {!loggedIn && <AuthStack />}
     </NavigationContainer>

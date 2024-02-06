@@ -6,21 +6,22 @@ import {
 import { auth } from "../firebaseConfig";
 import { useSelector } from "react-redux";
 import BottomSheet from "@gorhom/bottom-sheet"
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-function ScanTwo() {
+function Settings() {
 
   //If need
-  const token = useSelector(state => state.auth.token)
+  // const token = useSelector(state => state.auth.token)
 
   const handleLogout = () => {
-    signOut(auth).then(() => {
+    signOut(auth).then(async () => {
+      await AsyncStorage.removeItem('firebaseToken');
       console.log('Signed out!');
     }).catch((error) => {
       console.log(error);
     })
   }
 
-  
   return (
     <View style={styles.container}>
       <Button onPress={handleLogout} title="logout" />
@@ -40,4 +41,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ScanTwo;
+export default Settings;
