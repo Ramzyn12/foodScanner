@@ -33,7 +33,7 @@ function MainTabsStack() {
             <DiaryIcon color={color} size={size} />
           ),
         }}
-        component={Diary}
+        component={Diary} //Needs to be diaryStack
       />
       <Tab.Screen
         name="Health"

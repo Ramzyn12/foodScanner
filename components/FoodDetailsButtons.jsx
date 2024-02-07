@@ -35,12 +35,12 @@ const FoodDetailsButtons = ({foodItem}) => {
   const handleAddFoodItem = () => {
     addFoodMutation.mutate({
       barcode: foodItem?.barcode,
-      name: foodItem?.product_name,
+      name: foodItem?.name,
       brand: foodItem?.brand || 'Tesco',
       image_url: foodItem?.image_url,
       ingredients: foodItem?.ingredients || [], // Assuming ingredients is an array
       additives: foodItem?.additives || [], // Assuming additives is an array
-      nova_group: foodItem?.nova_group, // Make sure you have this value in foodDetails
+      processedScore: foodItem?.processedScore, // Make sure you have this value in foodDetails
     });
     setAdded(true);
   };

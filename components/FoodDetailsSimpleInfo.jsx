@@ -31,7 +31,7 @@ const FoodDetailsSimpleInfo = ({ modalVisible, setModalVisible, foodItem }) => {
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
           <Text style={styles.foodSupplierText}>{foodItem?.brand || 'Tesco'}</Text>
-          <Text style={styles.foodNameText}>{foodItem?.product_name && foodItem?.product_name}</Text>
+          <Text style={styles.foodNameText}>{foodItem?.name && foodItem?.name}</Text>
         </View>
         {/* exit svg */}
         <Pressable onPress={() => navigation.navigate("Scan")}>

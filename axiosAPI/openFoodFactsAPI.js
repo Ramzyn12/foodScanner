@@ -23,3 +23,13 @@ export const fetchFoodWithBarcode = async (barcode) => {
     console.error(error, "MY ERROR");
   }
 };
+
+export const fetchFoodWithSearch = async (search_term) => {
+  try {
+    const res = await openFoodFactsAPI.get(`products/search/${search_term}`);
+    return res.data;
+  } catch {
+    //else jsut show we dont have that product in DB
+    console.error(error, "MY ERROR");
+  }
+};

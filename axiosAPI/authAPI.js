@@ -48,7 +48,7 @@ export const signUp = async ({ email, password }) => {
     }
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-      console.error("Error during sign up:", error.response.data);
+      console.error("Error during sign up axios:", error.response.data);
     }
     console.log("Error during sign up:", error);
   }

@@ -9,8 +9,8 @@ const FoodListItem = ({ foodName, foodSupplier, foodItem }) => {
     <View style={styles.foodListItemContainer}>
       {/* Item and shop (if shop) */}
       <View style={styles.foodListItem}>
-        <Text style={styles.foodNameText}>{foodName}</Text>
-        <Text style={styles.foodSupplierText}>{foodSupplier}</Text>
+        <Text style={styles.foodNameText}>{foodItem?.name}</Text>
+        <Text style={styles.foodSupplierText}>{foodItem?.brand}</Text>
       </View>
       {/* Score */}
       <View style={styles.scoreBackground}>

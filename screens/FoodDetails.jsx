@@ -18,29 +18,44 @@ import FoodDetailsSimpleInfo from "../components/FoodDetailsSimpleInfo";
 import FoodDetailsScoreStrip from "../components/FoodDetailsScoreStrip";
 import FoodDetailsLessonCarousel from "../components/FoodDetailsLessonCarousel";
 import FoodDetailsIngredientsList from "../components/FoodDetailsIngredientsList";
+import { setCurrentFood } from "../redux/foodSlice";
+import { useDispatch } from "react-redux";
 const FoodDetails = ({ navigation, route }) => {
   const barcode = route?.params?.barcodeId;
+  const dispatch = useDispatch();
+  const [modalVisible, setModalVisible] = useState(false);
 
   const {
     data: foodDetails,
     isLoading,
     isError,
+    error,
   } = useQuery({
     queryKey: ["FoodDetails", barcode],
     retry: false,
+    enabled: !!barcode,
     queryFn: () => fetchFoodWithBarcode(barcode),
   });
 
-  const [modalVisible, setModalVisible] = useState(false);
+  useEffect(() => {
+    if (foodDetails) {
+      dispatch(setCurrentFood(foodDetails)); // Action to fetch food details
+    }
+  }, [foodDetails]);
+
 
   if (isLoading) {
-    return <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}><ActivityIndicator /></View>
+    return (
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <ActivityIndicator />
+      </View>
+    );
   }
 
   if (isError) {
-    return <Text>Product doesnt exist...</Text>
+    console.log(error);
+    return <Text>Product doesnt exist...</Text>;
   }
-
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -50,8 +65,8 @@ const FoodDetails = ({ navigation, route }) => {
         setModalVisible={setModalVisible}
         foodItem={foodDetails}
       />
-      <FoodDetailsScoreStrip nova_group={foodDetails?.nova_group} />
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <FoodDetailsScoreStrip processedScore={foodDetails?.processedScore} />
         <FoodDetailsLessonCarousel additives={foodDetails?.additives} />
         <FoodDetailsIngredientsList ingredients={foodDetails?.ingredients} />
       </ScrollView>

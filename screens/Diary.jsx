@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { InteractionManager } from "react-native";
+// import { BlurView } from 'expo-blur';
 
 import WeekDayProgress from "../components/WeekDayProgress";
 import Svg, { G, Path, ClipPath, Rect, Defs } from "react-native-svg";
@@ -88,6 +89,7 @@ const Diary = ({ navigation }) => {
         <WeekDayProgress dayType="future" />
         <WeekDayProgress dayType="future" />
       </View> */}
+
       <Carousel
         data={weeksData} // use the adjusted weeksData
         renderItem={renderWeek}
@@ -98,7 +100,7 @@ const Diary = ({ navigation }) => {
         height={100}
         onSnapToItem={(index) => {
           // console.log("current index:", index);
-          if (index < 1) Alert.alert('You need to pay')
+          if (index < 1) Alert.alert("You need to pay");
           setCurrentIndex(index); // Update current index state
         }}
       />

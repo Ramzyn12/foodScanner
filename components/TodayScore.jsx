@@ -4,7 +4,7 @@ import Svg, { G, Path, ClipPath, Rect, Defs } from "react-native-svg";
 import COLOURS from '../constants/colours'
 import Leaf from "../svgs/Leaf";
 
-const TodayScore = () => {
+const TodayScore = ({score}) => {
 
   return (
     <View style={styles.todayScoreContainer}>
@@ -17,7 +17,7 @@ const TodayScore = () => {
           />
         </Svg>
       </View>
-      <Text style={styles.todayScoreNumber}>87</Text>
+      <Text style={styles.todayScoreNumber}>{score || '100'}</Text>
       <Leaf direction={"left"} />
       <Leaf direction={"right"} />
     </View>

@@ -11,23 +11,14 @@ const addFoodToDiaryDay = async (req, res) => {
     brand,
     ingredients,
     additives,
-    nova_group,
+    processedScore,
     image_url,
   } = req.body;
 
-  const processedScore = 100 - (+nova_group - 1) * 25;
   // Check if food item in DB else create one
   let foodItem = await FoodItem.findOne({ barcode: barcode });
   if (!foodItem) {
-    foodItem = await FoodItem.create({
-      barcode,
-      image_url,
-      name,
-      brand,
-      ingredients,
-      additives,
-      processedScore,
-    });
+    foodItem = await FoodItem.create(req.body);
   }
 
   // Set today's date (with time part removed)
@@ -41,20 +32,8 @@ const addFoodToDiaryDay = async (req, res) => {
     { new: true, upsert: true } // Create the document if it doesn't exist and return the updated document
   );
 
-  // If diary day is created, set the initial score, else calculate the new average score
-  if (diaryDay.consumedFoods.length === 1 && diaryDay.score === undefined) {
-    // Newly created diary day
-    diaryDay.score = processedScore;
-  } else {
-    // Existing diary day, calculate new average score
-    // Pass thing into function to use in other handler aswell
-    const totalScore =
-      diaryDay.score * (diaryDay.consumedFoods.length - 1) + processedScore;
-    diaryDay.score = totalScore / diaryDay.consumedFoods.length;
-  }
-
-  // Save the updated diaryDay document
-  await diaryDay.save();
+  // Calculate and update the average score
+  await diaryDay.updateAverageScore(); // Calculate and update the average score
 
   res.status(200).json(diaryDay);
 };
@@ -85,13 +64,7 @@ const removeFoodFromDiaryDay = async (req, res) => {
     throw new NotFoundError("Diary entry not found for the specified date.");
   }
 
-  // Recalculate the score after removing the food item
-  // (This will depend on your scoring logic. Below is a placeholder for where that logic would go.)
-  // const newScore = recalculateScore(diaryDay.consumedFoods);
-  // diaryDay.score = newScore;
-
-  // Save the updated diaryDay document (if necessary, depending on your scoring logic)
-  // await diaryDay.save();
+  await diaryDay.updateAverageScore();
 
   res.status(200).json(diaryDay);
 };

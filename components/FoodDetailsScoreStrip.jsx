@@ -1,10 +1,12 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import COLOURS from "../constants/colours";
+import { useSelector } from "react-redux";
 
-const FoodDetailsScoreStrip = ({ nova_group }) => {
-  const score = 100 - ((nova_group - 1) * 25)
-
+const FoodDetailsScoreStrip = ({ processedScore }) => {
+  const score = processedScore
+  const reduxScore = useSelector(state => state.food.currentFood?.processedScore)
+  console.log(reduxScore, score);
   //Darker
   const background = score <= 75 && score > 50 ? COLOURS.okayFoodText : score <= 50 ? COLOURS.badFoodText : COLOURS.greatFoodText
   //Lighter
@@ -16,7 +18,7 @@ const FoodDetailsScoreStrip = ({ nova_group }) => {
     <View style={[styles.container, {backgroundColor: text}]}>
       <Text style={[styles.description, {color: background}]}>{message}</Text>
       <View style={[styles.scoreBackground, {backgroundColor: background}]}>
-        <Text style={styles.scoreText}>{score}</Text>
+        <Text style={styles.scoreText}>{reduxScore}</Text>
       </View>
     </View>
   );

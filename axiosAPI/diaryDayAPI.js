@@ -15,9 +15,9 @@ diaryDayAPI.interceptors.request.use(async(config) => {
   return config;
 });
 
-export const addFoodToDiaryDay = async ({ barcode, name, brand = 'Tesco', ingredients, additives, nova_group, image_url }) => {
+export const addFoodToDiaryDay = async ({ barcode, name, brand = 'Tesco', ingredients, additives, processedScore, image_url }) => {
   try {
-    const res = await diaryDayAPI.post('/', { barcode, name, brand, ingredients, additives, nova_group, image_url });
+    const res = await diaryDayAPI.post('/', { barcode, name, brand, ingredients, additives, processedScore, image_url });
     return res.data
   } catch (error) {
     console.error("Error adding user info:", error);

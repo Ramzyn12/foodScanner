@@ -17,9 +17,17 @@ import { Path, Svg } from "react-native-svg";
 import SearchBar from "./SearchBar";
 import FoodListItem from "./FoodListItem";
 import { useNavigation } from "@react-navigation/native";
+import { useSelector } from "react-redux";
+import RecentSearchList from "./RecentSearchList";
+import SearchResultsList from "./SearchResultsList";
 
 const ScanSearchBottomSheet = () => {
   const navigation = useNavigation();
+
+  const OFFResults = useSelector((state) => state.search.openFoodFactsResults);
+  const USDAResults = useSelector((state) => state.search.usdaResults);
+
+  const showRecent = OFFResults.length === 0 && USDAResults.length === 0;
 
   const bottomSheetRef = useRef(null);
   const reducedMotion = useReducedMotion();
@@ -33,7 +41,7 @@ const ScanSearchBottomSheet = () => {
       animateOnMount={!reducedMotion}
       snapPoints={snapPoints}
       keyboardBehavior="extend"
-      // handleStyle={{ display: "none" }}
+      handleStyle={{ display: "none" }}
       style={styles.contentContainer}
     >
       {/* <BottomSheetView > */}
@@ -55,20 +63,11 @@ const ScanSearchBottomSheet = () => {
       </BottomSheetView>
       {/* Search bar */}
       <SearchBar />
-      <Text style={styles.recentText}>Recent</Text>
-      <BottomSheetScrollView onScrollEndDrag={Keyboard.dismiss}>
-        <BottomSheetView style={styles.foodListContainer}>
-          <View style={styles.foodListItemContainer}>
-            <FoodListItem foodName={"Apple"} foodSupplier={"Tesco"} />
-          </View>
-          <View style={styles.foodListItemContainer}>
-            <FoodListItem foodName={"Apple"} foodSupplier={"Tesco"} />
-          </View>
-          <View style={styles.foodListItemContainer}>
-            <FoodListItem foodName={"Apple"} foodSupplier={"Tesco"} />
-          </View>
-        </BottomSheetView>
-      </BottomSheetScrollView>
+      {showRecent ? (
+        <RecentSearchList />
+      ) : (
+        <SearchResultsList OFFResults={OFFResults} USDAResults={USDAResults} />
+      )}
     </BottomSheet>
   );
 };

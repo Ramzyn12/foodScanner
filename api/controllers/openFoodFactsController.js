@@ -49,56 +49,62 @@ const fetchFoodWithBarcode = async (req, res) => {
   }).populate("consumedFoods");
 
   // Check if the scanned food is already part of the consumed foods
-  const isConsumedToday = diaryDay && diaryDay.consumedFoods.some((foodItem) => foodItem.barcode === barcode);
+  const isConsumedToday =
+    diaryDay &&
+    diaryDay.consumedFoods.some((foodItem) => foodItem.barcode === barcode);
+
+  const processedScore = 100 - (product.nova_group - 1) * 25;
 
   res.json({
-    status: "success",
-    product_name: product.product_name,
-    nova_group: product.nova_group,
+    name: product.product_name,
+    processedScore: processedScore,
     brand: product.brands,
     image_url: product.image_url,
     ingredients: ingredients,
     additives: additives,
     barcode: barcode,
-    isConsumedToday: isConsumedToday, 
+    isConsumedToday: isConsumedToday,
   });
 };
 
 const fetchFoodWithSearch = async (req, res) => {
   const search_term = req.params.search_term;
+  console.log(search_term);
   const user = req.user._id; // Assuming you have user information from authentication middleware
 
-  const response = await openFoodFactsAPI.get(`/api/v3/product/${barcode}`);
-  const product = response.data.product;
-  const ingredients = extractIngredients(product?.ingredients);
-  const additives = product.additives_tags.map((ing) => ing.split(":")[1]);
-
-  // Set today's date (with time part removed)
-  const today = new Date();
-  today.setHours(0, 0, 0, 0); // Reset time part to make sure it's the start of the day
-
-  // Find the diary entry for the user for the specific date
-  const diaryDay = await DiaryDay.findOne({
-    userId: user,
-    date: today,
-  }).populate("consumedFoods");
-
-  // Check if the scanned food is already part of the consumed foods
-  const isConsumedToday =
-    diaryDay &&
-    diaryDay.consumedFoods.some((foodItem) => foodItem.barcode === barcode);
-
-  res.json({
-    status: "success",
-    product_name: product.product_name,
-    nova_group: product.nova_group,
-    brand: product.brands,
-    image_url: product.image_url,
-    ingredients: ingredients,
-    additives: additives,
-    barcode: barcode,
-    isConsumedToday: isConsumedToday, // Send back the flag/status
+  // Make a request to the Open Food Facts API with the search term
+  const response = await openFoodFactsAPI.get("/cgi/search.pl", {
+    params: {
+      action: "process",
+      search_terms: search_term, // Use the search term parameter
+      sort_by: "popularity_key",
+      page_size: 8,
+      countries_tags: 'united-kingdom',
+      json: 1,
+      
+    },
   });
+
+  if (!response) throw new Error("No response ??");
+
+  // Handle the response data
+  const products = response.data.products;
+
+  // You can process the products array as needed
+  const foodList = products.map((product) => {
+    const processedScore = 100 - (product.nova_group - 1) * 25;
+
+    // You can add more fields as needed
+    return {
+      name: product.product_name,
+      processedScore: processedScore,
+      brand: product.brands,
+      barcode: product.code, // Use a unique identifier if available
+    };
+  });
+
+  // Send the food list as the response
+  res.json(foodList);
 };
 
-module.exports = { fetchFoodWithBarcode };
+module.exports = { fetchFoodWithBarcode, fetchFoodWithSearch };

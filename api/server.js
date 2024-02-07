@@ -10,6 +10,7 @@ const app = express();
 const authRoutes = require('./routes/authRoutes');
 const openFoodFactsRoutes = require('./routes/openFoodFactsRoutes');
 const diaryRoutes = require('./routes/diaryRoutes');
+const usdaRoutes = require('./routes/usdaRoutes');
 const errorHandler = require("./middleware/errorHandler");
 // const authMiddleware = require("./middleware/authMiddleware");
 
@@ -18,10 +19,10 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 
-
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/open-food-facts', openFoodFactsRoutes);
 app.use('/api/v1/diary-days', diaryRoutes);
+app.use('/api/v1/usda', usdaRoutes);
 
 // Error Handlers
 app.use("*", (req, res) => {

@@ -11,7 +11,7 @@ const FoodDetailsIngredientsList = ({ ingredients }) => {
       <Text style={styles.allIngredientsText}>All Ingredients</Text>
       <View>
         {filteredIngredients?.map((ing) => (
-          <FoodListItem foodName={ing} key={ing} foodSupplier={"Ingredient"} />
+          <FoodListItem key={ing} foodItem={{name: ing, brand: 'Ingredient'}} />
         ))}
       </View>
     </View>

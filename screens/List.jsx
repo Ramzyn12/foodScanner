@@ -1,24 +1,37 @@
-import { View, Text } from "react-native";
+import { View, Text, SafeAreaView, ScrollView } from "react-native";
 import React, { useEffect } from "react";
-
+import { useQuery } from "@tanstack/react-query";
+import { fetchFoodWithSearch } from "../axiosAPI/openFoodFactsAPI";
+import FoodListItem from "../components/FoodListItem";
+import { fetchFoodWithSearchUSDA } from "../axiosAPI/usdaAPI";
 const List = () => {
-  useEffect(() => {
-    handleFetch();
-  }, []);
+  
+  // const { data, isError, error } = useQuery({
+  //   queryFn: () => fetchFoodWithSearch("Chicken Breast"),
+  //   queryKey: ["searchFood"],
+  //   retry: false,
+  // });
 
-  const handleFetch = async () => {
-    const res = await fetch(
-      "https://world.openfoodfacts.org/cgi/search.pl?action=process&search_terms=chicken%20breast%20Asda&sort_by=unique_scans_n&page_size=24&json=1"
-    );
-    const data = await res.json();
-    console.log(data.products);
-    return data.products[0];
-  };
+  // const { data: usdaFoods } = useQuery({
+  //   queryFn: () => fetchFoodWithSearchUSDA("Chicken Breast"),
+  //   queryKey: ["usdaSearch"],
+  //   // retry: false
+  // });
+
+  // if (data) console.log(data)
+  // if (usdaFoods) console.log(usdaFoods);
 
   return (
-    <View>
-      <Text>List</Text>
-    </View>
+    <SafeAreaView style={{ flex: 1, padding: 30 }}>
+      <ScrollView>
+        {/* {usdaFoods?.map((item) => (
+          <FoodListItem key={item.fdcId} foodItem={item} />
+        ))}
+        {data?.map((item) => (
+          <FoodListItem key={item.barcode} foodItem={item} />
+        ))} */}
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 

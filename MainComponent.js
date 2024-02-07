@@ -13,6 +13,7 @@ import { useDispatch } from "react-redux";
 import { setToken } from "./redux/authSlice";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MainTabsStack from "./navigation/MainTabsStack";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
@@ -20,24 +21,29 @@ function MainComponent() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true); // Add loading state
   const dispatch = useDispatch();
+
+
   useEffect(() => {
     // This function runs when the component mounts, and sets up the auth state changed listener
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setLoggedIn(true);
-        user.getIdToken().then((token) => {
+        user.getIdToken().then(async (token) => {
           dispatch(setToken(token));
+          await AsyncStorage.setItem('firebaseToken', token); // Store the latest token in AsyncStorage
           setLoading(false); // Set loading to false when token is received
         });
       } else {
         setLoggedIn(false);
+        await AsyncStorage.removeItem('firebaseToken'); // Await the removal of the token from AsyncStorage when logged out
         setLoading(false); // Set loading to false when it's confirmed there is no user
       }
     });
-
+  
     // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
+  
 
   if (loading) {
     return (

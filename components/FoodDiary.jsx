@@ -38,7 +38,7 @@ const FoodDiary = () => {
 
   return (
     <View style={{ width: "100%", marginTop: 25, marginBottom: 60 }}>
-      {foodItems?.consumedFoods.length > 0 && <TodayScore />}
+      {foodItems?.consumedFoods.length > 0 && <TodayScore score={foodItems?.score} />}
       {/* MAYBE USE SCROLLVIEW OR FLATLIST!! */}
       <FoodList foodItems={foodItems} />
     </View>
