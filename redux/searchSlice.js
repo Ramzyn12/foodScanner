@@ -6,18 +6,18 @@ const searchSlice = createSlice({
   name: 'search',
   initialState: {
     openFoodFactsResults: [],
-    usdaResults: [],
+    IvyResults: [],
   },
   reducers: {
     setOpenFoodFactsResults: (state, action) => {
       state.openFoodFactsResults = action.payload;
     },
-    setUsdaResults: (state, action) => {
-      state.usdaResults = action.payload;
+    setIvyResults: (state, action) => {
+      state.IvyResults = action.payload;
     },
   },
 });
 
-export const { setOpenFoodFactsResults, setUsdaResults } = searchSlice.actions;
+export const { setOpenFoodFactsResults, setIvyResults } = searchSlice.actions;
 
 export default searchSlice.reducer;

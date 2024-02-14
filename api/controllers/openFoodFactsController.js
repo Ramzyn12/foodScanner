@@ -55,6 +55,7 @@ const fetchFoodWithBarcode = async (req, res) => {
 
   const processedScore = 100 - (product.nova_group - 1) * 25;
 
+
   res.json({
     name: product.product_name,
     processedScore: processedScore,
@@ -64,12 +65,13 @@ const fetchFoodWithBarcode = async (req, res) => {
     additives: additives,
     barcode: barcode,
     isConsumedToday: isConsumedToday,
+    hasPalmOil: product.ingredients_analysis_tags.includes('en:palm-oil'),
+    co2Footprint: product.ecoscore_data.agribalyse?.co2_total
   });
 };
 
 const fetchFoodWithSearch = async (req, res) => {
   const search_term = req.params.search_term;
-  console.log(search_term);
   const user = req.user._id; // Assuming you have user information from authentication middleware
 
   // Make a request to the Open Food Facts API with the search term
@@ -99,6 +101,7 @@ const fetchFoodWithSearch = async (req, res) => {
       name: product.product_name,
       processedScore: processedScore,
       brand: product.brands,
+      image_url: product.image_url,
       barcode: product.code, // Use a unique identifier if available
     };
   });

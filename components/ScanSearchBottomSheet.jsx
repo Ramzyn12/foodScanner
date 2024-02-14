@@ -25,9 +25,9 @@ const ScanSearchBottomSheet = () => {
   const navigation = useNavigation();
 
   const OFFResults = useSelector((state) => state.search.openFoodFactsResults);
-  const USDAResults = useSelector((state) => state.search.usdaResults);
+  const IvyResults = useSelector((state) => state.search.IvyResults);
 
-  const showRecent = OFFResults.length === 0 && USDAResults.length === 0;
+  const showRecent = OFFResults.length === 0 && IvyResults.length === 0;
 
   const bottomSheetRef = useRef(null);
   const reducedMotion = useReducedMotion();
@@ -66,7 +66,7 @@ const ScanSearchBottomSheet = () => {
       {showRecent ? (
         <RecentSearchList />
       ) : (
-        <SearchResultsList OFFResults={OFFResults} USDAResults={USDAResults} />
+        <SearchResultsList OFFResults={OFFResults} IvyResults={IvyResults} />
       )}
     </BottomSheet>
   );

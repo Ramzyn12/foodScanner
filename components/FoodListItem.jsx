@@ -1,16 +1,27 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Image } from "react-native";
 import React from "react";
 import COLOURS from "../constants/colours";
 
 const FoodListItem = ({ foodName, foodSupplier, foodItem }) => {
   //Change colours based on scores
-  
+
   return (
     <View style={styles.foodListItemContainer}>
+      {/* image */}
+      {foodItem?.image_url && (
+        <Image
+          style={styles.image}
+          source={{
+            uri: foodItem?.image_url,
+          }}
+        />
+      )}
       {/* Item and shop (if shop) */}
       <View style={styles.foodListItem}>
         <Text style={styles.foodNameText}>{foodItem?.name}</Text>
-        <Text style={styles.foodSupplierText}>{foodItem?.brand}</Text>
+        {foodItem?.brand && (
+          <Text style={styles.foodSupplierText}>{foodItem?.brand}</Text>
+        )}
       </View>
       {/* Score */}
       <View style={styles.scoreBackground}>
@@ -28,8 +39,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 8,
-    gap: 6,
+    gap: 10,
   },
+  image: { width: 38, height: 44, alignSelf: "center", objectFit: "cover" },
   foodListItem: {
     gap: 5,
     flex: 1,

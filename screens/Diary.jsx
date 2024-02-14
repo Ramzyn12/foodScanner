@@ -19,6 +19,7 @@ import BenefitFactCard from "../components/BenefitFactCard";
 import FoodDiary from "../components/FoodDiary";
 import Carousel from "react-native-reanimated-carousel";
 import moment from "moment"; // make sure moment is installed
+import { BlurView } from "expo-blur";
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -81,13 +82,13 @@ const Diary = ({ navigation }) => {
       {/* Week Header */}
       {/* <View style={styles.weekHeaderContainer}>
       
-        <WeekDayProgress dayType="past" />
-        <WeekDayProgress dayType="past" />
-        <WeekDayProgress dayType="current" />
-        <WeekDayProgress dayType="future" />
-        <WeekDayProgress dayType="future" />
-        <WeekDayProgress dayType="future" />
-        <WeekDayProgress dayType="future" />
+        <WeekDayProgress dayType="past" date={currentWeekStart.clone().subtract((totalWeeks - 2 - 1) * 7, "days")} />
+        <WeekDayProgress dayType="past" date={currentWeekStart.clone().subtract((totalWeeks - 2 - 1) * 7, "days")}/>
+        <WeekDayProgress dayType="current" date={currentWeekStart.clone().subtract((totalWeeks - 2 - 1) * 7, "days")}/>
+        <WeekDayProgress dayType="future" date={currentWeekStart.clone().subtract((totalWeeks - 2 - 1) * 7, "days")}/>
+        <WeekDayProgress dayType="future" date={currentWeekStart.clone().subtract((totalWeeks - 2 - 1) * 7, "days")}/>
+        <WeekDayProgress dayType="future" date={currentWeekStart.clone().subtract((totalWeeks - 2 - 1) * 7, "days")}/>
+        <WeekDayProgress dayType="future" date={currentWeekStart.clone().subtract((totalWeeks - 2 - 1) * 7, "days")}/>
       </View> */}
 
       <Carousel
@@ -103,7 +104,7 @@ const Diary = ({ navigation }) => {
           if (index < 1) Alert.alert("You need to pay");
           setCurrentIndex(index); // Update current index state
         }}
-      />
+        />
 
       {/* Main page */}
       <ScrollView style={styles.mainSectionContainer}>

@@ -7,14 +7,13 @@ import { Pressable } from "react-native";
 import debounce from "lodash.debounce";
 import { useQuery } from "@tanstack/react-query";
 import { fetchFoodWithSearch } from "../axiosAPI/openFoodFactsAPI";
-import { fetchFoodWithSearchUSDA } from "../axiosAPI/usdaAPI";
-import { setOpenFoodFactsResults, setUsdaResults } from "../redux/searchSlice";
+import { setOpenFoodFactsResults, setIvyResults } from "../redux/searchSlice";
 import { useDispatch } from "react-redux";
+import { fetchFoodWithSearchIvy } from "../axiosAPI/searchSingleAPI";
 
 const SearchBar = () => {
   const [searchIconColour, setSearchIconColour] = useState("#606060");
   const [searchInput, setSearchInput] = useState("");
-  const [searchResults, setSearchResults] = useState("");
   const [showClear, setShowClear] = useState(false);
   const dispatch = useDispatch()
 
@@ -24,9 +23,9 @@ const SearchBar = () => {
     enabled: false, // Prevent automatic execution
   });
 
-  const { data: DataUSDA, refetch: refetchUSDA } = useQuery({
-    queryKey: ["searchUSDA", searchInput],
-    queryFn: () => fetchFoodWithSearchUSDA(searchInput),
+  const { data: DataIvy, refetch: refetchIvy } = useQuery({
+    queryKey: ["searchIvy", searchInput],
+    queryFn: () => fetchFoodWithSearchIvy(searchInput),
     enabled: false, // Prevent automatic execution
   });
 
@@ -34,19 +33,19 @@ const SearchBar = () => {
     debounce((input) => {
       if (input.length >= 3) {
         refetchOFF();
-        refetchUSDA();
+        refetchIvy();
       }
-    }, 1000),
+    }, 500),
     [] // Dependencies array is empty to ensure debounce function is not recreated on each render
   );
 
   useEffect(() => {
-    if (DataUSDA) {
-      dispatch(setUsdaResults(DataUSDA));
+    if (DataIvy) {
+      dispatch(setIvyResults(DataIvy));
     } else {
-      dispatch(setUsdaResults([]));
+      dispatch(setIvyResults([]));
     }
-  }, [DataUSDA, dispatch]);
+  }, [DataIvy, dispatch]);
 
   useEffect(() => {
     if (DataOFF) {

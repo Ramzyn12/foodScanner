@@ -21,3 +21,12 @@ export const fetchFoodWithSearchUSDA = async (search_term) => {
     console.error(error, "MY ERROR");
   }
 };
+
+export const fetchFoodWithFDCID = async (fdcId) => {
+  try {
+    const res = await usdaAPI.get(`products/${fdcId}`);
+    return res.data;
+  } catch {
+    console.error(error, "MY ERROR");
+  }
+};

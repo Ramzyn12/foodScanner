@@ -4,9 +4,8 @@ import COLOURS from "../constants/colours";
 import { useSelector } from "react-redux";
 
 const FoodDetailsScoreStrip = ({ processedScore }) => {
-  const score = processedScore
-  const reduxScore = useSelector(state => state.food.currentFood?.processedScore)
-  console.log(reduxScore, score);
+
+  const score = useSelector(state => state.food.currentFood?.processedScore)
   //Darker
   const background = score <= 75 && score > 50 ? COLOURS.okayFoodText : score <= 50 ? COLOURS.badFoodText : COLOURS.greatFoodText
   //Lighter
@@ -18,7 +17,7 @@ const FoodDetailsScoreStrip = ({ processedScore }) => {
     <View style={[styles.container, {backgroundColor: text}]}>
       <Text style={[styles.description, {color: background}]}>{message}</Text>
       <View style={[styles.scoreBackground, {backgroundColor: background}]}>
-        <Text style={styles.scoreText}>{reduxScore}</Text>
+        <Text style={styles.scoreText}>{score}</Text>
       </View>
     </View>
   );

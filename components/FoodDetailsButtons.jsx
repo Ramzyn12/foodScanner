@@ -1,15 +1,21 @@
 import { View, Text, Pressable } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Path, Svg } from "react-native-svg";
 import COLOURS from "../constants/colours";
 import { StyleSheet } from "react-native";
 import DeleteIcon from "../svgs/DeleteIcon";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addFoodToDiaryDay, removeFoodFromDiaryDay } from "../axiosAPI/diaryDayAPI";
+import { useSelector } from "react-redux";
 
 const FoodDetailsButtons = ({foodItem}) => {
-  const [added, setAdded] = useState(foodItem?.isConsumedToday || false);
+  const currentFood = useSelector(state => state.food.currentFood)
+  const [added, setAdded] = useState(currentFood?.isConsumedToday);
   const queryClient = useQueryClient()
+
+  useEffect(() => {
+    setAdded(currentFood?.isConsumedToday);
+  }, [currentFood?.isConsumedToday]);
 
   const addFoodMutation = useMutation({
     mutationFn: addFoodToDiaryDay,
@@ -21,6 +27,7 @@ const FoodDetailsButtons = ({foodItem}) => {
       console.log(err, "HERE");
     },
   });
+
   const removeFoodMutation = useMutation({
     mutationFn: removeFoodFromDiaryDay,
     onSuccess: () => {
@@ -33,20 +40,23 @@ const FoodDetailsButtons = ({foodItem}) => {
   });
 
   const handleAddFoodItem = () => {
+    // Could just send currentFood? 
     addFoodMutation.mutate({
-      barcode: foodItem?.barcode,
-      name: foodItem?.name,
-      brand: foodItem?.brand || 'Tesco',
-      image_url: foodItem?.image_url,
-      ingredients: foodItem?.ingredients || [], // Assuming ingredients is an array
-      additives: foodItem?.additives || [], // Assuming additives is an array
-      processedScore: foodItem?.processedScore, // Make sure you have this value in foodDetails
+      barcode: currentFood?.barcode,
+      singleFoodId: currentFood.singleFoodId, //Then in axiosAPI, if id... query params if barcode...
+      name: currentFood?.name,
+      brand: currentFood?.brand,
+      description: '',
+      image_url: currentFood?.image_url,
+      ingredients: currentFood?.ingredients || [], // Assuming ingredients is an array
+      additives: currentFood?.additives || [], // Assuming additives is an array
+      processedScore: currentFood?.processedScore, // Make sure you have this value in foodDetails
     });
     setAdded(true);
   };
   
   const handleRemoveFoodItem = () => {
-    removeFoodMutation.mutate({barcode: foodItem?.barcode});
+    removeFoodMutation.mutate({barcode: currentFood?.barcode, singleFoodId: currentFood?.singleFoodId});
     setAdded(false);
   };
 

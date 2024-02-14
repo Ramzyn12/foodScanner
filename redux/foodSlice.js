@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const foodSlice = createSlice({
   name: "food",
   initialState: {
-    currentFood: null,
+    currentFood: {},
   },
   reducers: {
     setCurrentFood(state, action) {

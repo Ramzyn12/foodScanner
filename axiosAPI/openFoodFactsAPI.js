@@ -14,7 +14,6 @@ openFoodFactsAPI.interceptors.request.use(async(config) => {
 });
 
 export const fetchFoodWithBarcode = async (barcode) => {
-  console.log(barcode, 'FROM API');
   try {
     const res = await openFoodFactsAPI.get(`products/${barcode}`);
     return res.data;

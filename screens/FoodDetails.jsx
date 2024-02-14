@@ -19,10 +19,19 @@ import FoodDetailsScoreStrip from "../components/FoodDetailsScoreStrip";
 import FoodDetailsLessonCarousel from "../components/FoodDetailsLessonCarousel";
 import FoodDetailsIngredientsList from "../components/FoodDetailsIngredientsList";
 import { setCurrentFood } from "../redux/foodSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchFoodWithIvyId } from "../axiosAPI/searchSingleAPI";
+
+const DEFAULT_IMAGE =
+  "https://static4.depositphotos.com/1026550/376/i/450/depositphotos_3763236-stock-photo-gold-star.jpg";
+
 const FoodDetails = ({ navigation, route }) => {
   const barcode = route?.params?.barcodeId;
+  const singleFoodId = route?.params?.singleFoodId;
   const dispatch = useDispatch();
+  const currentFood = useSelector((state) => state.food.currentFood);
+
+  // Cant this be one level down?
   const [modalVisible, setModalVisible] = useState(false);
 
   const {
@@ -37,12 +46,51 @@ const FoodDetails = ({ navigation, route }) => {
     queryFn: () => fetchFoodWithBarcode(barcode),
   });
 
+  const { data: singleFoodDetails } = useQuery({
+    queryKey: ["FoodDetailsIvy", singleFoodId],
+    retry: false,
+    enabled: !!singleFoodId,
+    queryFn: () => fetchFoodWithIvyId(singleFoodId),
+  });
+
   useEffect(() => {
     if (foodDetails) {
-      dispatch(setCurrentFood(foodDetails)); // Action to fetch food details
+      const normalizedData = {
+        name: foodDetails.name,
+        brand: foodDetails?.brand || "Unknown", // Default value if not present
+        isConsumedToday: foodDetails.isConsumedToday, // Not applicable for single foods
+        image_url: foodDetails?.image_url || DEFAULT_IMAGE,
+        description: "", // Empty since OFF doesn't provide it
+        barcode: foodDetails.barcode,
+        singleFoodId: "",
+        environment: {
+          hasPalmOil: foodDetails.hasPalmOil,
+          co2Footprint: foodDetails.co2Footprint,
+        },
+        ingredients: foodDetails?.ingredients, // Assuming comma-separated string
+        additives: foodDetails.additives || [],
+        processedScore: foodDetails?.processedScore, // Hypothetical function
+      };
+      dispatch(setCurrentFood(normalizedData));
     }
-  }, [foodDetails]);
 
+    if (singleFoodDetails) {
+      const normalizedData = {
+        name: singleFoodDetails.name,
+        singleFoodId: singleFoodDetails._id,
+        environment: "",
+        brand: "Fresh", // Not applicable for single foods
+        isConsumedToday: singleFoodDetails.isConsumedToday, // Not applicable for single foods
+        image_url: singleFoodDetails?.image_url || DEFAULT_IMAGE,
+        description: singleFoodDetails.description,
+        barcode: "", // Empty since single foods don't have barcodes
+        ingredients: [singleFoodDetails.name],
+        additives: [], // Assuming no additives for single foods
+        processedScore: singleFoodDetails.processedScore || 100, // Default to 0 if not present
+      };
+      dispatch(setCurrentFood(normalizedData));
+    }
+  }, [foodDetails, singleFoodDetails]);
 
   if (isLoading) {
     return (
@@ -66,9 +114,19 @@ const FoodDetails = ({ navigation, route }) => {
         foodItem={foodDetails}
       />
       <ScrollView showsVerticalScrollIndicator={false}>
-        <FoodDetailsScoreStrip processedScore={foodDetails?.processedScore} />
-        <FoodDetailsLessonCarousel additives={foodDetails?.additives} />
-        <FoodDetailsIngredientsList ingredients={foodDetails?.ingredients} />
+        {currentFood?.processedScore && <FoodDetailsScoreStrip />}
+        {currentFood?.additives?.length > 0 && <FoodDetailsLessonCarousel />}
+        {currentFood?.description && <Text>{currentFood?.description}</Text>}
+        {currentFood?.ingredients && <FoodDetailsIngredientsList />}
+        {!currentFood?.ingredients && (
+          <Button title="Add Missing ingredients" />
+        )}
+        {currentFood?.environment && (
+          <View>
+            <Text>{currentFood?.environment?.hasPalmOil ? 'Has Palm Oil': 'No palm oil found'}</Text>
+            <Text>{currentFood?.environment?.co2Footprint}</Text>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );

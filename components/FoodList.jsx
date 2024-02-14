@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import React from "react";
 import AddFoodButton from "./AddFoodButton";
 import FoodListItem from "./FoodListItem";
@@ -6,6 +6,7 @@ import COLOURS from "../constants/colours";
 import { useQuery } from "@tanstack/react-query";
 import { getDiaryDay } from "../axiosAPI/diaryDayAPI";
 import FruitBowlIcon from "../svgs/FruitBowlIcon";
+import { useNavigation } from "@react-navigation/native";
 
 const DUMMY_FOODS = [
   { id: 1, foodName: "Apple", foodSupplier: "Tesco" },
@@ -17,25 +18,69 @@ const DUMMY_FOODS = [
 ];
 //Cant use flatlist since inside another scrollView
 
-const FoodList = ({foodItems}) => {
-  
-  const noFoods = foodItems?.consumedFoods.length === 0
+const FoodList = ({ foodItems }) => {
+  const noFoods = foodItems?.consumedFoods.length === 0;
+  const navigation = useNavigation();
 
   return (
-    <View style={[styles.foodListContainer, noFoods && {borderTopLeftRadius: 20, borderTopRightRadius: 20}]}>
+    <View
+      style={[
+        styles.foodListContainer,
+        noFoods && { borderTopLeftRadius: 20, borderTopRightRadius: 20 },
+      ]}
+    >
       {/* Food List Item */}
       {foodItems?.consumedFoods?.map((item) => (
-        <FoodListItem
+        <Pressable
+          onPress={() =>
+            navigation.navigate("FoodDetailsDiary", { barcodeId: item.barcode })
+          }
           key={item._id}
-          foodItem={item}
-          foodName={item.name}
-          foodSupplier={item.brand}
-        />
+        >
+          <FoodListItem
+            foodItem={item}
+            foodName={item.name}
+            foodSupplier={item.brand}
+          />
+        </Pressable>
       ))}
-      {foodItems?.consumedFoods?.length === 0 && <View style={{height: 200, alignItems: 'center', justifyContent: 'center', gap: 15}}>
+
+      {foodItems?.consumedSingleFoods?.map((item) => (
+        <Pressable
+          onPress={() =>
+            navigation.navigate("FoodDetailsDiary", { singleFoodId: item._id })
+          }
+          key={item._id}
+        >
+          <FoodListItem
+            foodItem={item}
+            foodName={item.name}
+            foodSupplier={item.brand}
+          />
+        </Pressable>
+      ))}
+
+      {foodItems?.consumedFoods?.length === 0 && foodItems?.consumedSingleFoods?.length === 0 && (
+        <View
+          style={{
+            height: 200,
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 15,
+          }}
+        >
           <FruitBowlIcon />
-          <Text style={{fontFamily: 'Mulish_500Medium', fontSize: 16, color: COLOURS.tabUnselected}}>Add food to get started</Text>
-        </View>}
+          <Text
+            style={{
+              fontFamily: "Mulish_500Medium",
+              fontSize: 16,
+              color: COLOURS.tabUnselected,
+            }}
+          >
+            Add food to get started
+          </Text>
+        </View>
+      )}
       {/* More food button */}
       <AddFoodButton />
     </View>

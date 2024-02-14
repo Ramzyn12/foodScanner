@@ -14,9 +14,12 @@ import FoodDetailsButtons from "./FoodDetailsButtons";
 import { Modal } from "react-native";
 import FoodImageModal from "./FoodImageModal";
 import { useNavigation } from "@react-navigation/native";
+import { useSelector } from "react-redux";
 
 const FoodDetailsSimpleInfo = ({ modalVisible, setModalVisible, foodItem }) => {
   const navigation = useNavigation();
+
+  const currentFood = useSelector(state => state.food.currentFood)
 
   return (
     <View style={styles.container}>
@@ -25,16 +28,16 @@ const FoodDetailsSimpleInfo = ({ modalVisible, setModalVisible, foodItem }) => {
           <Image
             style={styles.image}
             source={{
-              uri: foodItem?.image_url,
+              uri: currentFood?.image_url,
             }}
           />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
-          <Text style={styles.foodSupplierText}>{foodItem?.brand || 'Tesco'}</Text>
-          <Text style={styles.foodNameText}>{foodItem?.name && foodItem?.name}</Text>
+          <Text style={styles.foodSupplierText}>{currentFood?.brand}</Text>
+          <Text style={styles.foodNameText}>{currentFood?.name}</Text>
         </View>
         {/* exit svg */}
-        <Pressable onPress={() => navigation.navigate("Scan")}>
+        <Pressable onPress={() => navigation.goBack()}>
           <Svg
             style={{ alignSelf: "flex-start" }}
             width="30"
@@ -65,7 +68,7 @@ const FoodDetailsSimpleInfo = ({ modalVisible, setModalVisible, foodItem }) => {
       <FoodImageModal
         setModalVisible={setModalVisible}
         modalVisible={modalVisible}
-        image_url={foodItem?.image_url}
+        image_url={currentFood?.image_url}
       />
     </View>
   );

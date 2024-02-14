@@ -1,11 +1,14 @@
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import React from "react";
 import FoodDetailsLesson from "./FoodDetailsLesson";
+import { useSelector } from "react-redux";
 
 const FoodDetailsLessonCarousel = ({ additives }) => {
+  const currentFood = useSelector(state => state.food.currentFood)
+
   return (
     <>
-      {additives?.length > 0 && (
+      {currentFood.additives?.length > 0 && (
         <View style={styles.container}>
           <Text style={styles.titleText}>Here's why:</Text>
           <ScrollView
@@ -15,7 +18,7 @@ const FoodDetailsLessonCarousel = ({ additives }) => {
             horizontal
             snapToAlignment="center"
           >
-            {additives.map((additive) => (
+            {currentFood?.additives.map((additive) => (
               <FoodDetailsLesson key={additive} additive={additive} />
             ))}
           </ScrollView>
