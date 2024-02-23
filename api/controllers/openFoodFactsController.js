@@ -1,11 +1,13 @@
 // Endpoint to fetch food details by barcode
 const axios = require("axios");
 const DiaryDay = require("../models/DiaryDay");
+const Grocery = require("../models/Grocery");
 
 const openFoodFactsAPI = axios.create({
   baseURL: "https://world.openfoodfacts.org",
 });
 
+//Is it bad to have this type of synchronosity in the backend???
 function extractIngredients(data) {
   let ingredientsSet = new Set();
 
@@ -48,22 +50,31 @@ const fetchFoodWithBarcode = async (req, res) => {
     date: today,
   }).populate("consumedFoods");
 
+  const groceries = await Grocery.findOne({
+    userId: user,
+  }).populate("groceries.item");
+
+  const isInGroceryList =
+    groceries &&
+    groceries.groceries.some(
+      (groceryItem) => groceryItem.item.barcode === barcode
+    );
+
   // Check if the scanned food is already part of the consumed foods
   const isConsumedToday =
     diaryDay &&
     diaryDay.consumedFoods.some((foodItem) => foodItem.barcode === barcode);
 
-  const processedScore = 100 - (product.nova_group - 1) * 25;
-
   res.json({
     name: product.product_name,
-    processedScore: processedScore,
+    processedScore: 100 - (product.nova_group - 1) * 25,
     brand: product.brands,
     image_url: product.image_url,
     ingredients: ingredients,
     additives: additives,
     barcode: barcode,
     isConsumedToday: isConsumedToday,
+    isInGroceryList,
     hasPalmOil: product.ingredients_analysis_tags.includes("en:palm-oil")
       ? "Yes"
       : product.ingredients_analysis_tags.includes(

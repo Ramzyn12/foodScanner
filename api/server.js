@@ -10,6 +10,7 @@ const app = express();
 const authRoutes = require('./routes/authRoutes');
 const openFoodFactsRoutes = require('./routes/openFoodFactsRoutes');
 const diaryRoutes = require('./routes/diaryRoutes');
+const groceryRoutes = require('./routes/groceryRoutes');
 const usdaRoutes = require('./routes/usdaRoutes');
 const fatSecretRoutes = require('./routes/fatSecretRoutes');
 const searchSingleRoutes = require('./routes/searchSingleRoutes');
@@ -27,6 +28,7 @@ app.use('/api/v1/diary-days', diaryRoutes);
 app.use('/api/v1/usda', usdaRoutes);
 app.use('/api/v1/fat-secret', fatSecretRoutes);
 app.use('/api/v1/ivy', searchSingleRoutes);
+app.use('/api/v1/groceries', groceryRoutes);
 
 // Error Handlers
 app.use("*", (req, res) => {

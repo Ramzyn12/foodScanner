@@ -7,7 +7,7 @@ import {
   StyleSheet,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import AddToBasketIcon from "../svgs/AddToBasketIcon";
 import COLOURS from "../constants/colours";
 import EmptyGroceries from "../components/groceries/EmptyGroceries";
@@ -17,21 +17,71 @@ import FilterButton from "../components/groceries/FilterButton";
 import ShareList from "../components/groceries/ShareListButton";
 import UnmarkButton from "../components/groceries/UnmarkButton";
 import GroceryList from "../components/groceries/GroceryList";
+import { getGroceryList, updateSortPreference } from "../axiosAPI/groceryAPI";
+import { useDispatch } from "react-redux";
+import {
+  setCurrentGroceries,
+  sortByProcessedScore,
+} from "../redux/grocerySlice";
+import SortOptionsModal from "../components/groceries/SortOptionsModal";
+import ContextMenu from "react-native-context-menu-view";
+import Toast from "react-native-toast-message";
 const Groceries = ({ navigation }) => {
-  const groceries = [];
-  const [showSortOptions, setShowSortOptions] = useState(false);
+  const [showUnmark, setShowUnmark] = useState(true);
+  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
+
+  const { data } = useQuery({
+    queryKey: ["Groceries"],
+    queryFn: getGroceryList,
+  });
+
+  useEffect(() => {
+    if (data) fetchSortPreference(data?.sortPreference)
+  }, [data]);
+
+  const fetchSortPreference = (preference) => {
+    if (preference === "Processed Score") {
+      dispatch(sortByProcessedScore(data?.groceries));
+    } else if (preference === 'Manual') {
+      dispatch(setCurrentGroceries(data));
+    }
+  }
 
   const handleAddFirstItem = () => {
     navigation.navigate("ScanStack");
   };
 
-  const handleShowSortOptions = () => {
-    setShowSortOptions(curr => !curr);
-    //Remove all the others
-  }
+  const updateSortMutation = useMutation({
+    mutationFn: updateSortPreference,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["Groceries"]);
+    },
+    onError: (err) => {
+      console.log(err);
+    },
+  });
 
+  const toastConfig = {
+    groceryToast: ({ text1, props }) => (
+      <Pressable style={{ height: 44, width: '90%', backgroundColor: COLOURS.nearBlack, borderRadius: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20 }}>
+        <Text style={{color: 'white', fontFamily: 'Mulish_500Medium', fontSize: 14}}>Item added to grocery list</Text>
+        <Text style={{color: 'white', fontFamily: 'Mulish_600SemiBold', fontSize: 14}}>View</Text>
+      </Pressable>
+    )
+  };
 
-  const [showUnmark, setShowUnmark] = useState(false);
+  const handleSortPress = (e) => {
+    if (e.nativeEvent.index === 0) {
+      updateSortMutation.mutate({ sortPreference: "Manual" });
+      dispatch(setCurrentGroceries(data));
+    }
+    if (e.nativeEvent.index === 1) {
+      updateSortMutation.mutate({ sortPreference: "Processed Score" });
+      dispatch(sortByProcessedScore(data?.groceries));
+    }
+  };
+
 
   return (
     <SafeAreaView
@@ -39,79 +89,85 @@ const Groceries = ({ navigation }) => {
         flex: 1,
         padding: 15,
         backgroundColor: "white",
-        position: "relative",
+        // position: "relative",
       }}
     >
-      {false && <EmptyGroceries onPress={handleAddFirstItem} />}
-      <View>
-        {/* Top actions */}
-        <View
-          style={{
-            flexDirection: "row",
-            paddingHorizontal: 20,
-            justifyContent: "space-between",
-            paddingVertical: 15,
-          }}
-        >
-          <Text
+      {(data?.groceries?.length == 0 || !data) && (
+        <EmptyGroceries onPress={handleAddFirstItem} />
+      )}
+      {data && data?.groceries?.length > 0 && (
+        <View>
+          {/* Top actions */}
+          <View
             style={{
-              color: COLOURS.darkGreen,
-              fontSize: 14,
-              fontFamily: "Mulish_600SemiBold",
+              flexDirection: "row",
+              paddingHorizontal: 20,
+              justifyContent: "space-between",
+              paddingVertical: 15,
             }}
           >
-            Edit
-          </Text>
-          <Text
-            style={{
-              color: COLOURS.nearBlack,
-              fontSize: 16,
-              fontFamily: "Mulish_700Bold",
-            }}
+            <Text
+              style={{
+                color: COLOURS.darkGreen,
+                fontSize: 14,
+                fontFamily: "Mulish_600SemiBold",
+              }}
+            >
+              Edit
+            </Text>
+            <Text
+              style={{
+                color: COLOURS.nearBlack,
+                fontSize: 16,
+                fontFamily: "Mulish_700Bold",
+              }}
+            >
+              Groceries
+            </Text>
+            <Svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 18 18"
+              fill="none"
+            >
+              <Path
+                d="M9.75 1C9.75 0.585786 9.41421 0.25 9 0.25C8.58579 0.25 8.25 0.585786 8.25 1L8.25 8.25H1C0.585786 8.25 0.25 8.58579 0.25 9C0.25 9.41421 0.585786 9.75 1 9.75H8.25V17C8.25 17.4142 8.58579 17.75 9 17.75C9.41421 17.75 9.75 17.4142 9.75 17V9.75H17C17.4142 9.75 17.75 9.41421 17.75 9C17.75 8.58579 17.4142 8.25 17 8.25H9.75L9.75 1Z"
+                fill="#1F2C35"
+              />
+            </Svg>
+          </View>
+          {/* Buttons */}
+          <ScrollView
+            horizontal={true}
+            scrollEnabled={showUnmark}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.buttonsContainer}
           >
-            Groceries
-          </Text>
-          <Svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 18 18"
-            fill="none"
-          >
-            <Path
-              d="M9.75 1C9.75 0.585786 9.41421 0.25 9 0.25C8.58579 0.25 8.25 0.585786 8.25 1L8.25 8.25H1C0.585786 8.25 0.25 8.58579 0.25 9C0.25 9.41421 0.585786 9.75 1 9.75H8.25V17C8.25 17.4142 8.58579 17.75 9 17.75C9.41421 17.75 9.75 17.4142 9.75 17V9.75H17C17.4142 9.75 17.75 9.41421 17.75 9C17.75 8.58579 17.4142 8.25 17 8.25H9.75L9.75 1Z"
-              fill="#1F2C35"
-            />
-          </Svg>
+            {/* Put context menu in sort button coomponent */}
+            <ContextMenu
+              actions={[
+                { title: "Manual" },
+                { title: "processedScore" },
+                { title: "Date" },
+              ]}
+              dropdownMenuMode={true}
+              onPress={handleSortPress}
+            >
+              <SortButton />
+            </ContextMenu>
+            <FilterButton />
+            {showUnmark && <UnmarkButton />}
+            <ShareList />
+          </ScrollView>
+
+          <GroceryList data={data} />
         </View>
-        {/* Buttons */}
-        <ScrollView
-          horizontal={true}
-          scrollEnabled={showUnmark}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.buttonsContainer}
-        >
-          <SortButton onPress={handleShowSortOptions} />
-          <FilterButton />
-          {showUnmark && <UnmarkButton />}
-          <ShareList />
-        </ScrollView>
-        <GroceryList />
-      </View>
-      {showSortOptions && <Pressable onPress={() => setShowSortOptions(false)} style={styles.modalOverlay}>
-        <View style={{position: 'absolute', bottom: 0, backgroundColor: 'white', width: '100%'}}>
-          <Pressable onPress={() =>  console.log('sort pressed')} style={{padding: 15, borderWidth: 1}}>
-            <Text>Manual</Text>
-          </Pressable>
-          <Pressable onPress={() =>  console.log('sort pressed')} style={{padding: 15, borderWidth: 1}}>
-            <Text>Manual</Text>
-          </Pressable>
-          <Pressable onPress={() =>  console.log('sort pressed')} style={{padding: 15, borderWidth: 1}}>
-            <Text>Manual</Text>
-          </Pressable>
-      
-        </View>
-      </Pressable>}
+      )}
+      {/* {showSortOptions && (
+        <SortOptionsModal onPress={() => setShowSortOptions(false)} />
+      )} */}
+      <Toast config={toastConfig} />
     </SafeAreaView>
   );
 };
@@ -128,16 +184,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderBottomWidth: 1,
     borderBottomColor: COLOURS.lightGray,
-    overflow: "hidden",
-    width: "100%",
-  },
-  modalOverlay: {
-    position: "absolute",
-    bottom: 0,
-    top: 0,
-    left: 0,
-    right: 0,
-    opacity: 0.8,
-    backgroundColor: COLOURS.lightGray,
+    // overflow: "hidden",
+    // width: "100%",
   },
 });

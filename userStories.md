@@ -54,7 +54,49 @@ When a user adds a first food for a day we create a diary day doc and add that f
 GET 5 weeks of their daily scores to use for weekly header:
 return all diaryDay docs where the user has userId and the date is less than now and more than 5 weeks ago
 
+WHEN UPDATING GROCERY LIST ORDER WE ADD THE FOODITEM ID NOT THE
+GROCERYLIST ITEM ID
+
+
 Note:
 Before adding the food to the user's diary, check if the FoodItem already exists in your database (based on the barcode).
 If it doesn't exist, create a new FoodItem in your database with the data fetched from OpenFoodFacts and calculate its processed score based on your algorithm.
 If it exists, you may opt to update it with the latest information from OpenFoodFacts or simply fetch the existing details from your database.
+
+Some tips: 
+Local First, Sync Later
+Implement a "local-first" approach where changes are first made locally and then synchronized with the backend at opportune moments. This could be:
+When the user explicitly chooses to sync (e.g., through a refresh action).
+Automatically, in the background, at regular intervals.
+When detecting that the network status changes to online.
+1. Combine Backend Calls
+If possible, try to combine the diary and grocery list checks into a single backend call. This would involve creating a new endpoint or modifying an existing one that, given a barcode and user ID, checks both the diary and grocery list for the presence of the item and returns this information alongside the food details from Open Food Facts.
+2. Use Caching
+Server-side Caching: Implement caching for frequently requested data. For example, food item details fetched from Open Food Facts could be cached on your server for a short period. This reduces the need to fetch the same data from Open Food Facts upon every request.
+Client-side Caching: Utilize client-side caching strategies to store previously fetched data. If a user scans a barcode that has already been scanned recently, you can serve the data from the cache rather than making all the API calls again.
+3. Lazy Loading
+Consider whether all the information is needed immediately upon scanning. If not, you could initially fetch only the essential details from Open Food Facts and then lazily load the consumption and grocery list status either on user request or as part of a subsequent background process.
+
+
+TO combine api calls:
+
+const fetchFoodDetailsAndStatus = async (req, res) => {
+  const { barcode } = req.params;
+  const user = req.user._id;
+
+  // Fetch food details from Open Food Facts
+  const foodDetails = await fetchFoodDetailsFromOpenFoodFacts(barcode);
+
+  // Combine checks for diary and grocery list into a single operation
+  const [isConsumedToday, isOnGroceryList] = await Promise.all([
+    checkIfConsumedToday(user, barcode),
+    checkIfOnGroceryList(user, barcode),
+  ]);
+
+  // Return combined response
+  res.json({
+    ...foodDetails,
+    isConsumedToday,
+    isOnGroceryList,
+  });
+};

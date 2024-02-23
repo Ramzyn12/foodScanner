@@ -6,7 +6,7 @@ import {
   Animated,
   Pressable,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import COLOURS from "../../constants/colours";
 import FoodListItem from "../FoodListItem";
 const dummyItem = {
@@ -20,11 +20,60 @@ import { TouchableOpacity } from "react-native";
 import { Path, Svg } from "react-native-svg";
 import TickIcon from "../../svgs/TickIcon";
 import { useNavigation } from "@react-navigation/native";
-const GroceryListItem = () => {
-  const id = "sdohsdough";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  removeFoodFromGroceryList,
+  toggleCheckedState,
+} from "../../axiosAPI/groceryAPI";
+import { useDispatch, useSelector } from "react-redux";
+import { checkGrocery } from "../../redux/grocerySlice";
+import Toast from "react-native-toast-message";
 
-  const [foodSelected, setFoodSelected] = useState(false);
-const navigation = useNavigation()
+const GroceryListItem = ({ foodItem, checked, id, onLongPress, isActive }) => {
+  const groceries = useSelector((state) => state.grocery.currentGroceries);
+  const grocery = groceries.find((item) => item._id === id);
+  // const [foodSelected, setFoodSelected] = useState(grocery?.checked);
+  const navigation = useNavigation();
+  const queryClient = useQueryClient();
+  const dispatch = useDispatch();
+
+  const handleDeletePress = () => {
+    Toast.show({
+      type: "groceryToast",
+      text1: "Item removed",
+      text2: "Undo",
+    });
+    removeFoodMutation.mutate({
+      barcode: foodItem?.barcode,
+      singleFoodId: foodItem?.singleFoodId,
+    });
+  };
+
+  useEffect(() => {
+    console.log(grocery.checked, id);
+  }, [grocery]);
+
+  const removeFoodMutation = useMutation({
+    mutationFn: removeFoodFromGroceryList,
+    onSuccess: () => {
+      // removeFoodFromGroceryList(id)
+      queryClient.invalidateQueries(["Groceries"]);
+    },
+    onError: (err) => {
+      console.log(err);
+    },
+  });
+
+  const toggleMutation = useMutation({
+    mutationFn: toggleCheckedState,
+    onSuccess: () => {
+      console.log("checked");
+    },
+    onError: (err) => {
+      console.log(err);
+    },
+  });
+
   const renderRightActions = (progress, dragX) => {
     const trans = dragX.interpolate({
       inputRange: [-100, 0],
@@ -35,7 +84,7 @@ const navigation = useNavigation()
     return (
       <Animated.View style={{ transform: [{ translateX: trans }] }}>
         <TouchableOpacity
-          onPress={() => console.log("deleting", id)}
+          onPress={handleDeletePress}
           style={styles.deleteButton}
         >
           <Text style={styles.deleteButtonText}>Delete</Text>
@@ -45,12 +94,17 @@ const navigation = useNavigation()
   };
 
   const handleSelectFood = () => {
-    setFoodSelected((curr) => !curr);
+    console.log("Checked");
+    toggleMutation.mutate({ groceryItemId: id });
+    dispatch(checkGrocery(id));
   };
 
   const handleGoToFood = () => {
-    navigation.navigate('FoodDetailsGroceries')
-  }
+    navigation.navigate("FoodDetailsGroceries", {
+      barcodeId: foodItem?.barcode,
+      singleFoodId: foodItem?.singleFoodId,
+    });
+  };
 
   return (
     <Swipeable
@@ -59,20 +113,26 @@ const navigation = useNavigation()
       overshootFriction={8}
       renderRightActions={renderRightActions}
     >
-      <View style={styles.listItemContainer}>
+      <View
+        style={[styles.listItemContainer, isActive && styles.isActiveStyles]}
+      >
         {/* Unchecked */}
         <Pressable onPress={handleSelectFood}>
           <View
             style={[
               styles.unChecked,
-              foodSelected && { backgroundColor: COLOURS.darkGreen },
+              grocery?.checked && { backgroundColor: COLOURS.darkGreen },
             ]}
           >
-            {foodSelected && <TickIcon />}
+            {grocery?.checked && <TickIcon />}
           </View>
         </Pressable>
-        <Pressable style={styles.foodItemContainer} onPress={handleGoToFood}>
-            <FoodListItem foodSelected={foodSelected} foodItem={dummyItem} />
+        <Pressable
+          onLongPress={onLongPress}
+          style={styles.foodItemContainer}
+          onPress={handleGoToFood}
+        >
+          <FoodListItem foodSelected={grocery?.checked} foodItem={foodItem} />
         </Pressable>
       </View>
     </Swipeable>
@@ -87,6 +147,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     gap: 14,
+    backgroundColor: "white",
   },
   deleteButton: {
     backgroundColor: "#DB1200",
@@ -118,5 +179,8 @@ const styles = StyleSheet.create({
     width: "100%",
     paddingRight: 15,
     paddingVertical: 2,
+  },
+  isActiveStyles: {
+    transform: [{ scale: 1.05 }],
   },
 });

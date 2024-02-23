@@ -14,6 +14,8 @@ import { setToken } from "./redux/authSlice";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MainTabsStack from "./navigation/MainTabsStack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from "react-native-toast-message";
+
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
@@ -68,6 +70,7 @@ function MainComponent() {
         </Stack.Navigator>
       )}
       {!loggedIn && <AuthStack />}
+      {/* <Toast /> */}
     </NavigationContainer>
   );
 }

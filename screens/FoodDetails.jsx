@@ -21,13 +21,13 @@ import FoodDetailsIngredientsList from "../components/FoodDetailsIngredientsList
 import { setCurrentFood } from "../redux/foodSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchFoodWithIvyId } from "../axiosAPI/searchSingleAPI";
+import Toast, { BaseToast } from "react-native-toast-message";
 
 const DEFAULT_IMAGE =
   "https://static4.depositphotos.com/1026550/376/i/450/depositphotos_3763236-stock-photo-gold-star.jpg";
 
 const FoodDetails = ({ navigation, route }) => {
   const barcode = route?.params?.barcodeId;
-  console.log(barcode);
   const singleFoodId = route?.params?.singleFoodId;
   const dispatch = useDispatch();
   const currentFood = useSelector((state) => state.food.currentFood);
@@ -60,6 +60,7 @@ const FoodDetails = ({ navigation, route }) => {
         name: foodDetails.name,
         brand: foodDetails?.brand || "Unknown Brand", // Default value if not present
         isConsumedToday: foodDetails.isConsumedToday, // Not applicable for single foods
+        isInGroceryList: foodDetails?.isInGroceryList, // Not applicable for single foods
         image_url: foodDetails?.image_url || DEFAULT_IMAGE,
         description: "", // Empty since OFF doesn't provide it
         barcode: foodDetails.barcode,
@@ -82,6 +83,7 @@ const FoodDetails = ({ navigation, route }) => {
         environment: "",
         brand: "Fresh", // Not applicable for single foods
         isConsumedToday: singleFoodDetails.isConsumedToday, // Not applicable for single foods
+        isInGroceryList: singleFoodDetails?.isInGroceryList, // Not applicable for single foods
         image_url: singleFoodDetails?.image_url || DEFAULT_IMAGE,
         description: singleFoodDetails.description,
         barcode: "", // Empty since single foods don't have barcodes
@@ -105,6 +107,14 @@ const FoodDetails = ({ navigation, route }) => {
     console.log(error);
     return <Text>Product doesnt exist...</Text>;
   }
+  const toastConfig = {
+    foodDetailToast: ({ text1, props }) => (
+      <Pressable onPress={() => navigation.navigate('GroceriesStack')} style={{ height: 44, width: '90%', backgroundColor: COLOURS.nearBlack, borderRadius: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20 }}>
+        <Text style={{color: 'white', fontFamily: 'Mulish_500Medium', fontSize: 14}}>Item added to grocery list</Text>
+        <Text style={{color: 'white', fontFamily: 'Mulish_600SemiBold', fontSize: 14}}>View</Text>
+      </Pressable>
+    )
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -135,6 +145,7 @@ const FoodDetails = ({ navigation, route }) => {
           </View>
         )}
       </ScrollView>
+      <Toast position="bottom" config={toastConfig} />
     </SafeAreaView>
   );
 };

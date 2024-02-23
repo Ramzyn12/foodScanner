@@ -1,17 +1,18 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet, Pressable, Modal } from "react-native";
 import React from "react";
 import { Path, Svg } from "react-native-svg";
 import COLOURS from "../../constants/colours";
 import ContextMenu from "react-native-context-menu-view";
 
-const SortButton = ({onPress}) => {
+const SortButton = ({ onPress }) => {
   return (
     <Pressable
-    onPress={onPress}
+      onPress={onPress}
       style={{
         height: 36,
-        position: "relative",
+        // position: "relative",
         paddingHorizontal: 15,
+        // zIndex: 4000,
         gap: 8,
         borderWidth: 1,
         borderColor: COLOURS.lightGray,
@@ -21,6 +22,7 @@ const SortButton = ({onPress}) => {
         justifyContent: "center",
       }}
     >
+      {/* <View style={styles.dropdownContainer}></View> */}
       <Svg
         xmlns="http://www.w3.org/2000/svg"
         width="16"
@@ -54,16 +56,16 @@ const SortButton = ({onPress}) => {
           fill="#1F2C35"
         />
       </Svg>
-      <ContextMenu
-      actions={[{ title: "Title 1" }, { title: "Title 2" }]}
-      onPress={(e) => {
-        console.warn(
-          `Pressed ${e.nativeEvent.name} at index ${e.nativeEvent.index}`
-        );
-      }}
-    >
-      <View style={styles.yourOwnStyles} />
-    </ContextMenu>
+      {/* <ContextMenu
+        actions={[{ title: "Title 1" }, { title: "Title 2" }]}
+        onPress={(e) => {
+          console.warn(
+            `Pressed ${e.nativeEvent.name} at index ${e.nativeEvent.index}`
+          );
+        }}
+      >
+        <View style={{ width: 100, backgroundColor: "blue", height: 300 }} />
+      </ContextMenu> */}
     </Pressable>
   );
 };
@@ -72,10 +74,9 @@ export default SortButton;
 
 const styles = StyleSheet.create({
   dropdownContainer: {
-    width: 60,
-    top: 100,
-    zIndex: 4000,
-    position: 'absolute',
+    width: 100,
+    top: 30,
+    position: "absolute",
     height: 100,
     backgroundColor: COLOURS.lightGray,
   },

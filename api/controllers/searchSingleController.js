@@ -1,4 +1,5 @@
 const DiaryDay = require("../models/DiaryDay");
+const Grocery = require("../models/Grocery");
 const SingleFood = require("../models/SingleFood");
 
 const searchSingleFood = async (req, res) => {
@@ -53,9 +54,21 @@ const fetchFoodWithIvyId = async (req, res) => {
   // Check if the scanned food is already part of the consumed foods
   const isConsumedToday =
     diaryDay &&
-    diaryDay.consumedSingleFoods.some((foodItem) => foodItem._id.toString === IvyId);
+    diaryDay.consumedSingleFoods.some(
+      (foodItem) => foodItem._id.toString() === IvyId
+    );
 
-  res.json({ ...singleFood, isConsumedToday });
+  const groceries = await Grocery.findOne({
+    userId: user,
+  }).populate("groceries.item");
+
+  const isInGroceryList =
+    groceries &&
+    groceries.groceries.some(
+      (groceryItem) => groceryItem.item._id.toString() === IvyId
+    );
+  
+  res.json({ ...singleFood, isConsumedToday, isInGroceryList });
 };
 
 module.exports = { searchSingleFood, fetchFoodWithIvyId };

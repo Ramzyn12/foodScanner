@@ -20,6 +20,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import RecentSearchList from "./RecentSearchList";
 import SearchResultsList from "./SearchResultsList";
+import Toast from "react-native-toast-message";
 
 const ScanSearchBottomSheet = () => {
   const navigation = useNavigation();
@@ -45,6 +46,7 @@ const ScanSearchBottomSheet = () => {
       style={styles.contentContainer}
     >
       {/* <BottomSheetView > */}
+
       <BottomSheetView style={styles.containerHeader}>
         <Text style={{ fontFamily: "Mulish_700Bold", fontSize: 28 }}>
           Search

@@ -1,11 +1,32 @@
-import { View, Text } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import React from "react";
 import { Path, Svg } from "react-native-svg";
 import COLOURS from "../../constants/colours";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { uncheckAllItems } from "../../axiosAPI/groceryAPI";
+import { useDispatch } from "react-redux";
+import { setCurrentGroceries } from "../../redux/grocerySlice";
 
 const UnmarkButton = () => {
+  const queryClient = useQueryClient()
+
+  const unMarkMutation = useMutation({
+    mutationFn: uncheckAllItems,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['Groceries'])
+    },
+    onError: (err) => {
+      console.log(err);
+    },
+  });
+
+  const handleUnselectAll = () => {
+    unMarkMutation.mutate()
+  }
+  
   return (
-    <View
+    <Pressable
+      onPress={handleUnselectAll}
       style={{
         height: 36,
         paddingHorizontal: 15,
@@ -40,7 +61,7 @@ const UnmarkButton = () => {
       >
         Unmark all
       </Text>
-    </View>
+    </Pressable>
   );
 };
 
