@@ -30,8 +30,8 @@ export default RecentSearchList;
 
 const styles = StyleSheet.create({
   foodListContainer: {
-    borderTopWidth: 1,
-    borderTopColor: COLOURS.lightGray,
+    borderTopWidth: 2,
+    borderTopColor: 'white',
     marginBottom: 80,
   },
   foodListItemContainer: {

@@ -16,10 +16,12 @@ import MotivationQuestion from "../screens/onboarding/MotivationQuestion";
 import ExcitementQuestion from "../screens/onboarding/ExcitementQuestion";
 import AuthScreen from "../screens/onboarding/AuthScreen";
 import CreateAccount from "../components/onboarding/CreateAccount";
+import ProgressBar from "../components/onboarding/ProgressBar";
+import { View } from "react-native";
 
 const Stack = createNativeStackNavigator();
 
-const AuthStack = () => {
+const AuthStackNavigator = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -99,6 +101,15 @@ const AuthStack = () => {
       /> */}
       {/* <Stack.Screen name="auth" component={LoginSignUp} options={{ headerShown: false }} /> */}
     </Stack.Navigator>
+  );
+};
+
+const AuthStack = () => {
+  return (
+    <>
+      {/* <ProgressBar percent={10} /> */}
+      <AuthStackNavigator />
+    </>
   );
 };
 

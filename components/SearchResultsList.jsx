@@ -6,8 +6,8 @@ import COLOURS from "../constants/colours";
 import { useNavigation } from "@react-navigation/native";
 import { useMutation } from "@tanstack/react-query";
 
-const SearchResultsList = ({ OFFResults, IvyResults }) => {
-  const areResults = OFFResults.length > 0 || IvyResults.length > 0;
+const SearchResultsList = ({ DataOFF, DataIvy }) => {
+  // const areResults = OFFResults.length > 0 || IvyResults.length > 0;
 
   const navigation = useNavigation();
 
@@ -23,16 +23,21 @@ const SearchResultsList = ({ OFFResults, IvyResults }) => {
   //   IvyMutation.mutate(IvyId)
   // }
 
+
   return (
     <BottomSheetScrollView
       showsVerticalScrollIndicator={false}
       onScrollEndDrag={Keyboard.dismiss}
+      keyboardShouldPersistTaps={'always'}
     >
       <BottomSheetView style={styles.foodListContainer}>
-        {IvyResults.map((item) => (
+        {/* CHANGE TO FLATLIST IF EXPECTING MORE ITEMS */}
+        {DataIvy?.map((item) => (
           <Pressable
-            onPress={() =>
+            onPress={() => {
+              Keyboard.dismiss()
               navigation.navigate("FoodDetails", { singleFoodId: item._id })
+            }
             }
             key={item._id}
             style={styles.foodListItemContainer}
@@ -40,11 +45,13 @@ const SearchResultsList = ({ OFFResults, IvyResults }) => {
             <FoodListItem foodItem={{ ...item, brand: "Fresh" }} />
           </Pressable>
         ))}
-        {OFFResults.map((item) => (
+        {DataOFF?.map((item) => (
           <Pressable
             key={item.barcode}
-            onPress={() =>
+            onPress={() => {
+              Keyboard.dismiss()
               navigation.navigate("FoodDetails", { barcodeId: item.barcode })
+            }
             }
             style={styles.foodListItemContainer}
           >
@@ -60,8 +67,8 @@ export default SearchResultsList;
 
 const styles = StyleSheet.create({
   foodListContainer: {
-    borderTopWidth: 1,
-    borderTopColor: COLOURS.lightGray,
+    borderTopWidth: 2,
+    borderTopColor: 'white',
     marginBottom: 80,
   },
   foodListItemContainer: {

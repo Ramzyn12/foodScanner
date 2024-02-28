@@ -1,46 +1,44 @@
-import { View, Text, Pressable } from 'react-native'
-import React from 'react'
-import AddToBasketIcon from '../../svgs/AddToBasketIcon'
-import COLOURS from '../../constants/colours'
-const EmptyGroceries = ({onPress}) => {
+import { View, Text, Pressable } from "react-native";
+import React from "react";
+import AddToBasketIcon from "../../svgs/AddToBasketIcon";
+import COLOURS from "../../constants/colours";
+import { StyleSheet } from "react-native";
+const EmptyGroceries = ({ onPress }) => {
   return (
-    <Pressable
-        onPress={onPress}
-        style={{ padding: 20, gap: 20, alignItems: "center" }}
-      >
-        <Text style={{ fontSize: 16, fontFamily: "Mulish_700Bold" }}>
-          Groceries
-        </Text>
-        <View
-          style={{
-            padding: 20,
-            gap: 20,
-            alignItems: "center",
-            backgroundColor: "#F5F5F5",
-            width: "100%",
-            borderRadius: 20,
-          }}
-        >
-          <AddToBasketIcon />
-          <View
-            style={{
-              height: 44,
-              width: "100%",
-              alignItems: "center",
-              justifyContent: "center",
-              borderWidth: 1,
-              borderColor: COLOURS.lightGray,
-              backgroundColor: "#FFF",
-              borderRadius: 12,
-            }}
-          >
-            <Text style={{ fontSize: 14, fontFamily: "Mulish_600SemiBold" }}>
-              Add your first item
-            </Text>
-          </View>
+    <Pressable onPress={onPress} style={styles.container}>
+      <Text style={styles.titleText}>Groceries</Text>
+      <View style={styles.boxContainer}>
+        <AddToBasketIcon />
+        <View style={styles.boxInnerContainer}>
+          <Text style={styles.boxText}>Add your first item</Text>
         </View>
-      </Pressable>
-  )
-}
+      </View>
+    </Pressable>
+  );
+};
 
-export default EmptyGroceries
+export default EmptyGroceries;
+
+const styles = StyleSheet.create({
+  container: { padding: 20, gap: 20, alignItems: "center" },
+  titleText: { fontSize: 16, fontFamily: "Mulish_700Bold" },
+  boxContainer: {
+    padding: 20,
+    gap: 20,
+    alignItems: "center",
+    backgroundColor: "#F5F5F5",
+    width: "100%",
+    borderRadius: 20,
+  },
+  boxInnerContainer: {
+    height: 44,
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: COLOURS.lightGray,
+    backgroundColor: "#FFF",
+    borderRadius: 12,
+  },
+  boxText: { fontSize: 14, fontFamily: "Mulish_600SemiBold" },
+});

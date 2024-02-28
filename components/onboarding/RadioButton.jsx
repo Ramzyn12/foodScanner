@@ -36,6 +36,8 @@ const styles = StyleSheet.create({
   },
   radioButtonContainerSelected: {
     borderWidth: 2,
+    paddingHorizontal: 11,
+    marginVertical: -1,
     borderColor: COLOURS.darkGreen,
   },
   radioButton: {

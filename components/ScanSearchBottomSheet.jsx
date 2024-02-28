@@ -5,35 +5,120 @@ import {
   SafeAreaView,
   Pressable,
   Keyboard,
+  TextInput,
+  ActivityIndicator,
 } from "react-native";
-import React, { useMemo, useRef } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import BottomSheet, {
   BottomSheetScrollView,
+  BottomSheetTextInput,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
+import { SearchBar } from "@rneui/themed";
 import COLOURS from "../constants/colours";
-import { useReducedMotion } from "react-native-reanimated";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 import { Path, Svg } from "react-native-svg";
-import SearchBar from "./SearchBar";
 import FoodListItem from "./FoodListItem";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import RecentSearchList from "./RecentSearchList";
 import SearchResultsList from "./SearchResultsList";
 import Toast from "react-native-toast-message";
+import SearchIcon from "../svgs/SearchIcon";
+import ClearIcon from "../svgs/ClearIcon";
+import { Button } from "@rneui/base";
+// import SearchBar from "./SearchBar";
+import debounce from "lodash.debounce";
+import { useQuery } from "@tanstack/react-query";
+import { fetchFoodWithSearchIvy } from "../axiosAPI/searchSingleAPI";
+import { fetchFoodWithSearch } from "../axiosAPI/openFoodFactsAPI";
+import NativeSearchBar from "./NativeSearchBar";
 
 const ScanSearchBottomSheet = () => {
   const navigation = useNavigation();
-
-  const OFFResults = useSelector((state) => state.search.openFoodFactsResults);
-  const IvyResults = useSelector((state) => state.search.IvyResults);
-
-  const showRecent = OFFResults.length === 0 && IvyResults.length === 0;
-
+  // const OFFResults = useSelector((state) => state.search.openFoodFactsResults);
+  // const IvyResults = useSelector((state) => state.search.IvyResults);
   const bottomSheetRef = useRef(null);
   const reducedMotion = useReducedMotion();
-
   const snapPoints = useMemo(() => ["20%", "50%", "90%"], []);
+  const inputRef = useRef(null);
+  const cancelButtonWidth = 55;
+  const cancelBtnX = useSharedValue(-1 * cancelButtonWidth); // Start off-screen to the right
+  const [search, setSearch] = useState("");
+  const [triggerSearch, setTriggerSearch] = useState("");
+
+  const { data: DataIvy, isLoading: isLoadingIvy } = useQuery({
+    queryKey: ["searchIvy", triggerSearch],
+    queryFn: () => fetchFoodWithSearchIvy(triggerSearch),
+    retry: false,
+    enabled: triggerSearch.trim() !== "", // Ensure search term is not empty or just spaces
+  });
+
+  const { data: DataOFF, isLoading: isLoadingIvyOFf } = useQuery({
+    queryKey: ["searchOFF", triggerSearch],
+    queryFn: () => fetchFoodWithSearch(triggerSearch),
+    retry: false,
+    enabled: triggerSearch.trim() !== "", // Ensure search term is not empty or just spaces
+  });
+
+  const isLoading = isLoadingIvy || isLoadingIvyOFf;
+  const hideRecent = DataOFF?.length > 0 || DataIvy?.length > 0 || isLoading;
+
+  const debounceSearch = useCallback(
+    debounce((search) => {
+      setTriggerSearch(search);
+    }, 300),
+    []
+  );
+
+  const updateSearch = (search) => {
+    setSearch(search);
+    debounceSearch(search);
+  };
+
+  const handleClearInput = () => {
+    inputRef.current.clear(); // Clear the text input
+    setSearch("");
+    setTriggerSearch("");
+  };
+
+  const handleCancelPress = () => {
+    inputRef.current.clear();
+    setSearch("");
+    setTriggerSearch("");
+    Keyboard.dismiss();
+    cancelBtnX.value = withTiming(-1 * cancelButtonWidth, {
+      duration: 300,
+      easing: Easing.out(Easing.quad),
+    });
+  };
+
+  const handleFocus = () => {
+    bottomSheetRef.current.snapToIndex(2);
+    cancelBtnX.value = withTiming(0, {
+      duration: 300,
+      easing: Easing.out(Easing.quad),
+    });
+  };
+
+  const animatedCancelBtnStyle = useAnimatedStyle(() => {
+    return {
+      marginRight: cancelBtnX.value,
+    };
+  });
 
   return (
     <BottomSheet
@@ -45,14 +130,12 @@ const ScanSearchBottomSheet = () => {
       handleStyle={{ display: "none" }}
       style={styles.contentContainer}
     >
-      {/* <BottomSheetView > */}
-
       <BottomSheetView style={styles.containerHeader}>
         <Text style={{ fontFamily: "Mulish_700Bold", fontSize: 28 }}>
           Search
         </Text>
         <Pressable
-          onPress={() => navigation.navigate("MainTabsStack")}
+          onPress={() => navigation.navigate("MainTabsStack")} //Or go back
           style={styles.exitButtonContainer}
         >
           <Svg width="14" height="14" viewBox="0 0 8 8" fill="none">
@@ -64,11 +147,14 @@ const ScanSearchBottomSheet = () => {
         </Pressable>
       </BottomSheetView>
       {/* Search bar */}
-      <SearchBar />
-      {showRecent ? (
-        <RecentSearchList />
-      ) : (
-        <SearchResultsList OFFResults={OFFResults} IvyResults={IvyResults} />
+      <NativeSearchBar onFocus={handleFocus} />
+
+      {/* Search Results */}
+      {/* {isLoading && <ActivityIndicator  color={COLOURS.darkGreen} />} */}
+      {isLoading && <Text>Searching for {search}...</Text>}
+      {!isLoading && !hideRecent && <RecentSearchList />}
+      {!isLoading && (DataOFF?.length > 0 || DataIvy?.length > 0) && (
+        <SearchResultsList DataOFF={DataOFF} DataIvy={DataIvy} />
       )}
     </BottomSheet>
   );
@@ -80,6 +166,39 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     padding: 18,
+  },
+  inputContainer: {
+    backgroundColor: "#EEEEF0",
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    height: 40,
+    gap: 8,
+    borderRadius: 12,
+    marginVertical: 20,
+  },
+  searchContainerStyle: {
+    borderWidth: 0,
+    backgroundColor: "white",
+    height: 40,
+    paddingTop: 0,
+    paddingBottom: 0,
+    marginVertical: 15,
+    borderWidth: 0,
+  },
+  searchInputStyle: {
+    backgroundColor: "#EEEEF0",
+    // paddingRight: 7,
+    borderWidth: 0,
+  },
+  searchInputContainerStyle: {
+    backgroundColor: "#EEEEF0",
+    height: 40,
+    flex: 1,
+    // overflow: 'hidden',
+    marginLeft: 0,
+    borderWidth: 0,
   },
   exitButtonContainer: {
     width: 30,

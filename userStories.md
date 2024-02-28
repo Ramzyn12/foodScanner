@@ -57,7 +57,6 @@ return all diaryDay docs where the user has userId and the date is less than now
 WHEN UPDATING GROCERY LIST ORDER WE ADD THE FOODITEM ID NOT THE
 GROCERYLIST ITEM ID
 
-
 Note:
 Before adding the food to the user's diary, check if the FoodItem already exists in your database (based on the barcode).
 If it doesn't exist, create a new FoodItem in your database with the data fetched from OpenFoodFacts and calculate its processed score based on your algorithm.

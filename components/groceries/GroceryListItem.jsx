@@ -6,58 +6,39 @@ import {
   Animated,
   Pressable,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import COLOURS from "../../constants/colours";
 import FoodListItem from "../FoodListItem";
-const dummyItem = {
-  brand: "Tesco",
-  name: "sweet potato",
-  image_url:
-    "https://img.freepik.com/free-photo/sweet-potato_144627-20748.jpg?w=2000&t=st=1708436069~exp=1708436669~hmac=d5806ccc5e3e06c555d0549193a77a804c4abdba921bada59b1375174593f0ca",
-};
 import { Swipeable } from "react-native-gesture-handler";
 import { TouchableOpacity } from "react-native";
-import { Path, Svg } from "react-native-svg";
 import TickIcon from "../../svgs/TickIcon";
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   removeFoodFromGroceryList,
   toggleCheckedState,
 } from "../../axiosAPI/groceryAPI";
 import { useDispatch, useSelector } from "react-redux";
-import { checkGrocery } from "../../redux/grocerySlice";
+import {
+  addVirtualGroceryItem,
+  checkGrocery,
+  removeVirtualGroceryItem,
+} from "../../redux/grocerySlice";
 import Toast from "react-native-toast-message";
 
 const GroceryListItem = ({ foodItem, checked, id, onLongPress, isActive }) => {
   const groceries = useSelector((state) => state.grocery.currentGroceries);
   const grocery = groceries.find((item) => item._id === id);
-  // const [foodSelected, setFoodSelected] = useState(grocery?.checked);
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
-
-  const handleDeletePress = () => {
-    Toast.show({
-      type: "groceryToast",
-      text1: "Item removed",
-      text2: "Undo",
-    });
-    removeFoodMutation.mutate({
-      barcode: foodItem?.barcode,
-      singleFoodId: foodItem?.singleFoodId,
-    });
-  };
-
-  useEffect(() => {
-    console.log(grocery.checked, id);
-  }, [grocery]);
+  const deletionTimerRef = useRef(null);
 
   const removeFoodMutation = useMutation({
     mutationFn: removeFoodFromGroceryList,
     onSuccess: () => {
-      // removeFoodFromGroceryList(id)
       queryClient.invalidateQueries(["Groceries"]);
+      // queryClient.invalidateQueries(["DiaryDay"]); //Maybe?
     },
     onError: (err) => {
       console.log(err);
@@ -66,13 +47,60 @@ const GroceryListItem = ({ foodItem, checked, id, onLongPress, isActive }) => {
 
   const toggleMutation = useMutation({
     mutationFn: toggleCheckedState,
-    onSuccess: () => {
-      console.log("checked");
-    },
+    onSuccess: () => {},
     onError: (err) => {
       console.log(err);
     },
   });
+
+  const handleUndo = () => {
+    if (deletionTimerRef.current) {
+      // Reset Ref
+      clearTimeout(deletionTimerRef.current);
+      deletionTimerRef.current = null;
+    }
+
+    dispatch(addVirtualGroceryItem());
+    Toast.hide();
+  };
+
+  const handleDeletePress = () => {
+    dispatch(removeVirtualGroceryItem(id));
+
+    // Clear any existing timer to ensure we don't have multiple timers running
+    if (deletionTimerRef.current) {
+      clearTimeout(deletionTimerRef.current);
+    }
+
+    // Start a new timer
+    deletionTimerRef.current = setTimeout(() => {
+      removeFoodMutation.mutate({
+        barcode: foodItem?.barcode,
+        singleFoodId: foodItem?._id,
+      });
+    }, 4000); 
+
+    Toast.show({
+      type: "groceryToast",
+      text1: "Item removed",
+      text2: "Undo",
+      props: {
+        onUndo: handleUndo,
+      },
+    });
+  };
+
+  const handleSelectFood = () => {
+    toggleMutation.mutate({ groceryItemId: id });
+    dispatch(checkGrocery(id));
+  };
+
+  const handleGoToFood = () => {
+    navigation.navigate("FoodDetailsGroceries", {
+      barcodeId: foodItem?.barcode,
+      singleFoodId: foodItem?._id,
+    });
+  };
 
   const renderRightActions = (progress, dragX) => {
     const trans = dragX.interpolate({
@@ -93,24 +121,12 @@ const GroceryListItem = ({ foodItem, checked, id, onLongPress, isActive }) => {
     );
   };
 
-  const handleSelectFood = () => {
-    console.log("Checked");
-    toggleMutation.mutate({ groceryItemId: id });
-    dispatch(checkGrocery(id));
-  };
-
-  const handleGoToFood = () => {
-    navigation.navigate("FoodDetailsGroceries", {
-      barcodeId: foodItem?.barcode,
-      singleFoodId: foodItem?.singleFoodId,
-    });
-  };
-
   return (
     <Swipeable
       // onSwipeableOpen={() => console.log("deleted by drag")}
       rightThreshold={100}
       overshootFriction={8}
+      friction={1.5}
       renderRightActions={renderRightActions}
     >
       <View
@@ -131,6 +147,7 @@ const GroceryListItem = ({ foodItem, checked, id, onLongPress, isActive }) => {
           onLongPress={onLongPress}
           style={styles.foodItemContainer}
           onPress={handleGoToFood}
+          delayLongPress={200}
         >
           <FoodListItem foodSelected={grocery?.checked} foodItem={foodItem} />
         </Pressable>
@@ -180,7 +197,5 @@ const styles = StyleSheet.create({
     paddingRight: 15,
     paddingVertical: 2,
   },
-  isActiveStyles: {
-    transform: [{ scale: 1.05 }],
-  },
+
 });

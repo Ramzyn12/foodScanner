@@ -108,10 +108,10 @@ const FoodDetails = ({ navigation, route }) => {
     return <Text>Product doesnt exist...</Text>;
   }
   const toastConfig = {
-    foodDetailToast: ({ text1, props }) => (
+    foodDetailToast: ({ text1, text2, props }) => (
       <Pressable onPress={() => navigation.navigate('GroceriesStack')} style={{ height: 44, width: '90%', backgroundColor: COLOURS.nearBlack, borderRadius: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20 }}>
-        <Text style={{color: 'white', fontFamily: 'Mulish_500Medium', fontSize: 14}}>Item added to grocery list</Text>
-        <Text style={{color: 'white', fontFamily: 'Mulish_600SemiBold', fontSize: 14}}>View</Text>
+        <Text style={{color: 'white', fontFamily: 'Mulish_500Medium', fontSize: 14}}>{text1}</Text>
+        <Text style={{color: 'white', fontFamily: 'Mulish_600SemiBold', fontSize: 14}}>{text2}</Text>
       </Pressable>
     )
   };

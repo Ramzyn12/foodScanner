@@ -5,6 +5,8 @@ const SingleFood = require("../models/SingleFood");
 const searchSingleFood = async (req, res) => {
   const searchTerm = req.params.search_term; // Assuming you're getting the search term from a query parameter
 
+  if (!searchTerm) return 
+  
   const searchStage = {
     $search: {
       autocomplete: {

@@ -96,7 +96,7 @@ const fetchFoodWithSearch = async (req, res) => {
       action: "process",
       search_terms: search_term, // Use the search term parameter
       sort_by: "popularity_key",
-      page_size: 8,
+      page_size: 20,
       countries_tags: "united-kingdom",
       json: 1,
     },

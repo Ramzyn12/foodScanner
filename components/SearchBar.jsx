@@ -1,5 +1,5 @@
-import { View, Text } from "react-native";
-import React, { useCallback, useEffect, useState } from "react";
+import { View, Text, StyleSheet } from "react-native";
+import React, { memo, useCallback, useEffect, useState } from "react";
 import { Path, Svg } from "react-native-svg";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import COLOURS from "../constants/colours";
@@ -10,12 +10,13 @@ import { fetchFoodWithSearch } from "../axiosAPI/openFoodFactsAPI";
 import { setOpenFoodFactsResults, setIvyResults } from "../redux/searchSlice";
 import { useDispatch } from "react-redux";
 import { fetchFoodWithSearchIvy } from "../axiosAPI/searchSingleAPI";
+import { TextInput } from "react-native";
 
 const SearchBar = () => {
   const [searchIconColour, setSearchIconColour] = useState("#606060");
   const [searchInput, setSearchInput] = useState("");
   const [showClear, setShowClear] = useState(false);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const { data: DataOFF, refetch: refetchOFF } = useQuery({
     queryKey: ["searchOFF", searchInput],
@@ -40,6 +41,7 @@ const SearchBar = () => {
   );
 
   useEffect(() => {
+    //Why not just use the data directly?? 
     if (DataIvy) {
       dispatch(setIvyResults(DataIvy));
     } else {
@@ -68,19 +70,12 @@ const SearchBar = () => {
     setShowClear(false);
   };
 
+  const handleFocus = () => {
+    setSearchIconColour("#2D264B")
+  }
+
   return (
-    <View
-      style={{
-        backgroundColor: "#EEEEF0",
-        flexDirection: "row",
-        alignItems: "center",
-        paddingHorizontal: 10,
-        height: 42,
-        gap: 8,
-        borderRadius: 15,
-        marginVertical: 20,
-      }}
-    >
+    <View style={styles.container}>
       <Svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <Path
           d="M13.197 11.4698C12.9041 11.1769 12.4292 11.1769 12.1363 11.4697C11.8434 11.7626 11.8434 12.2375 12.1363 12.5304L13.197 11.4698ZM14.8029 15.197C15.0958 15.4899 15.5707 15.4899 15.8636 15.197C16.1564 14.9042 16.1565 14.4293 15.8636 14.1364L14.8029 15.197ZM12.1363 12.5304L14.8029 15.197L15.8636 14.1364L13.197 11.4698L12.1363 12.5304ZM7.33325 11.9167C4.43376 11.9167 2.08325 9.56618 2.08325 6.66669H0.583252C0.583252 10.3946 3.60533 13.4167 7.33325 13.4167V11.9167ZM12.5833 6.66669C12.5833 9.56618 10.2327 11.9167 7.33325 11.9167V13.4167C11.0612 13.4167 14.0833 10.3946 14.0833 6.66669H12.5833ZM7.33325 1.41669C10.2327 1.41669 12.5833 3.76719 12.5833 6.66669H14.0833C14.0833 2.93877 11.0612 -0.083313 7.33325 -0.083313V1.41669ZM7.33325 -0.083313C3.60533 -0.083313 0.583252 2.93877 0.583252 6.66669H2.08325C2.08325 3.76719 4.43376 1.41669 7.33325 1.41669V-0.083313Z"
@@ -88,8 +83,8 @@ const SearchBar = () => {
         />
       </Svg>
       <BottomSheetTextInput
-        onScroll={() => console.log("scrolled")}
-        onFocus={() => setSearchIconColour("#2D264B")}
+        // onScroll={() => console.log("scrolled")}
+        onFocus={handleFocus}
         placeholderTextColor={"#606060"}
         placeholder="Search food and drink"
         value={searchInput}
@@ -98,14 +93,7 @@ const SearchBar = () => {
       />
       {showClear && (
         <Pressable
-          style={{
-            width: 18,
-            height: 18,
-            borderRadius: 20,
-            backgroundColor: "#D5D5D5",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+          style={styles.clearButtonContainer}
           onPress={handleClearInput}
         >
           <Svg width="8" height="8" viewBox="0 0 8 8" fill="none">
@@ -121,3 +109,25 @@ const SearchBar = () => {
 };
 
 export default SearchBar;
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "#EEEEF0",
+    // flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    height: 40,
+    gap: 8,
+    borderRadius: 15,
+    marginVertical: 20,
+  },
+  clearButtonContainer: {
+    width: 18,
+    height: 18,
+    borderRadius: 20,
+    backgroundColor: "#D5D5D5",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
