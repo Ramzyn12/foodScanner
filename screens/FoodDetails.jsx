@@ -22,6 +22,7 @@ import { setCurrentFood } from "../redux/foodSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchFoodWithIvyId } from "../axiosAPI/searchSingleAPI";
 import Toast, { BaseToast } from "react-native-toast-message";
+import { saveRecentScan } from "../utils/RecentsStorageHelper";
 
 const DEFAULT_IMAGE =
   "https://static4.depositphotos.com/1026550/376/i/450/depositphotos_3763236-stock-photo-gold-star.jpg";
@@ -74,6 +75,7 @@ const FoodDetails = ({ navigation, route }) => {
         processedScore: foodDetails?.processedScore, // Hypothetical function
       };
       dispatch(setCurrentFood(normalizedData));
+      saveRecentScan(normalizedData)
     }
 
     if (singleFoodDetails) {
@@ -92,6 +94,7 @@ const FoodDetails = ({ navigation, route }) => {
         processedScore: singleFoodDetails.processedScore || 100, // Default to 0 if not present
       };
       dispatch(setCurrentFood(normalizedData));
+      saveRecentScan(normalizedData)
     }
   }, [foodDetails, singleFoodDetails]);
 

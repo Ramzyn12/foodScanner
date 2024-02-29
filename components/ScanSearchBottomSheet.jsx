@@ -47,7 +47,7 @@ import { fetchFoodWithSearchIvy } from "../axiosAPI/searchSingleAPI";
 import { fetchFoodWithSearch } from "../axiosAPI/openFoodFactsAPI";
 import NativeSearchBar from "./NativeSearchBar";
 
-const ScanSearchBottomSheet = () => {
+const ScanSearchBottomSheet = ({setSheetIndex}) => {
   const navigation = useNavigation();
   // const OFFResults = useSelector((state) => state.search.openFoodFactsResults);
   // const IvyResults = useSelector((state) => state.search.IvyResults);
@@ -124,6 +124,7 @@ const ScanSearchBottomSheet = () => {
     <BottomSheet
       ref={bottomSheetRef}
       index={0}
+      onChange={(ind) => setSheetIndex(ind)}
       animateOnMount={!reducedMotion}
       snapPoints={snapPoints}
       keyboardBehavior="extend"
@@ -147,7 +148,16 @@ const ScanSearchBottomSheet = () => {
         </Pressable>
       </BottomSheetView>
       {/* Search bar */}
-      <NativeSearchBar onFocus={handleFocus} />
+      <NativeSearchBar
+        animatedCancelBtnStyle={animatedCancelBtnStyle}
+        onCancel={handleCancelPress}
+        search={search}
+        ref={inputRef} // Directly pass the ref here
+        inputRef={inputRef}
+        onClearInput={handleClearInput}
+        onFocus={handleFocus}
+        updateSearch={updateSearch}
+      />
 
       {/* Search Results */}
       {/* {isLoading && <ActivityIndicator  color={COLOURS.darkGreen} />} */}

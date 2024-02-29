@@ -2,58 +2,45 @@ import {
   CameraHighlights,
   useBarcodeScanner,
 } from "@mgcrea/vision-camera-barcode-scanner";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Alert, Button, Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
 import {
   Camera,
   useCameraDevice,
   useCameraFormat,
   useCameraPermission,
 } from "react-native-vision-camera";
-import { MaterialIcons } from "@expo/vector-icons";
 import { Worklets } from "react-native-worklets-core";
 import { useIsFocused, useNavigationState } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
-import { useReducedMotion } from "react-native-reanimated";
+import { useReducedMotion, useSharedValue } from "react-native-reanimated";
 import ScanSearchBottomSheet from "../components/ScanSearchBottomSheet";
 import ScannerOverlay from "../components/ScannerOverlay";
 
-//TO-DO
-// Check if the code is the correct type or if it exists and show alert if not
-
 export const Scan = ({ navigation }) => {
-  // Use a simple default back camera
   const device = useCameraDevice("back");
-  const reducedMotion = useReducedMotion();
-
-  const [torch, setTorch] = useState(false);
-  //Maybe add debounce to the scanning so doesnt scan too much!!!!
-  const lastScannedBarcode = useRef(null); // Initialize a ref to store the last scanned barcode
-
-  // Set the Format
-  const format = useCameraFormat(device, [
-    { videoResolution: { width: 1280, height: 720 } },
-  ]);
-
-  const { hasPermission, requestPermission } = useCameraPermission();
-
-  // Camera active when screen focused or on modalScreen
+  const [sheetIndex, setSheetIndex] = useState(0);
+  const lastScanTimestamp = useRef(0);
+  const debounceDelay = 2000; // 2 second
+  const sheetIndexShared = useSharedValue(0);
+  const currentRouteNameShared = useSharedValue("");
   const isFocused = useIsFocused();
   const state = useNavigationState((state) => state);
   const currentRouteName = state.routes[state.index].name;
   const isActive = isFocused || currentRouteName === "FoodDetails";
+  const { hasPermission, requestPermission } = useCameraPermission();
+  
+  const format = useCameraFormat(device, [
+    { videoResolution: { width: 1280, height: 720 } },
+  ]);
 
-  //Bottom sheet setup
+  useEffect(() => {
+    sheetIndexShared.value = sheetIndex;
+  }, [sheetIndex]);
 
-  //IF NEED IT TO ANIMATE EVERY TIME
-  // useEffect(() => {
-  //   if (!isFocused) {
-  //     bottomSheetRef.current.close();
-  //   } else {
-  //     bottomSheetRef.current.collapse();
-  //   }
-  // }, [isFocused]);
+  useEffect(() => {
+    currentRouteNameShared.value = currentRouteName;
+  }, [currentRouteName]);
 
   useEffect(() => {
     if (!hasPermission) {
@@ -61,25 +48,28 @@ export const Scan = ({ navigation }) => {
     }
   }, [hasPermission]);
 
-  // What to do when barcode detected
   const onBarcodeDetected = Worklets.createRunInJsFn((barcodes) => {
-    // If already scanned dont fetch again...
-    //OR COULD JUST ADD A DEBOUNCE OF LIKE 2 seconds
-    if (barcodes["0"].value === lastScannedBarcode.current) {
-      console.log("already scanned!");
+    if (
+      sheetIndexShared.value === 2 ||
+      currentRouteNameShared.value === "FoodDetails"
+    ) {
       return;
     }
-    // Update the ref with the new scanned barcode
-    lastScannedBarcode.current = barcodes["0"].value;
-    Haptics.selectionAsync(); // Vibration
 
+    const now = Date.now();
+    const timeSinceLastScan = now - lastScanTimestamp.current;
+    if (timeSinceLastScan < debounceDelay) return 
+
+    lastScanTimestamp.current = now; // Update timestamp of last scan
+
+    Haptics.selectionAsync();
     navigation.navigate("FoodDetails", { barcodeId: barcodes["0"].value });
   });
 
   // Barcode scanner hook from frame plugin
   const { props: cameraProps, highlights } = useBarcodeScanner({
     fps: 5,
-    barcodeTypes: ["ean-13", 'ean-8'], //NEED TO ADD MORE CODES
+    barcodeTypes: ["ean-13", "ean-8"],
     scanMode: "continuous",
     onBarcodeScanned: (barcodes) => {
       "worklet";
@@ -89,7 +79,6 @@ export const Scan = ({ navigation }) => {
     },
   });
 
-  //if no device (or format?)
   if (!device || !format) {
     return <Text>No device available</Text>;
   }
@@ -97,12 +86,8 @@ export const Scan = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {!hasPermission && (
-        //Probs shouldnt be button?
-        <Button
-          title="Grant Permission to use scanner settings > "
-          color="#007aff"
-          accessibilityLabel="Learn more about this purple button"
-        />
+        //REMEBER TO MAKE THIS BETTER
+        <Text>Grant Permission to use scanner settings</Text>
       )}
       {hasPermission && (
         <>
@@ -110,29 +95,14 @@ export const Scan = ({ navigation }) => {
             style={StyleSheet.absoluteFill}
             device={device}
             {...cameraProps}
-            torch={torch ? "on" : "off"}
+            // torch={torch ? "on" : "off"}
             resizeMode="cover"
             isActive={isActive}
             // format={format}
           />
           <CameraHighlights highlights={highlights} color="peachpuff" />
-          {/* <CameraOverlay/> */}
           <ScannerOverlay />
-          {/* <View style={styles.boxOverlay}></View> */}
-          {/* <View style={styles.leftButtonRow}>
-            <Pressable
-              style={styles.torchbutton}
-              onPress={() => setTorch(!torch)}
-              // disabledOpacity={0.4}
-            >
-              <MaterialIcons
-                name={torch ? "flashlight-on" : "flashlight-off"}
-                color="white"
-                size={40}
-              />
-            </Pressable>
-          </View> */}
-          <ScanSearchBottomSheet />
+          <ScanSearchBottomSheet setSheetIndex={setSheetIndex} />
         </>
       )}
     </View>
@@ -169,7 +139,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     justifySelf: "start",
     alignSelf: "center",
-    
   },
   permissionContainer: {
     alignItems: "center",

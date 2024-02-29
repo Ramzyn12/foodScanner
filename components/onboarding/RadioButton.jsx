@@ -1,10 +1,10 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import COLOURS from "../../constants/colours";
-import { TouchableOpacity } from "react-native";
+import { Pressable } from "react-native";
 const RadioButton = ({ value, selectedValue, onSelect }) => {
   return (
-    <TouchableOpacity
+    <Pressable
       style={[
         styles.radioButtonContainer,
         selectedValue === value && styles.radioButtonContainerSelected,
@@ -17,7 +17,7 @@ const RadioButton = ({ value, selectedValue, onSelect }) => {
         )}
       </View>
       <Text style={styles.radioButtonText}>{value}</Text>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
