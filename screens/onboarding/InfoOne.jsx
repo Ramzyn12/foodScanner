@@ -6,10 +6,13 @@ import SeedOils from "../../svgs/SeedOils";
 import FastFood from "../../svgs/FastFood";
 import VeganBurger from "../../svgs/VeganBurger";
 import ImageCard from "../../components/onboarding/ImageCard";
+// import { SharedElement } from "react-navigation-shared-element";
+import Animated from "react-native-reanimated";
 
 const InfoOne = ({ navigation }) => {
   return (
-    <SafeAreaView style={styles.container}>
+    // <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+    <View style={styles.container}>
       <View style={styles.contentContainer}>
         <Text style={styles.titleText}>
           Since the 20th century, processed foods have invaded our diets.
@@ -25,11 +28,9 @@ const InfoOne = ({ navigation }) => {
           alternatives to other more natural food sources.
         </Text>
       </View>
-      <View style={styles.buttonContainer}>
-        <Pressable
-          onPress={() => navigation.navigate("InfoTwo")}
-          style={styles.button}
-        >
+      {/* Button */}
+      <Pressable onPress={() => navigation.navigate("InfoTwo")}>
+        <Animated.View sharedTransitionTag="greenButton" style={styles.button}>
           <Text style={styles.buttonText}>Next</Text>
           <Svg
             xmlns="http://www.w3.org/2000/svg"
@@ -43,9 +44,11 @@ const InfoOne = ({ navigation }) => {
               fill="white"
             />
           </Svg>
-        </Pressable>
-      </View>
-    </SafeAreaView>
+        </Animated.View>
+      </Pressable>
+      {/* </SharedElement> */}
+    </View>
+    // </View>
   );
 };
 
@@ -57,11 +60,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#FFFFFF",
     paddingHorizontal: 30,
+    paddingVertical: 30,
   },
   contentContainer: {
     alignItems: "center",
     gap: 40,
-    paddingHorizontal: 30,
     flex: 1,
     justifyContent: "center",
   },
@@ -87,7 +90,7 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 15,
   },
-  buttonContainer: { paddingHorizontal: 30, paddingBottom: 10 },
+  // buttonContainer: { paddingHorizontal: 30, paddingBottom: 10 },
   imageCardsContainer: {
     flexDirection: "row",
     alignItems: "center",

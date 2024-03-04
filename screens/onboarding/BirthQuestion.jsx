@@ -4,36 +4,52 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import ProgressBar from "../../components/onboarding/ProgressBar";
 import COLOURS from "../../constants/colours";
 import { Path, Svg } from "react-native-svg";
+import Animated from "react-native-reanimated";
+import dayjs from "dayjs";
+import { useDispatch } from "react-redux";
+import { setAge } from "../../redux/onboardingSlice";
+
 const BirthQuestion = ({ navigation }) => {
   const [date, setDate] = useState(new Date());
+  const dispatch = useDispatch(); // Use the useDispatch hook
 
   const handleDateChange = (e, selectedDate) => {
     const currentDate = selectedDate || date;
     setDate(currentDate);
   };
 
+  const calculateAge = (birthdate) => {
+    return dayjs().diff(dayjs(birthdate), 'year');
+  };
+
   const handleDatePick = () => {
+    const age = calculateAge(date); // Calculate age
+    dispatch(setAge(age)); // Dispatch the age to the Redux store
     navigation.navigate("GenderQuestion");
-    console.log(date);
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.contentContainer}>
-        <View style={styles.topContainer}>
+    <View style={styles.container}>
+      <View style={styles.topContainer}>
+        {/* <Animated.View
+          sharedTransitionTag="progressBar"
+          style={{ width: "100%" }}
+        > */}
           <ProgressBar percent={24} />
-          <Text style={styles.titleText}>When were you born?</Text>
-          <DateTimePicker
-            testID="dateTimePicker"
-            value={date}
-            mode={"date"}
-            is24Hour={true}
-            onChange={handleDateChange}
-            display="spinner"
-            maximumDate={new Date()}
-          />
-        </View>
-        <Pressable onPress={handleDatePick} style={styles.button}>
+        {/* </Animated.View> */}
+        <Text style={styles.titleText}>When were you born?</Text>
+        <DateTimePicker
+          testID="dateTimePicker"
+          value={date}
+          mode={"date"}
+          is24Hour={true}
+          onChange={handleDateChange}
+          display="spinner"
+          maximumDate={new Date()}
+        />
+      </View>
+      <Pressable onPress={handleDatePick} style={{ width: "100%" }}>
+        <Animated.View style={styles.button} sharedTransitionTag="greenButton">
           <Text style={styles.buttonText}>Next</Text>
           <Svg
             xmlns="http://www.w3.org/2000/svg"
@@ -47,9 +63,9 @@ const BirthQuestion = ({ navigation }) => {
               fill="white"
             />
           </Svg>
-        </Pressable>
-      </View>
-    </SafeAreaView>
+        </Animated.View>
+      </Pressable>
+    </View>
   );
 };
 
@@ -61,6 +77,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#FFFFFF",
     paddingHorizontal: 30,
+    paddingVertical: 40,
   },
   contentContainer: {
     alignItems: "center",

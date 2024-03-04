@@ -13,6 +13,7 @@ import FormSubmissionButton from "./FormSubmissionButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useMutation } from "@tanstack/react-query";
 import { addFirstLastName } from "../../axiosAPI/authAPI";
+import { addUserNames } from "../../axiosAPI/userAPI";
 
 const CreateAccount = ({ navigation, route }) => {
   const [firstName, setFirstName] = useState("");
@@ -21,12 +22,9 @@ const CreateAccount = ({ navigation, route }) => {
   const firebaseId = route?.params?.firebaseId;
 
   const addNamesMutation = useMutation({
-    mutationFn: addFirstLastName,
+    mutationFn: addUserNames,
     onSuccess: async () => {
       navigation.goBack();
-      if (token) {
-        await AsyncStorage.setItem("firebaseToken", token);
-      }
     },
     onError: (err) => {
       console.log(err);
@@ -34,7 +32,8 @@ const CreateAccount = ({ navigation, route }) => {
   });
 
   const handleFinaliseAccount = async () => {
-    addNamesMutation.mutate({ firebaseId, firstName, lastName });
+    console.log('sending names..', {firstName, lastName});
+    addNamesMutation.mutate({ firstName, lastName });
   };
 
   return (

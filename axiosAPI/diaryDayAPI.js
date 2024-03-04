@@ -44,3 +44,13 @@ export const getDiaryDay = async ({ date }) => {
     throw error;
   }
 };
+
+export const getAllDiaryDays = async () => {
+  try {
+    const res = await diaryDayAPI.get(`/all`);
+    return res.data
+  } catch (error) {
+    console.error("Error fetching user info:", error.response.data.message);
+    throw error;
+  }
+};

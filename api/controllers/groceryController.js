@@ -56,7 +56,6 @@ const getGroceryList = async (req, res) => {
       "groceries.item"
     );
 
-    // console.log(groceryList, "List backend");
     if (!groceryList) {
       return res.status(404).send("Grocery list not found");
     }

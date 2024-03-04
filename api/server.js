@@ -14,6 +14,7 @@ const groceryRoutes = require('./routes/groceryRoutes');
 const usdaRoutes = require('./routes/usdaRoutes');
 const fatSecretRoutes = require('./routes/fatSecretRoutes');
 const searchSingleRoutes = require('./routes/searchSingleRoutes');
+const userRoutes = require('./routes/userRoutes');
 const errorHandler = require("./middleware/errorHandler");
 // const authMiddleware = require("./middleware/authMiddleware");
 
@@ -29,6 +30,7 @@ app.use('/api/v1/usda', usdaRoutes);
 app.use('/api/v1/fat-secret', fatSecretRoutes);
 app.use('/api/v1/ivy', searchSingleRoutes);
 app.use('/api/v1/groceries', groceryRoutes);
+app.use('/api/v1/users', userRoutes);
 
 // Error Handlers
 app.use("*", (req, res) => {

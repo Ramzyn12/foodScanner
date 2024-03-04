@@ -10,10 +10,15 @@ const TopActions = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.editText}>Edit</Text>
+      <Pressable hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}>
+        <Text style={styles.editText}>Edit</Text>
+      </Pressable>
       <Text style={styles.titleText}>Groceries</Text>
-      <Pressable onPress={() => navigation.navigate("ScanStack")}>
-       <PlusIcon />
+      <Pressable
+        hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+        onPress={() => navigation.navigate("ScanStack")}
+      >
+        <PlusIcon />
       </Pressable>
     </View>
   );

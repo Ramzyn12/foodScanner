@@ -2,13 +2,13 @@ import { View, Text } from "react-native";
 import React from "react";
 import { Path, Svg } from "react-native-svg";
 
-const LeftHalfHeart = () => {
+const LeftHalfHeart = ({width, height, ignore}) => {
   return (
     <View style={{position: 'relative'}}>
       <Svg
         xmlns="http://www.w3.org/2000/svg"
-        width="189"
-        height="235"
+        width={width || "189"}
+        height={height || "235"}
         viewBox="0 0 189 235"
         fill="none"
       >
@@ -17,7 +17,7 @@ const LeftHalfHeart = () => {
           fill="black"
         />
       </Svg>
-      <Svg
+      {!ignore && <Svg
       style={{position: 'absolute', left: 23, top: 46}}
         xmlns="http://www.w3.org/2000/svg"
         width="18"
@@ -29,7 +29,7 @@ const LeftHalfHeart = () => {
           d="M3.80435 2.47064C-2.93107 20.6583 -0.194023 41.8157 10.9458 57.6861C11.6278 58.6577 12.7135 59.1778 13.8151 59.1778C16.6206 59.1778 18.3196 55.9945 16.6799 53.6626C6.84476 39.6444 4.42703 20.964 10.3733 4.90661C11.0461 3.09103 10.1201 1.07474 8.30452 0.404164C6.48894 -0.270975 4.47493 0.65506 3.80435 2.47064Z"
           fill="black"
         />
-      </Svg>
+      </Svg>}
     </View>
   );
 };

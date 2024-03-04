@@ -3,20 +3,33 @@ import React from "react";
 import { Path, Svg } from "react-native-svg";
 import COLOURS from "../../constants/colours";
 import FullBrokenHeart from "../../svgs/FullBrokenHeart";
+import Animated from "react-native-reanimated";
+import LeftHalfHeart from "../../svgs/LeftHalfHeart";
+import RightHalfHeart from "../../svgs/RightHalfHeart";
 
-const MakeChange = ({navigation}) => {
+const MakeChange = ({ navigation }) => {
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.contentContainer}>
-        <FullBrokenHeart />
-        <Text style={styles.title}>Make a change</Text>
-        <Text style={styles.description}>
-          You are what you eat, so it’s time to take control of the food that
-          goes into your body.
-        </Text>
-        <View style={{paddingVertical: 12, width: '100%'}}>
-          <Pressable
-            onPress={() => navigation.navigate("HeartAnimation")}
+    <View style={styles.container}>
+      <FullBrokenHeart />
+      {/* <View style={{ flexDirection: "row"}}>
+        <Animated.Image
+          sharedTransitionTag="leftHeart"
+          source={require("../../assets/smallLeftHeart.png")}
+        />
+        <Animated.Image
+          sharedTransitionTag="rightHeart"
+          source={require("../../assets/smallRightHeart.png")}
+        />
+      </View> */}
+      <Text style={styles.title}>Make a change</Text>
+      <Text style={styles.description}>
+        You are what you eat, so it’s time to take control of the food that goes
+        into your body.
+      </Text>
+      <View style={{ paddingVertical: 12, width: "100%" }}>
+        <Pressable onPress={() => navigation.navigate("HeartAnimation")}>
+          <Animated.View
+            sharedTransitionTag="greenButton"
             style={styles.button}
           >
             <Text style={styles.buttonText}>Start the healing process</Text>
@@ -32,10 +45,10 @@ const MakeChange = ({navigation}) => {
                 fill="white"
               />
             </Svg>
-          </Pressable>
-        </View>
+          </Animated.View>
+        </Pressable>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -43,21 +56,17 @@ export default MakeChange;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: "center",
-    backgroundColor: "#FFFFFF",
-    paddingHorizontal: 30,
-  },
-  contentContainer: {
     alignItems: "center",
     gap: 20,
     paddingHorizontal: 30,
     flex: 1,
+    backgroundColor: "#FFFFFF",
     justifyContent: "center",
   },
   title: {
     fontSize: 28,
     fontFamily: "Mulish_700Bold",
+    color: COLOURS.nearBlack,
   },
   description: {
     fontFamily: "Mulish_600SemiBold",

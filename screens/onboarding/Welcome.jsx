@@ -2,6 +2,7 @@ import { View, Text, SafeAreaView, Pressable, StyleSheet } from "react-native";
 import React from "react";
 import { Path, Svg } from "react-native-svg";
 import COLOURS from "../../constants/colours";
+import Animated from "react-native-reanimated";
 
 const Welcome = ({ navigation }) => {
   return (

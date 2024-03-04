@@ -14,6 +14,9 @@ import { Path, Svg } from "react-native-svg";
 import RadioButton from "../../components/onboarding/RadioButton";
 import { ScrollView } from "react-native";
 import CheckBox from "../../components/onboarding/CheckBox";
+import Animated from "react-native-reanimated";
+import { useDispatch } from "react-redux";
+import { setLikeFeatures } from "../../redux/onboardingSlice";
 
 const options = [
   "Barcode scanner",
@@ -23,7 +26,7 @@ const options = [
 
 const ExcitementQuestion = ({ navigation }) => {
   const [selectedExcitements, setSelectedExcitements] = useState([]);
-
+  const dispatch = useDispatch()
   const handleExcitementSelect = (value) => {
     setSelectedExcitements((currentSelectedExcitements) => {
       if (currentSelectedExcitements.includes(value)) {
@@ -35,31 +38,37 @@ const ExcitementQuestion = ({ navigation }) => {
   };
 
   const handleNext = () => {
-    console.log(selectedExcitements);
+    dispatch(setLikeFeatures(selectedExcitements))
     navigation.navigate("AuthScreen");
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.contentContainer}>
-        <View style={styles.topContainer}>
+    <View style={styles.container}>
+      <View style={styles.topContainer}>
+        {/* <Animated.View
+          style={{ width: "100%" }}
+          sharedTransitionTag="progressBar"
+        > */}
           <ProgressBar percent={90} />
-          <Text style={styles.titleText}>
-          What features are you most excited to use?          </Text>
-          {/* Radio Buttons */}
-          <View showsVerticalScrollIndicator={false}>
-            {options.map((option) => (
-              <View key={option} style={{ marginBottom: 12 }}>
-                <CheckBox
-                  selectedValues={selectedExcitements}
-                  value={option}
-                  onSelect={handleExcitementSelect}
-                />
-              </View>
-            ))}
-          </View>
+        {/* </Animated.View> */}
+        <Text style={styles.titleText}>
+          What features are you most excited to use?{" "}
+        </Text>
+        {/* Radio Buttons */}
+        <View showsVerticalScrollIndicator={false}>
+          {options.map((option) => (
+            <View key={option} style={{ marginBottom: 12 }}>
+              <CheckBox
+                selectedValues={selectedExcitements}
+                value={option}
+                onSelect={handleExcitementSelect}
+              />
+            </View>
+          ))}
         </View>
-        <Pressable style={styles.button} onPress={handleNext}>
+      </View>
+      <Pressable style={{ width: "100%" }} onPress={handleNext}>
+        <Animated.View style={styles.button} sharedTransitionTag="greenButton">
           <Text style={styles.buttonText}>Next</Text>
           <Svg
             xmlns="http://www.w3.org/2000/svg"
@@ -73,9 +82,9 @@ const ExcitementQuestion = ({ navigation }) => {
               fill="white"
             />
           </Svg>
-        </Pressable>
-      </View>
-    </SafeAreaView>
+        </Animated.View>
+      </Pressable>
+    </View>
   );
 };
 
@@ -87,6 +96,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#FFFFFF",
     paddingHorizontal: 30,
+    paddingVertical: 40,
   },
   contentContainer: {
     // alignItems: "center",

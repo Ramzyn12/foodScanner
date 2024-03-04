@@ -40,7 +40,7 @@ const GroceryList = () => {
       <GroceryListItem
         foodItem={item.item}
         id={item._id}
-        onLongPress={null}
+        onLongPress={drag}
         isActive={isActive}
       />
     );

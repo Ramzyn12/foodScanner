@@ -9,10 +9,12 @@ import ImageCard from "../../components/onboarding/ImageCard";
 import Cancer from "../../svgs/Cancer";
 import HeartDisease from "../../svgs/HeartDisease";
 import Dementia from "../../svgs/Dementia";
+import Animated from "react-native-reanimated";
+// import { SharedElement } from "react-navigation-shared-element";
 
 const InfoTwo = ({ navigation }) => {
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.contentContainer}>
         <Text style={styles.titleText}>
           However, these foods have led to a sharp rise in diseases such as:{" "}
@@ -31,11 +33,8 @@ const InfoTwo = ({ navigation }) => {
           <Text style={styles.scoreText}>62%</Text>
         </View>
       </View>
-      <View style={styles.buttonContainer}>
-        <Pressable
-          onPress={() => navigation.navigate("MakeChange")}
-          style={styles.button}
-        >
+      <Pressable onPress={() => navigation.navigate("MakeChange")}>
+        <Animated.View sharedTransitionTag="greenButton" style={styles.button}>
           <Text style={styles.buttonText}>Next</Text>
           <Svg
             xmlns="http://www.w3.org/2000/svg"
@@ -49,9 +48,11 @@ const InfoTwo = ({ navigation }) => {
               fill="white"
             />
           </Svg>
-        </Pressable>
-      </View>
-    </SafeAreaView>
+        </Animated.View>
+      </Pressable>
+      {/* Button */}
+
+    </View>
   );
 };
 
@@ -63,11 +64,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#FFFFFF",
     paddingHorizontal: 30,
+    paddingVertical: 30,
   },
   contentContainer: {
     alignItems: "center",
     gap: 40,
-    paddingHorizontal: 30,
     flex: 1,
     justifyContent: "center",
   },

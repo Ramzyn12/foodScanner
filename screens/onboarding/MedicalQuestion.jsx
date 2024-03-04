@@ -14,6 +14,9 @@ import { Path, Svg } from "react-native-svg";
 import RadioButton from "../../components/onboarding/RadioButton";
 import { ScrollView } from "react-native";
 import CheckBox from "../../components/onboarding/CheckBox";
+import Animated from "react-native-reanimated";
+import { useDispatch } from "react-redux";
+import { setMedicalConditions } from "../../redux/onboardingSlice";
 
 const options = [
   "Cancer",
@@ -36,12 +39,14 @@ const options = [
 ];
 
 const MedicalQuestion = ({ navigation }) => {
+  
   const [selectedConditions, setSelectedConditions] = useState([]);
+  const dispatch = useDispatch();
 
   const handleConditionSelect = (value) => {
     setSelectedConditions((currentSelectedConditions) => {
       if (currentSelectedConditions.includes(value)) {
-        return currentSelectedConditions.filter(day => day !== value);
+        return currentSelectedConditions.filter((day) => day !== value);
       } else {
         return [...currentSelectedConditions, value];
       }
@@ -49,33 +54,34 @@ const MedicalQuestion = ({ navigation }) => {
   };
 
   const handleNext = () => {
-    console.log(selectedConditions)
-    navigation.navigate('MotivationQuestion')
-  }
-
+    dispatch(setMedicalConditions(selectedConditions));
+    navigation.navigate("MotivationQuestion");
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.contentContainer}>
-        <View style={styles.topContainer}>
+    <View style={styles.container}>
+      <View style={styles.topContainer}>
+        {/* <Animated.View sharedTransitionTag="progressBar"> */}
           <ProgressBar percent={60} />
-          <Text style={styles.titleText}>
-            Do you suffer from any of these medical conditions?{" "}
-          </Text>
-          {/* Radio Buttons */}
-          <ScrollView showsVerticalScrollIndicator={false}>
-            {options.map((option) => (
-              <View key={option} style={{ marginBottom: 12 }}>
-                <CheckBox
-                  selectedValues={selectedConditions}
-                  value={option}
-                  onSelect={handleConditionSelect}
-                />
-              </View>
-            ))}
-          </ScrollView>
-        </View>
-        <Pressable style={styles.button} onPress={handleNext}>
+        {/* </Animated.View> */}
+        <Text style={styles.titleText}>
+          Do you suffer from any of these medical conditions?{" "}
+        </Text>
+        {/* Radio Buttons */}
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {options.map((option) => (
+            <View key={option} style={{ marginBottom: 12 }}>
+              <CheckBox
+                selectedValues={selectedConditions}
+                value={option}
+                onSelect={handleConditionSelect}
+              />
+            </View>
+          ))}
+        </ScrollView>
+      </View>
+      <Pressable style={{ width: "100%" }} onPress={handleNext}>
+        <Animated.View style={styles.button} sharedTransitionTag="greenButton">
           <Text style={styles.buttonText}>Next</Text>
           <Svg
             xmlns="http://www.w3.org/2000/svg"
@@ -89,9 +95,9 @@ const MedicalQuestion = ({ navigation }) => {
               fill="white"
             />
           </Svg>
-        </Pressable>
-      </View>
-    </SafeAreaView>
+        </Animated.View>
+      </Pressable>
+    </View>
   );
 };
 
@@ -103,6 +109,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#FFFFFF",
     paddingHorizontal: 30,
+    paddingVertical: 40,
   },
   contentContainer: {
     // alignItems: "center",

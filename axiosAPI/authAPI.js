@@ -7,12 +7,13 @@ const authAPI = axios.create({
   baseURL: "http://192.168.0.145:3000/api/v1/auth/",
 });
 
-export const signUpApple = async ({ email, uid, idToken }) => {
+export const signUpApple = async ({ email, uid, idToken, userInformation }) => {
   try {
     const response = await authAPI.post("signUpApple", {
       email,
       uid,
       idToken,
+      userInformation
     });
     return response.data;
   } catch (error) {
@@ -24,7 +25,7 @@ export const signUpApple = async ({ email, uid, idToken }) => {
   }
 };
 
-export const signUp = async ({ email, password }) => {
+export const signUp = async ({ email, password, userInfo }) => {
   if (password.length < 6) {
     console.log("Password needs to be at least 6 characters.");
     return;
@@ -34,6 +35,7 @@ export const signUp = async ({ email, password }) => {
     const response = await authAPI.post("signUp", {
       email: email,
       password: password,
+      userInfo
     });
 
     const data = response.data;

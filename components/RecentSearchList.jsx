@@ -35,7 +35,6 @@ const RecentSearchList = () => {
   };
 
   const handleListItemPress = (item) => {
-    console.log(item);
     navigation.navigate("FoodDetails", {
       singleFoodId: item.singleFoodId,
       barcodeId: item.barcode,

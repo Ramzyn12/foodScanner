@@ -5,8 +5,12 @@ import { auth } from "../firebaseConfig";
 import { signUpApple } from "../axiosAPI/authAPI";
 import { useMutation } from "@tanstack/react-query";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useSelector } from "react-redux";
 
 export const useAppleAuth = () => {
+
+  const userInformation = useSelector(state => state.onboarding.userInformation)
+
   const signUpAppleMutation = useMutation({
     mutationFn: signUpApple,
     onSuccess: () => {},
@@ -49,6 +53,7 @@ export const useAppleAuth = () => {
               email: user.email,
               uid: user.uid,
               idToken: identityToken,
+              userInformation
             });
             // Could potentially get operationType to know if first time signing
             // Up or just signing in?

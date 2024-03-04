@@ -72,18 +72,6 @@ const AuthScreen = ({ route }) => {
               ? "Welcome back. Sign in to Ivy."
               : "Sign up to begin changing your life."}
           </Text>
-          {/* <Text
-            style={{
-              fontFamily: "Mulish_500Medium",
-              fontSize: 14,
-              color: COLOURS.nearBlack,
-              textAlign: "center",
-            }}
-          >
-            {showSignIn
-              ? `By signing in, you’ll be able to access any previously saved progress.`
-              : `By signing up, you’ll never lose any of your saved progress, lists or statistics.`}
-          </Text> */}
         </View>
         {/* Buttons */}
         <View

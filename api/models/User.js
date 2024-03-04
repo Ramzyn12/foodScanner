@@ -38,10 +38,36 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
-
     bio: {
       type: String,
       default: "I like skiing",
+    },
+    userInformation: {
+      age: {
+        type: Number,
+        default: null,
+      },
+      gender: {
+        type: String,
+        default: null,
+        enum: ['Male', 'Female', 'Non-binary', 'Prefer not to say'], // Adjust based on your requirements
+      },
+      processedFoodConsumption: {
+        type: Number, // Assuming this will be stored as a description e.g., "2 days"
+        default: null,
+      },
+      MedicalConditions: [{
+        type: String,
+        default: [],
+      }],
+      Motivations: [{
+        type: String,
+        default: [],
+      }],
+      LikeFeatures: [{
+        type: String,
+        default: [],
+      }],
     },
   },
   {

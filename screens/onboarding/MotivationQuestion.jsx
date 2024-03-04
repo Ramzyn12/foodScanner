@@ -14,21 +14,25 @@ import { Path, Svg } from "react-native-svg";
 import RadioButton from "../../components/onboarding/RadioButton";
 import { ScrollView } from "react-native";
 import CheckBox from "../../components/onboarding/CheckBox";
+import Animated from "react-native-reanimated";
+import { useDispatch } from "react-redux";
+import { setMotivations } from "../../redux/onboardingSlice";
 
 const options = [
-  'Improve my mental health',
-  'Reduce risk of disease',
-  'Improve life span',
-  'Improve health span'
+  "Improve my mental health",
+  "Reduce risk of disease",
+  "Improve life span",
+  "Improve health span",
 ];
 
 const MotivationQuestion = ({ navigation }) => {
   const [selectedMotivations, setSelectedMotivations] = useState([]);
+  const dispatch = useDispatch()
 
   const handleMotivationSelect = (value) => {
     setSelectedMotivations((currentSelectedMotivations) => {
       if (currentSelectedMotivations.includes(value)) {
-        return currentSelectedMotivations.filter(day => day !== value);
+        return currentSelectedMotivations.filter((day) => day !== value);
       } else {
         return [...currentSelectedMotivations, value];
       }
@@ -36,32 +40,34 @@ const MotivationQuestion = ({ navigation }) => {
   };
 
   const handleNext = () => {
-    console.log(selectedMotivations)
-    navigation.navigate('ExcitementQuestion')
-  }
-
+    dispatch(setMotivations(selectedMotivations))
+    navigation.navigate("ExcitementQuestion");
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.contentContainer}>
-        <View style={styles.topContainer}>
+    <View style={styles.container}>
+      <View style={styles.topContainer}>
+        {/* <Animated.View sharedTransitionTag="progressBar"> */}
           <ProgressBar percent={75} />
-          <Text style={styles.titleText}>
-          Why do you want to reduce your intake of processed foods?          </Text>
-          {/* Radio Buttons */}
-          <View showsVerticalScrollIndicator={false}>
-            {options.map((option) => (
-              <View key={option} style={{ marginBottom: 12 }}>
-                <CheckBox
-                  selectedValues={selectedMotivations}
-                  value={option}
-                  onSelect={handleMotivationSelect}
-                />
-              </View>
-            ))}
-          </View>
+        {/* </Animated.View> */}
+        <Text style={styles.titleText}>
+          Why do you want to reduce your intake of processed foods?{" "}
+        </Text>
+        {/* Radio Buttons */}
+        <View showsVerticalScrollIndicator={false}>
+          {options.map((option) => (
+            <View key={option} style={{ marginBottom: 12 }}>
+              <CheckBox
+                selectedValues={selectedMotivations}
+                value={option}
+                onSelect={handleMotivationSelect}
+              />
+            </View>
+          ))}
         </View>
-        <Pressable style={styles.button} onPress={handleNext}>
+      </View>
+      <Pressable style={{ width: "100%" }} onPress={handleNext}>
+        <Animated.View sharedTransitionTag="greenButton" style={styles.button}>
           <Text style={styles.buttonText}>Next</Text>
           <Svg
             xmlns="http://www.w3.org/2000/svg"
@@ -75,9 +81,9 @@ const MotivationQuestion = ({ navigation }) => {
               fill="white"
             />
           </Svg>
-        </Pressable>
-      </View>
-    </SafeAreaView>
+        </Animated.View>
+      </Pressable>
+    </View>
   );
 };
 
@@ -89,6 +95,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#FFFFFF",
     paddingHorizontal: 30,
+    paddingVertical: 40,
   },
   contentContainer: {
     // alignItems: "center",

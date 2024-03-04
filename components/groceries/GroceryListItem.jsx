@@ -22,6 +22,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   addVirtualGroceryItem,
   checkGrocery,
+  confirmDeletion,
   removeVirtualGroceryItem,
 } from "../../redux/grocerySlice";
 import Toast from "react-native-toast-message";
@@ -37,6 +38,7 @@ const GroceryListItem = ({ foodItem, checked, id, onLongPress, isActive }) => {
   const removeFoodMutation = useMutation({
     mutationFn: removeFoodFromGroceryList,
     onSuccess: () => {
+      dispatch(confirmDeletion(id))
       queryClient.invalidateQueries(["Groceries"]);
       // queryClient.invalidateQueries(["DiaryDay"]); //Maybe?
     },
@@ -78,7 +80,7 @@ const GroceryListItem = ({ foodItem, checked, id, onLongPress, isActive }) => {
         barcode: foodItem?.barcode,
         singleFoodId: foodItem?._id,
       });
-    }, 4000); 
+    }, 4000);
 
     Toast.show({
       type: "groceryToast",
@@ -197,5 +199,4 @@ const styles = StyleSheet.create({
     paddingRight: 15,
     paddingVertical: 2,
   },
-
 });

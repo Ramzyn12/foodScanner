@@ -12,33 +12,55 @@ import ProgressBar from "../../components/onboarding/ProgressBar";
 import COLOURS from "../../constants/colours";
 import { Path, Svg } from "react-native-svg";
 import RadioButton from "../../components/onboarding/RadioButton";
+import Animated from "react-native-reanimated";
+import { useDispatch } from "react-redux";
+import { setGender } from "../../redux/onboardingSlice";
 
-
-const GenderQuestion = ({navigation}) => {
+const GenderQuestion = ({ navigation }) => {
   const [selectedGender, setSelectedGender] = useState(null);
+  const dispatch = useDispatch()
 
   const handleGenderSelect = (value) => {
     setSelectedGender(value); // Set the selected gender
-    console.log(value); // Log the selected value
+    dispatch(setGender(value))
     setTimeout(() => {
-      navigation.navigate('ConsumptionQuestion');
-    }, 800); 
+      navigation.navigate("ConsumptionQuestion");
+    }, 800);
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.contentContainer}>
+    <View style={styles.container}>
+      {/* <Animated.View
+        sharedTransitionTag="progressBar"
+        style={{ width: "100%" }}
+      > */}
         <ProgressBar percent={36} />
-        <Text style={styles.titleText}>What is your gender?</Text>
-        {/* Radio Buttons */}
-        <View style={{ gap: 12 }}>
-          <RadioButton selectedValue={selectedGender} value={'Female'} onSelect={handleGenderSelect} />
-          <RadioButton selectedValue={selectedGender} value={'Male'} onSelect={handleGenderSelect} />
-          <RadioButton selectedValue={selectedGender} value={'Non-binary'} onSelect={handleGenderSelect} />
-          <RadioButton selectedValue={selectedGender} value={'Prefer not to say'} onSelect={handleGenderSelect} />
-        </View>
+      {/* </Animated.View> */}
+      <Text style={styles.titleText}>What is your gender?</Text>
+      {/* Radio Buttons */}
+      <View style={{ gap: 12 }}>
+        <RadioButton
+          selectedValue={selectedGender}
+          value={"Female"}
+          onSelect={handleGenderSelect}
+        />
+        <RadioButton
+          selectedValue={selectedGender}
+          value={"Male"}
+          onSelect={handleGenderSelect}
+        />
+        <RadioButton
+          selectedValue={selectedGender}
+          value={"Non-binary"}
+          onSelect={handleGenderSelect}
+        />
+        <RadioButton
+          selectedValue={selectedGender}
+          value={"Prefer not to say"}
+          onSelect={handleGenderSelect}
+        />
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -47,9 +69,11 @@ export default GenderQuestion;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
+    gap: 40,
     backgroundColor: "#FFFFFF",
     paddingHorizontal: 30,
+    paddingVertical: 40,
   },
   contentContainer: {
     // alignItems: "center",

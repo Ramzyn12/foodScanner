@@ -110,7 +110,6 @@ const FoodDetailsButtons = ({ foodItem }) => {
   };
 
   const handleRemoveFromList = () => {
-    console.log(currentFood, "FROM BUTTONS");
     removeFromListMutation.mutate({
       barcode: currentFood?.barcode,
       singleFoodId: currentFood?.singleFoodId,

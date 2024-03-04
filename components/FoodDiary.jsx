@@ -30,7 +30,7 @@ const FoodDiary = () => {
     queryFn: () => getDiaryDay({ date: new Date() }),
     queryKey: ["DiaryDay"], //MIGHT NEED TO ADD SECOND PARAM
     enabled: !!token,
-    retry: false,
+    // retry: false,
   });
 
   if (isLoading) return <ActivityIndicator />;

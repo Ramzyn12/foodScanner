@@ -3,6 +3,7 @@ import React from "react";
 import { Path, Svg } from "react-native-svg";
 import COLOURS from "../../constants/colours";
 import { useNavigation } from "@react-navigation/native";
+import Animated, { FadeIn, SlideInRight } from "react-native-reanimated";
 
 const ProgressBar = ({ percent, hideBack }) => {
   const navigation = useNavigation();
@@ -11,7 +12,8 @@ const ProgressBar = ({ percent, hideBack }) => {
   const completedWidth = (210 * percent) / 100;
 
   return (
-    <View
+    <Animated.View
+      sharedTransitionTag="progressBar"
       style={{
         position: "relative",
         width: "100%",
@@ -19,11 +21,10 @@ const ProgressBar = ({ percent, hideBack }) => {
         marginTop: 20,
       }}
     >
-      {!hideBack && (
+      {
         <Pressable
-          style={{ position: "absolute", left: 0, paddingHorizontal: 5 }}
+          style={{ position: "absolute", left: 0 }}
           hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-
           onPress={() => navigation.goBack()}
         >
           <Svg
@@ -39,7 +40,7 @@ const ProgressBar = ({ percent, hideBack }) => {
             />
           </Svg>
         </Pressable>
-      )}
+      }
       <View
         style={{
           width: fullWidth,
@@ -50,7 +51,9 @@ const ProgressBar = ({ percent, hideBack }) => {
           backgroundColor: "#F5F5F5",
         }}
       >
-        <View
+        <Animated.View
+          entering={FadeIn.duration(500)}
+          sharedTransitionTag="progress"
           style={{
             width: completedWidth,
             height: "100%",
@@ -58,9 +61,9 @@ const ProgressBar = ({ percent, hideBack }) => {
             borderRadius: 200,
             backgroundColor: COLOURS.darkGreen,
           }}
-        ></View>
+        ></Animated.View>
       </View>
-    </View>
+    </Animated.View>
   );
 };
 

@@ -15,32 +15,39 @@ import FormSubmissionButton from "./FormSubmissionButton";
 import { useNavigation } from "@react-navigation/native";
 import { signUp } from "../../axiosAPI/authAPI";
 import { useMutation } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
+import { addUserInformation } from "../../axiosAPI/userAPI";
 
 const SignUpForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigation = useNavigation()
+  const navigation = useNavigation();
+  const userInformation = useSelector(
+    (state) => state.onboarding.userInformation
+  );
+
 
   const signUpMutation = useMutation({
     mutationFn: signUp,
     onSuccess: async (data) => {
-      navigation.navigate('MainTabsStack', { 
-        screen: 'DiaryStack',
-        params: { 
-          screen: 'CreateAccount', 
-          params: { 
-            token: data?.token, 
-            firebaseId: data?.firebaseId 
-          } 
+      navigation.navigate("MainTabsStack", {
+        screen: "DiaryStack",
+        params: {
+          screen: "CreateAccount",
+          params: {
+            token: data?.token,
+            firebaseId: data?.firebaseId,
+          },
         },
-      });    },
+      });
+    },
     onError: (err) => {
-      console.log(err, 'Error signing up to ur account...');
+      console.log(err, "Error signing up to ur account...");
     },
   });
 
   const handleCreateAccount = () => {
-    signUpMutation.mutate({ email, password });
+    signUpMutation.mutate({ email, password, userInfo: userInformation });
   };
 
   return (

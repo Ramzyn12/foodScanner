@@ -73,20 +73,24 @@ const HeartAnimation = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <Animated.View style={[leftHeartStyle]}>
         <LeftHalfHeart />
       </Animated.View>
       <Animated.View style={[rightHeartStyle]}>
         <RightHalfHeart />
       </Animated.View>
-      {/* <Pressable
-        style={{ position: "absolute", top: 50 }}
-        onPress={handleAnimate}
-      >
-        <Text style={{ fontSize: 16, color: "#000" }}>Animate!</Text>
-      </Pressable> */}
-    </SafeAreaView>
+      {/* <Animated.Image
+        style={[leftHeartStyle]}
+        sharedTransitionTag="leftHeart"
+        source={require("../../assets/Vector-3.png")}
+      />
+      <Animated.Image
+        sharedTransitionTag="rightHeart"
+        source={require("../../assets/Vector-4.png")}
+        style={[rightHeartStyle]}
+      /> */}
+    </View>
   );
 };
 

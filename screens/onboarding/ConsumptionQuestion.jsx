@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Pressable,
   TouchableOpacity,
+  Animated,
 } from "react-native";
 import React, { useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -12,40 +13,45 @@ import ProgressBar from "../../components/onboarding/ProgressBar";
 import COLOURS from "../../constants/colours";
 import { Path, Svg } from "react-native-svg";
 import RadioButton from "../../components/onboarding/RadioButton";
+import { useDispatch } from "react-redux";
+import { setProcessedFoodConsumption } from "../../redux/onboardingSlice";
 
 const options = ["1", "2", "3", "4", "5", "6", "7"];
-
 const ConsumptionQuestion = ({ navigation }) => {
   const [selectedDays, setSelectedDays] = useState(null);
+  const dispatch = useDispatch();
 
   const handleDaySelect = (value) => {
     setSelectedDays(value); // Set the selected gender
-    console.log(value); // Log the selected value
+    dispatch(setProcessedFoodConsumption(value));
     setTimeout(() => {
       navigation.navigate("MedicalQuestion");
     }, 800);
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.contentContainer}>
+    <View style={styles.container}>
+      {/* <Animated.View
+        sharedTransitionTag="progressBar"
+        style={{ width: "100%" }}
+      > */}
         <ProgressBar percent={48} />
-        <Text style={styles.titleText}>
-          On average, how many days per week do you consume processed food?
-        </Text>
-        {/* Radio Buttons */}
-        <View style={{ gap: 12 }}>
-          {options.map((option) => (
-            <RadioButton
-              key={option}
-              selectedValue={selectedDays}
-              value={option}
-              onSelect={handleDaySelect}
-            />
-          ))}
-        </View>
+      {/* </Animated.View> */}
+      <Text style={styles.titleText}>
+        On average, how many days per week do you consume processed food?
+      </Text>
+      {/* Radio Buttons */}
+      <View style={{ gap: 12 }}>
+        {options.map((option) => (
+          <RadioButton
+            key={option}
+            selectedValue={selectedDays}
+            value={option}
+            onSelect={handleDaySelect}
+          />
+        ))}
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -54,9 +60,11 @@ export default ConsumptionQuestion;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "flex-start",
     backgroundColor: "#FFFFFF",
     paddingHorizontal: 30,
+    paddingVertical: 40,
+    gap: 40,
   },
   contentContainer: {
     // alignItems: "center",

@@ -1,5 +1,5 @@
 // ScanStack.js
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+// import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginSignUp from "../screens/LoginSignUp";
 import Welcome from "../screens/onboarding/Welcome";
 import Notifications from "../screens/onboarding/Notifications";
@@ -19,11 +19,14 @@ import CreateAccount from "../components/onboarding/CreateAccount";
 import ProgressBar from "../components/onboarding/ProgressBar";
 import { View } from "react-native";
 
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+// import { createSharedElementStackNavigator } from "react-navigation-shared-element";
+
 const Stack = createNativeStackNavigator();
 
-const AuthStackNavigator = () => {
+const AuthStack = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator >
       <Stack.Screen
         name="Welcome"
         component={Welcome}
@@ -104,13 +107,13 @@ const AuthStackNavigator = () => {
   );
 };
 
-const AuthStack = () => {
-  return (
-    <>
-      {/* <ProgressBar percent={10} /> */}
-      <AuthStackNavigator />
-    </>
-  );
-};
+// const AuthStack = () => {
+//   return (
+//     <>
+//       {/* <ProgressBar percent={10} /> */}
+//       <Auth />
+//     </>
+//   );
+// };
 
 export default AuthStack;

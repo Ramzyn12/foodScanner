@@ -2,13 +2,13 @@ import { View, Text } from "react-native";
 import React from "react";
 import { Path, Svg } from "react-native-svg";
 
-const RightHalfHeart = () => {
+const RightHalfHeart = ({ width, height, ignore }) => {
   return (
     <View style={{ position: "relative" }}>
       <Svg
         xmlns="http://www.w3.org/2000/svg"
-        width="158"
-        height="240"
+        width={width || "158"}
+        height={height || "240"}
         viewBox="0 0 158 240"
         fill="none"
       >
@@ -17,32 +17,36 @@ const RightHalfHeart = () => {
           fill="black"
         />
       </Svg>
-      <Svg
-        style={{ position: "absolute", right: 22, top: 26 }}
-        xmlns="http://www.w3.org/2000/svg"
-        width="44"
-        height="60"
-        viewBox="0 0 44 60"
-        fill="none"
-      >
-        <Path
-          d="M3.53269 7.25744C25.959 11.1312 40.4982 33.2515 35.1591 55.3266C34.713 57.1764 35.8258 59.0425 37.6566 59.5331L37.7425 59.5561C39.6238 60.0082 41.5155 58.8527 41.972 56.9727C48.2559 30.9799 31.1038 4.85835 4.71782 0.349316C2.81011 0.0223292 1.00038 1.30369 0.6728 3.21361C0.344202 5.11852 1.60515 6.92515 3.53269 7.25744Z"
-          fill="black"
-        />
-      </Svg>
-      <Svg
-        style={{ position: "absolute", right: 30, top: 97 }}
-        xmlns="http://www.w3.org/2000/svg"
-        width="9"
-        height="8"
-        viewBox="0 0 9 8"
-        fill="none"
-      >
-        <Path
-          d="M5.60453 1.13601L4.86647 0.938247C2.99819 0.437644 1.07627 1.54727 0.575669 3.41554C-0.637537 7.94329 6.8664 9.96282 8.08182 5.42681C8.58243 3.55853 7.4728 1.63661 5.60453 1.13601Z"
-          fill="black"
-        />
-      </Svg>
+      {!ignore && (
+        <>
+          <Svg
+            style={{ position: "absolute", right: 22, top: 26 }}
+            xmlns="http://www.w3.org/2000/svg"
+            width="44"
+            height="60"
+            viewBox="0 0 44 60"
+            fill="none"
+          >
+            <Path
+              d="M3.53269 7.25744C25.959 11.1312 40.4982 33.2515 35.1591 55.3266C34.713 57.1764 35.8258 59.0425 37.6566 59.5331L37.7425 59.5561C39.6238 60.0082 41.5155 58.8527 41.972 56.9727C48.2559 30.9799 31.1038 4.85835 4.71782 0.349316C2.81011 0.0223292 1.00038 1.30369 0.6728 3.21361C0.344202 5.11852 1.60515 6.92515 3.53269 7.25744Z"
+              fill="black"
+            />
+          </Svg>
+          <Svg
+            style={{ position: "absolute", right: 30, top: 97 }}
+            xmlns="http://www.w3.org/2000/svg"
+            width="9"
+            height="8"
+            viewBox="0 0 9 8"
+            fill="none"
+          >
+            <Path
+              d="M5.60453 1.13601L4.86647 0.938247C2.99819 0.437644 1.07627 1.54727 0.575669 3.41554C-0.637537 7.94329 6.8664 9.96282 8.08182 5.42681C8.58243 3.55853 7.4728 1.63661 5.60453 1.13601Z"
+              fill="black"
+            />
+          </Svg>
+        </>
+      )}
     </View>
   );
 };

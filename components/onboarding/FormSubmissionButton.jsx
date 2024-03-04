@@ -13,8 +13,6 @@ const FormSubmissionButton = ({onPress, email, password, firstName, lastName, te
     opacityStyle = 1
   }
 
-
-
   return (
     <Pressable
           onPress={onPress}

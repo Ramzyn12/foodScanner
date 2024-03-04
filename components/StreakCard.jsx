@@ -1,26 +1,40 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import Svg, { G, Path, ClipPath, Rect, Defs } from "react-native-svg";
-import COLOURS from '../constants/colours'
+import COLOURS from "../constants/colours";
 
+const StreakCard = ({ streak }) => {
 
-const StreakCard = () => {
+  const generateStreakNumbers = () => {
+    const numbers = [];
+    // Determine the range of numbers to display based on the current streak
+    const start = streak > 3 ? streak - 3 : 1;
+    const end = streak > 3 ? streak + 3 : 7;
+
+    for (let i = start; i <= end; i++) {
+      numbers.push(
+        <Text
+          key={i}
+          style={[
+            styles.streakCardNumber,
+            streak === i && styles.streakCardNumberCurrent, // Apply special styling for the current streak
+          ]}
+        >
+          {i}
+        </Text>
+      );
+    }
+
+    return numbers;
+  };
 
   return (
     <View style={styles.streakCardContainer}>
       <Text style={styles.streakCardText}>You're on a streak! Keep going.</Text>
       <View style={styles.streakCardNumbersContainer}>
-        {/* [[day], [day-1] ...] */}
-        <Text style={styles.streakCardNumber}>23</Text>
-        <Text style={styles.streakCardNumber}>24</Text>
-        <Text style={styles.streakCardNumber}>25</Text>
-        <Text style={[styles.streakCardNumber, styles.streakCardNumberCurrent]}>
-          26
-        </Text>
-        <Text style={styles.streakCardNumber}>27</Text>
-        <Text style={styles.streakCardNumber}>28</Text>
-        <Text style={styles.streakCardNumber}>29</Text>
+        {generateStreakNumbers()}
       </View>
+
       <Svg
         style={styles.streakCardSvg}
         width="146"
@@ -99,4 +113,4 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0, // adjust as needed
   },
-})
+});

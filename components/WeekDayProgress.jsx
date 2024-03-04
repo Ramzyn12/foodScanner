@@ -1,18 +1,39 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import Svg, { Path } from "react-native-svg";
-import COLOURS from '../constants/colours'
+import COLOURS from "../constants/colours";
 import CircularProgress from "./CircularProgress";
 
-const WeekDayProgress = ({ dayType, date }) => {
-
+const WeekDayProgress = ({ dayType, date, score }) => {
   return (
-    <View style={[styles.weekDayContainer, dayType === 'current' && {borderBottomWidth: 4, borderBottomColor: "#126668"}]}>
+    <View
+      style={[
+        styles.weekDayContainer,
+        dayType === "current" && {
+          borderBottomWidth: 4,
+          borderBottomColor: "#126668",
+        },
+      ]}
+    >
       <View style={styles.weekDayTop}>
-        <Text style={[styles.weekDayText, dayType === 'current' && {color: COLOURS.darkGreen}]}>{date.format('ddd').toUpperCase()}</Text>
-        <Text style={[styles.weekDayNumber, dayType === 'current' && {color: COLOURS.darkGreen}]}>{date.date()}</Text>
+        <Text
+          style={[
+            styles.weekDayText,
+            dayType === "current" && { color: COLOURS.darkGreen },
+          ]}
+        >
+          {date.format("ddd").toUpperCase()}
+        </Text>
+        <Text
+          style={[
+            styles.weekDayNumber,
+            dayType === "current" && { color: COLOURS.darkGreen },
+          ]}
+        >
+          {date.date()}
+        </Text>
       </View>
-      {dayType === "past" && (
+      {dayType === "past" && score >= 80 && (
         <View style={styles.progressCirclePast}>
           <Svg width="15" height="11" viewBox="0 0 15 11" fill="none">
             <Path
@@ -22,10 +43,16 @@ const WeekDayProgress = ({ dayType, date }) => {
           </Svg>
         </View>
       )}
+      {dayType === "past" && score < 80 && (
+        <CircularProgress progress={score} />
+      )}
+      {dayType === "past" && score === "none" && (
+        <View style={styles.progressCircleFuture}></View>
+      )}
       {dayType === "future" && (
         <View style={styles.progressCircleFuture}></View>
       )}
-      {dayType === 'current' && <CircularProgress progress={50}/>}
+      {dayType === "current" && <CircularProgress progress={score} />}
     </View>
   );
 };
