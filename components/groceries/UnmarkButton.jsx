@@ -5,16 +5,18 @@ import COLOURS from "../../constants/colours";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { uncheckAllItems } from "../../axiosAPI/groceryAPI";
 import { useDispatch } from "react-redux";
-import { restartCount, setCurrentGroceries } from "../../redux/grocerySlice";
+import { restartCount, setCurrentGroceries, unmarkAllChecked } from "../../redux/grocerySlice";
 import UnmarkIcon from "../../svgs/UnmarkIcon";
 
 const UnmarkButton = () => {
+
   const queryClient = useQueryClient();
   const dispatch = useDispatch()
+
+
   const unMarkMutation = useMutation({
     mutationFn: uncheckAllItems,
     onSuccess: () => {
-      dispatch(restartCount())
       queryClient.invalidateQueries(["Groceries"]);
     },
     onError: (err) => {
@@ -22,9 +24,12 @@ const UnmarkButton = () => {
     },
   });
 
+
   const handleUnselectAll = () => {
+    dispatch(unmarkAllChecked()) // Optimistic update
     unMarkMutation.mutate();
   };
+
 
   return (
     <Pressable onPress={handleUnselectAll} style={styles.container}>

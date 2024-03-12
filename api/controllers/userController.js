@@ -3,20 +3,26 @@ const FoodItem = require("../models/FoodItem");
 const SingleFood = require("../models/SingleFood");
 const User = require("../models/User");
 const { NotFoundError } = require("../utils/error");
+const userService = require("../services/userService");
+const { validationResult } = require("express-validator");
 
 const addUserNames = async (req, res) => {
-  const userId = req.user._id; // Assuming req.user is populated from your auth middleware
-  const { firstName, lastName } = req.body; // Extract the userInfo from the request body
+  const userId = req.user._id;
+  const { firstName, lastName } = req.body;
 
-  const user = await User.findByIdAndUpdate(
-    userId,
-    { firstName, lastName },
-    { new: true, runValidators: true } // This option returns the document after update was applied and runs schema validators
-    );
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
 
-  if (!user) throw new NotFoundError("Not found user to update name");
+  //Note: Error bubbles up to next global error handler
+  const user = await userService.updateFirstLastName(
+    firstName,
+    lastName,
+    userId
+  );
 
-  res.json(user)
+  res.json({ message: "Name updated successfully" });
 };
 
 module.exports = {

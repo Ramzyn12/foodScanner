@@ -21,11 +21,11 @@ const GroceriesStack = () => {
           
         }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="FoodDetailsGroceries"
         component={FoodDetails}
         options={{ presentation: "modal", headerShown: false }}
-      />
+      /> */}
     </Stack.Navigator>
   );
 };

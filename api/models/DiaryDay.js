@@ -14,32 +14,7 @@ const DiaryDaySchema = new mongoose.Schema(
   }
 );
 
-DiaryDaySchema.index({ userId: 1, date: -1 }, { unique: true }); // Ensure unique diary per day for each user
-
-// DiaryDaySchema.methods.updateAverageScore = async function () {
-//   await this.populate({
-//     path: "consumedFoods",
-//     select: "processedScore", // Only populate the processedScore field
-//   });
-
-//   if (this.consumedFoods.length > 0) {
-//     const totalScore = this.consumedFoods.reduce(
-//       (acc, foodItem) => acc + foodItem.processedScore,
-//       0
-//     );
-//     let averageScore = totalScore / this.consumedFoods.length;
-
-//     // Round up the score using Math.ceil
-//     averageScore = Math.ceil(averageScore);
-
-//     // Ensure the score does not exceed 100
-//     this.score = Math.min(averageScore, 100);
-//   } else {
-//     this.score = 0; // Set to 0 or a default value if there are no food items
-//   }
-
-//   await this.save(); // Save the document with the updated score
-// };
+DiaryDaySchema.index({ userId: 1, date: -1 }, { unique: true }); 
 
 // IF INCLUDE SINGLEFOODS
 DiaryDaySchema.methods.updateAverageScore = async function () {

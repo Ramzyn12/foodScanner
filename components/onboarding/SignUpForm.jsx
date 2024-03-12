@@ -21,11 +21,12 @@ import { addUserInformation } from "../../axiosAPI/userAPI";
 const SignUpForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState('')
+
   const navigation = useNavigation();
   const userInformation = useSelector(
     (state) => state.onboarding.userInformation
   );
-
 
   const signUpMutation = useMutation({
     mutationFn: signUp,
@@ -34,15 +35,21 @@ const SignUpForm = () => {
         screen: "DiaryStack",
         params: {
           screen: "CreateAccount",
-          params: {
-            token: data?.token,
-            firebaseId: data?.firebaseId,
-          },
+          // params: {
+          //   token: data?.token,
+          //   firebaseId: data?.firebaseId,
+          // },
         },
       });
     },
     onError: (err) => {
-      console.log(err, "Error signing up to ur account...");
+      // If validators
+      if (err?.response?.data?.errors) {
+        setErrorMessage(err.response.data.errors[0].msg);
+        // If firebase
+      } else {
+        setErrorMessage(err.response.data.message);
+      }
     },
   });
 
@@ -53,11 +60,13 @@ const SignUpForm = () => {
   return (
     <View style={styles.container}>
       <View style={styles.formContainer}>
+        {errorMessage && <Text>{errorMessage}</Text>}
         <EmailInput email={email} setEmail={setEmail} />
         <PasswordInput password={password} setPassword={setPassword} />
         <FormSubmissionButton
           email={email}
           password={password}
+          isLoading={signUpMutation.isLoading || signUpMutation.isPending}
           text={"Create an account"}
           onPress={handleCreateAccount}
         />

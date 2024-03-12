@@ -1,15 +1,36 @@
 import { View, Text, StyleSheet } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import PhotoPhrame from "../../svgs/PhotoPhrame";
 import Calender from "../../svgs/Calender";
 import AuthDesign from "./AuthDesign";
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
-const TopUI = ({showSignIn, showSignUpForm}) => {
+const AuthState = {
+  SIGN_IN: "signIn",
+  SIGN_UP_FORM_HIDDEN: "signUpFormHidden",
+  SIGN_UP_FORM_SHOWN: "signUpFormShown",
+};
+
+const TopUI = ({ authState, keyboardVisible }) => {
+  const translateY = useSharedValue(0);
+
+  useEffect(() => {
+    translateY.value = withTiming(keyboardVisible ? -350 : 0, {
+      duration: 300,
+    });
+  }, [keyboardVisible]);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateY: translateY.value }],
+    };
+  });
+
   return (
-    <View style={{ flex: 1, marginBottom: -15 }}>
+    <Animated.View style={[{ flex: 1, marginBottom: -15  }, animatedStyle]}>
       <View style={styles.topSquare}>
-        {/* If not signIn nor signUp then show */}
-        {!showSignIn && !showSignUpForm && (
+        {/* If not signIn or signUp then show */}
+        {authState === AuthState.SIGN_UP_FORM_HIDDEN && (
           <>
             <PhotoPhrame />
             <Calender />
@@ -17,7 +38,7 @@ const TopUI = ({showSignIn, showSignUpForm}) => {
         )}
       </View>
       <AuthDesign />
-    </View>
+    </Animated.View>
   );
 };
 

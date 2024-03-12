@@ -7,10 +7,6 @@ export async function saveRecentScan(foodItem) {
   try {
     const existingRecents = await getRecentScans();
 
-    console.log(existingRecents, 'FROM DEVICE');
-    console.log(existingRecents.some((item) => item.brand === foodItem.brand), 'True for brand');
-    console.log(existingRecents.some((item) => item.name === foodItem.name), 'True for name');
-
     if (
       !existingRecents.some((item) => item.brand === foodItem.brand) &&
       !existingRecents.some((item) => item.name === foodItem.name)
@@ -39,11 +35,12 @@ export async function getRecentScans() {
 
 export async function clearRecentScans() {
   try {
-    const recents = await AsyncStorage.setItem(RECENTS_STORAGE_KEY, JSON.stringify([]));
+    const recents = await AsyncStorage.setItem(
+      RECENTS_STORAGE_KEY,
+      JSON.stringify([])
+    );
   } catch (error) {
     console.error("Error fetching recent scans:", error);
     return [];
   }
 }
-
-

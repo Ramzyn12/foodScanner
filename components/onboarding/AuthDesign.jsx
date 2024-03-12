@@ -7,6 +7,7 @@ import FruitBowlAuth from "../../svgs/FruitBowlAuth";
 import CoffeeIcon from "../../svgs/CoffeeIcon";
 
 const AuthDesign = () => {
+  
   return (
     <View style={{ position: "relative" }}>
       <View style={styles.iconsContainer}>

@@ -15,6 +15,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import MainTabsStack from "./navigation/MainTabsStack";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
+import FoodDetails from "./screens/FoodDetails";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -29,11 +30,11 @@ function MainComponent() {
     // This function runs when the component mounts, and sets up the auth state changed listener
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        setLoggedIn(true);
         user.getIdToken().then(async (token) => {
           dispatch(setToken(token));
-          await AsyncStorage.setItem('firebaseToken', token); // Store the latest token in AsyncStorage
-          setLoading(false); // Set loading to false when token is received
+          await AsyncStorage.setItem('firebaseToken', token); 
+          setLoggedIn(true);
+          setLoading(false); 
         });
       } else {
         setLoggedIn(false);
@@ -67,6 +68,11 @@ function MainComponent() {
             component={ScanStack}
           />
           <Stack.Screen name="MainTabsStack" options={{headerShown: false}} component={MainTabsStack} />
+          <Stack.Screen
+            name="FoodDetailsModal"
+            options={{ headerShown: false, presentation: 'modal' }}
+            component={FoodDetails}
+          />
         </Stack.Navigator>
       )}
       {!loggedIn && <AuthStack />}

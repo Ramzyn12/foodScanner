@@ -1,28 +1,18 @@
-import {
-  View,
-  Text,
-  SafeAreaView,
-  StyleSheet,
-  Pressable,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import React, { useState } from "react";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import ProgressBar from "../../components/onboarding/ProgressBar";
 import COLOURS from "../../constants/colours";
-import { Path, Svg } from "react-native-svg";
 import RadioButton from "../../components/onboarding/RadioButton";
-import Animated from "react-native-reanimated";
 import { useDispatch } from "react-redux";
 import { setGender } from "../../redux/onboardingSlice";
 
 const GenderQuestion = ({ navigation }) => {
   const [selectedGender, setSelectedGender] = useState(null);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const handleGenderSelect = (value) => {
-    setSelectedGender(value); // Set the selected gender
-    dispatch(setGender(value))
+    setSelectedGender(value);
+    dispatch(setGender(value));
     setTimeout(() => {
       navigation.navigate("ConsumptionQuestion");
     }, 800);
@@ -30,12 +20,7 @@ const GenderQuestion = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* <Animated.View
-        sharedTransitionTag="progressBar"
-        style={{ width: "100%" }}
-      > */}
-        <ProgressBar percent={36} />
-      {/* </Animated.View> */}
+      <ProgressBar percent={36} />
       <Text style={styles.titleText}>What is your gender?</Text>
       {/* Radio Buttons */}
       <View style={{ gap: 12 }}>

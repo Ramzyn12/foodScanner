@@ -11,7 +11,7 @@ import { setAge } from "../../redux/onboardingSlice";
 
 const BirthQuestion = ({ navigation }) => {
   const [date, setDate] = useState(new Date());
-  const dispatch = useDispatch(); // Use the useDispatch hook
+  const dispatch = useDispatch(); 
 
   const handleDateChange = (e, selectedDate) => {
     const currentDate = selectedDate || date;
@@ -19,24 +19,19 @@ const BirthQuestion = ({ navigation }) => {
   };
 
   const calculateAge = (birthdate) => {
-    return dayjs().diff(dayjs(birthdate), 'year');
+    return dayjs().diff(dayjs(birthdate), "year");
   };
 
   const handleDatePick = () => {
-    const age = calculateAge(date); // Calculate age
-    dispatch(setAge(age)); // Dispatch the age to the Redux store
+    const age = calculateAge(date); 
+    dispatch(setAge(age)); 
     navigation.navigate("GenderQuestion");
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.topContainer}>
-        {/* <Animated.View
-          sharedTransitionTag="progressBar"
-          style={{ width: "100%" }}
-        > */}
-          <ProgressBar percent={24} />
-        {/* </Animated.View> */}
+        <ProgressBar percent={24} />
         <Text style={styles.titleText}>When were you born?</Text>
         <DateTimePicker
           testID="dateTimePicker"
@@ -45,6 +40,7 @@ const BirthQuestion = ({ navigation }) => {
           is24Hour={true}
           onChange={handleDateChange}
           display="spinner"
+          minimumDate={new Date(1930, 0, 1)} 
           maximumDate={new Date()}
         />
       </View>

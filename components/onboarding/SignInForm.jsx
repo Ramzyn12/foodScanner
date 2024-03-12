@@ -18,6 +18,31 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const SignInForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleFirebaseError = (code) => {
+    let message;
+
+    switch (code) {
+      case "auth/invalid-email":
+      case "auth/user-disabled":
+      case "auth/user-not-found":
+      case "auth/wrong-password":
+      case "auth/invalid-credential":
+        message = "Invalid email or password. Please try again.";
+        break;
+      case "auth/too-many-requests":
+        message = "Too many attempts. Please try again later.";
+        break;
+      case "auth/network-request-failed":
+        message = "Network error. Please check your connection and try again.";
+        break;
+      default:
+        message = "An unexpected error occurred. Please try again.";
+    }
+
+    setErrorMessage(message);
+  };
 
   const handleSignIn = () => {
     signInWithEmailAndPassword(auth, email, password)
@@ -27,14 +52,14 @@ const SignInForm = () => {
       })
       .catch((error) => {
         const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
+        handleFirebaseError(errorCode);
       });
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.formContainer}>
+        {errorMessage && <Text>{errorMessage}</Text>}
         <EmailInput email={email} setEmail={setEmail} />
         <PasswordInput password={password} setPassword={setPassword} />
         <FormSubmissionButton

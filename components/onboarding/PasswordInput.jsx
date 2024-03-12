@@ -31,12 +31,12 @@ const PasswordInput = ({password, setPassword}) => {
           onBlur={() => setIsPasswordFocused(false)}
           onChangeText={setPassword}
           value={password}
-          contextMenuHidden={true}
           autoCapitalize="none"
+          textContentType="password"
           autoCorrect={false}
-          secureTextEntry={true}
+          keyboardType='ascii-capable'
           autoComplete={"off"}
-          // keyboardType='ascii-capable'
+          secureTextEntry={true}
           placeholder={isPasswordFocused ? "" : "Create Password"}
           style={{
             fontSize: 14,

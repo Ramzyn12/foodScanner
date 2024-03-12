@@ -27,8 +27,7 @@ export const signUpApple = async ({ email, uid, idToken, userInformation }) => {
 
 export const signUp = async ({ email, password, userInfo }) => {
   if (password.length < 6) {
-    console.log("Password needs to be at least 6 characters.");
-    return;
+    throw new Error('Password needs to be at least 6 characters.')
   }
 
   try {
@@ -48,23 +47,22 @@ export const signUp = async ({ email, password, userInfo }) => {
       return { user, token, firebaseId: data.firebaseId };
     }
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      console.error("Error during sign up axios:", error.response.data);
-    }
-    console.log("Error during sign up:", error);
+    console.log("Error during sign up: authAPI", error);
+    throw error;
+
   }
 };
 
-export const addFirstLastName = async ({ firstName, lastName, firebaseId }) => {
-  try {
-    const response = await authAPI.post("names", {
-      firstName,
-      lastName,
-      firebaseId
-    });
-    const data = response.data;
-    return data;
-  } catch (error) {
-    console.log("Error during adding first and last name:", error);
-  }
-};
+// export const addFirstLastName = async ({ firstName, lastName, firebaseId }) => {
+//   try {
+//     const response = await authAPI.post("names", {
+//       firstName,
+//       lastName,
+//       firebaseId
+//     });
+//     const data = response.data;
+//     return data;
+//   } catch (error) {
+//     console.log("Error during adding first and last name:", error);
+//   }
+// };

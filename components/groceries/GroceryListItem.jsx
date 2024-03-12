@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import COLOURS from "../../constants/colours";
-import FoodListItem from "../FoodListItem";
+import FoodListItem from "../diary/FoodListItem";
 import { Swipeable } from "react-native-gesture-handler";
 import { TouchableOpacity } from "react-native";
 import TickIcon from "../../svgs/TickIcon";
@@ -27,25 +27,27 @@ import {
 } from "../../redux/grocerySlice";
 import Toast from "react-native-toast-message";
 
-const GroceryListItem = ({ foodItem, checked, id, onLongPress, isActive }) => {
+const GroceryListItem = ({ foodItem, id, onLongPress, isActive }) => {
+  // Could move this logic into a hook if needed
   const groceries = useSelector((state) => state.grocery.currentGroceries);
   const grocery = groceries.find((item) => item._id === id);
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
   const deletionTimerRef = useRef(null);
+  const singleFoodId = foodItem?.barcode ? '' : foodItem?._id
 
   const removeFoodMutation = useMutation({
     mutationFn: removeFoodFromGroceryList,
     onSuccess: () => {
       dispatch(confirmDeletion(id))
       queryClient.invalidateQueries(["Groceries"]);
-      // queryClient.invalidateQueries(["DiaryDay"]); //Maybe?
     },
     onError: (err) => {
       console.log(err);
     },
   });
+
 
   const toggleMutation = useMutation({
     mutationFn: toggleCheckedState,
@@ -55,18 +57,21 @@ const GroceryListItem = ({ foodItem, checked, id, onLongPress, isActive }) => {
     },
   });
 
+
   const handleUndo = () => {
     if (deletionTimerRef.current) {
-      // Reset Ref
       clearTimeout(deletionTimerRef.current);
       deletionTimerRef.current = null;
     }
 
+    // Add back temporarily removed item
     dispatch(addVirtualGroceryItem());
     Toast.hide();
   };
 
+
   const handleDeletePress = () => {
+
     dispatch(removeVirtualGroceryItem(id));
 
     // Clear any existing timer to ensure we don't have multiple timers running
@@ -78,7 +83,7 @@ const GroceryListItem = ({ foodItem, checked, id, onLongPress, isActive }) => {
     deletionTimerRef.current = setTimeout(() => {
       removeFoodMutation.mutate({
         barcode: foodItem?.barcode,
-        singleFoodId: foodItem?._id,
+        singleFoodId
       });
     }, 4000);
 
@@ -92,18 +97,22 @@ const GroceryListItem = ({ foodItem, checked, id, onLongPress, isActive }) => {
     });
   };
 
-  const handleSelectFood = () => {
+
+  const handleToggleCheck = () => {
     toggleMutation.mutate({ groceryItemId: id });
     dispatch(checkGrocery(id));
   };
 
+
   const handleGoToFood = () => {
-    navigation.navigate("FoodDetailsGroceries", {
+    navigation.navigate("FoodDetailsModal", {
       barcodeId: foodItem?.barcode,
-      singleFoodId: foodItem?._id,
+      singleFoodId
     });
   };
 
+
+  // Need to use callback this one I think
   const renderRightActions = (progress, dragX) => {
     const trans = dragX.interpolate({
       inputRange: [-100, 0],
@@ -123,9 +132,9 @@ const GroceryListItem = ({ foodItem, checked, id, onLongPress, isActive }) => {
     );
   };
 
+
   return (
     <Swipeable
-      // onSwipeableOpen={() => console.log("deleted by drag")}
       rightThreshold={100}
       overshootFriction={8}
       friction={1.5}
@@ -134,8 +143,9 @@ const GroceryListItem = ({ foodItem, checked, id, onLongPress, isActive }) => {
       <View
         style={[styles.listItemContainer, isActive && styles.isActiveStyles]}
       >
-        {/* Unchecked */}
-        <Pressable onPress={handleSelectFood}>
+
+        {/* Check Box */}
+        <Pressable onPress={handleToggleCheck}>
           <View
             style={[
               styles.unChecked,
@@ -145,6 +155,8 @@ const GroceryListItem = ({ foodItem, checked, id, onLongPress, isActive }) => {
             {grocery?.checked && <TickIcon />}
           </View>
         </Pressable>
+
+        {/* Food Item */}
         <Pressable
           onLongPress={onLongPress}
           style={styles.foodItemContainer}
@@ -153,6 +165,7 @@ const GroceryListItem = ({ foodItem, checked, id, onLongPress, isActive }) => {
         >
           <FoodListItem foodSelected={grocery?.checked} foodItem={foodItem} />
         </Pressable>
+
       </View>
     </Swipeable>
   );

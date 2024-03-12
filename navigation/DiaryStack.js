@@ -28,11 +28,11 @@ const DiaryStack = () => {
           headerShown: false,
         }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="FoodDetailsDiary"
         component={FoodDetails}
         options={{ presentation: "modal", headerShown: false }}
-      />
+      /> */}
     </Stack.Navigator>
   );
 };

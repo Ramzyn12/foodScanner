@@ -1,11 +1,9 @@
-import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import React, { useCallback, useState } from "react";
 import COLOURS from "../../constants/colours";
-import FoodListItem from "../FoodListItem";
 import GroceryListItem from "./GroceryListItem";
-import { BlurView } from "expo-blur";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { getGroceryList, updateOrder } from "../../axiosAPI/groceryAPI";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {  updateOrder } from "../../axiosAPI/groceryAPI";
 import { useDispatch, useSelector } from "react-redux";
 import DraggableFlatList, {
   ScaleDecorator,
@@ -13,13 +11,32 @@ import DraggableFlatList, {
 import * as Haptics from "expo-haptics";
 import { updateGroceryOrder } from "../../redux/grocerySlice";
 import { useFocusEffect } from "@react-navigation/native";
+
+
+
 const GroceryList = () => {
+  
   const groceries = useSelector((state) => state?.grocery?.currentGroceries);
   const dispatch = useDispatch();
-  const [newOrder, setNewOrder] = useState([]); // Temporary state to hold the new order
+  const [newOrder, setNewOrder] = useState([]); 
   const sortPreference = useSelector((state) => state.grocery.sortPreference);
+  const queryClient = useQueryClient()
+
+
+  const updateOrderMutation = useMutation({
+    mutationFn: updateOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['Groceries'])
+    },
+    onError: (err) => {
+      console.log("Update Order Failed: ", err);
+    },
+  });
+
 
   const renderItem = ({ item, drag, isActive }) => {
+    
+    // Don't allow drag unless in manual sort mode
     const onLongPress = sortPreference === "Manual" ? drag : null;
 
     return (
@@ -34,8 +51,9 @@ const GroceryList = () => {
     );
   };
 
-  const renderPlaceholder = useCallback(({ item, index, isActive, drag }) => {
-    // You can customize this placeholder component as needed
+
+  const renderPlaceholder = useCallback(({ item, isActive, drag }) => {
+
     return (
       <GroceryListItem
         foodItem={item.item}
@@ -46,15 +64,6 @@ const GroceryList = () => {
     );
   }, []);
 
-  const updateOrderMutation = useMutation({
-    mutationFn: updateOrder,
-    onSuccess: () => {
-      // console.log('order updated');
-    },
-    onError: (err) => {
-      console.log(" failed", err);
-    },
-  });
 
   useFocusEffect(
     useCallback(() => {
@@ -67,11 +76,12 @@ const GroceryList = () => {
     }, [newOrder, updateOrderMutation, dispatch])
   );
 
+
   const handleDragEnd = ({ data }) => {
     setNewOrder(data.map((item) => item.item._id));
-    // updateOrderMutation.mutate(data.map((item) => item.item._id))
     dispatch(updateGroceryOrder(data));
   };
+
 
   return (
     <View style={{ paddingBottom: 120, flex: 1 }}>
@@ -80,7 +90,7 @@ const GroceryList = () => {
           data={groceries}
           renderItem={renderItem}
           renderPlaceholder={renderPlaceholder}
-          onPlaceholderIndexChange={(ind) => Haptics.selectionAsync()}
+          onPlaceholderIndexChange={() => Haptics.selectionAsync()}
           keyExtractor={(item, index) => `draggable-item-${item._id}`}
           onDragEnd={handleDragEnd}
           containerStyle={{ flexGrow: 1 }}

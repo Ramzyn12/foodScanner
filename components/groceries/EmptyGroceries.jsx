@@ -3,7 +3,9 @@ import React from "react";
 import AddToBasketIcon from "../../svgs/AddToBasketIcon";
 import COLOURS from "../../constants/colours";
 import { StyleSheet } from "react-native";
+
 const EmptyGroceries = ({ onPress }) => {
+  
   return (
     <Pressable onPress={onPress} style={styles.container}>
       <Text style={styles.titleText}>Groceries</Text>

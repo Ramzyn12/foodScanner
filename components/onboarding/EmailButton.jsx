@@ -1,26 +1,13 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import React from "react";
 import COLOURS from "../../constants/colours";
 import { Path, Svg } from "react-native-svg";
-const EmailButton = ({onPress}) => {
+const EmailButton = ({ onPress }) => {
   return (
-    <View
-      style={{
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: COLOURS.lightGray,
-      }}
-    >
+    <View style={styles.buttonContainer}>
       <Pressable
-      onPress={onPress}
-        style={{
-          width: "100%",
-          height: 44,
-          alignItems: "center",
-          flexDirection: "row",
-          justifyContent: "center",
-          gap: 10,
-        }}
+        onPress={onPress}
+        style={styles.buttonInnerContainer}
       >
         <Svg
           xmlns="http://www.w3.org/2000/svg"
@@ -35,11 +22,7 @@ const EmailButton = ({onPress}) => {
           />
         </Svg>
         <Text
-          style={{
-            fontSize: 14,
-            fontFamily: "Mulish_600SemiBold",
-            color: COLOURS.nearBlack,
-          }}
+          style={styles.buttonText}
         >
           Sign up with email
         </Text>
@@ -49,3 +32,24 @@ const EmailButton = ({onPress}) => {
 };
 
 export default EmailButton;
+
+const styles = StyleSheet.create({
+  buttonContainer: {
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLOURS.lightGray,
+  },
+  buttonInnerContainer: {
+    width: "100%",
+    height: 44,
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 10,
+  },
+  buttonText: {
+    fontSize: 14,
+    fontFamily: "Mulish_600SemiBold",
+    color: COLOURS.nearBlack,
+  }
+});

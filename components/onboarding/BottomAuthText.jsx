@@ -2,15 +2,25 @@ import { View, Text, Pressable } from "react-native";
 import React from "react";
 import COLOURS from "../../constants/colours";
 import { StyleSheet } from "react-native";
-const BottomAuthText = ({ showSignIn, onPress }) => {
+
+const AuthState = {
+  SIGN_IN: "signIn",
+  SIGN_UP_FORM_HIDDEN: "signUpFormHidden",
+  SIGN_UP_FORM_SHOWN: "signUpFormShown",
+};
+
+const BottomAuthText = ({ authState, onPress }) => {
+  
   return (
     <View style={styles.container}>
       <Text style={styles.questionText}>
-        {showSignIn ? `Don't have an account yet?` : "Already have an account?"}
+        {authState === AuthState.SIGN_IN
+          ? `Don't have an account yet?`
+          : "Already have an account?"}
       </Text>
       <Pressable onPress={onPress}>
         <Text style={styles.actionText}>
-          {showSignIn ? `Sign up` : "Sign in"}
+          {authState == AuthState.SIGN_IN ? `Sign up` : "Sign in"}
         </Text>
       </Pressable>
     </View>

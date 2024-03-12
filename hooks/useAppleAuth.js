@@ -4,18 +4,23 @@ import * as AppleAuthentication from "expo-apple-authentication";
 import { auth } from "../firebaseConfig";
 import { signUpApple } from "../axiosAPI/authAPI";
 import { useMutation } from "@tanstack/react-query";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useSelector } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserCreatedStatus } from "../redux/authSlice";
 
 export const useAppleAuth = () => {
-
-  const userInformation = useSelector(state => state.onboarding.userInformation)
-
+  const userInformation = useSelector(
+    (state) => state.onboarding.userInformation
+  );
+  const dispatch = useDispatch();
   const signUpAppleMutation = useMutation({
     mutationFn: signUpApple,
-    onSuccess: () => {},
+    onSuccess: () => {
+      dispatch(setUserCreatedStatus(true));
+    },
     onError: (err) => {
-      console.log(err, "APPLE");
+      console.log(err, "APPLE Hooks");
+      // Need to add an error toast here as wont know why got logged out!
       signOut(auth)
         .then(() => {
           console.log("User signed out cos error signign in to apple");
@@ -53,7 +58,7 @@ export const useAppleAuth = () => {
               email: user.email,
               uid: user.uid,
               idToken: identityToken,
-              userInformation
+              userInformation,
             });
             // Could potentially get operationType to know if first time signing
             // Up or just signing in?

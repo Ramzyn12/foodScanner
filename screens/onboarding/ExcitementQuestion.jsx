@@ -1,18 +1,13 @@
 import {
   View,
   Text,
-  SafeAreaView,
   StyleSheet,
   Pressable,
-  TouchableOpacity,
 } from "react-native";
 import React, { useState } from "react";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import ProgressBar from "../../components/onboarding/ProgressBar";
 import COLOURS from "../../constants/colours";
 import { Path, Svg } from "react-native-svg";
-import RadioButton from "../../components/onboarding/RadioButton";
-import { ScrollView } from "react-native";
 import CheckBox from "../../components/onboarding/CheckBox";
 import Animated from "react-native-reanimated";
 import { useDispatch } from "react-redux";

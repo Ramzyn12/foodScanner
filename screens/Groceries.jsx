@@ -5,6 +5,8 @@ import {
   ScrollView,
   Pressable,
   StyleSheet,
+  Modal,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -26,69 +28,27 @@ import {
 } from "../redux/grocerySlice";
 import Toast from "react-native-toast-message";
 import TopActions from "../components/groceries/TopActions";
+import FoodDetails from "./FoodDetails";
+import { useGrocerySortPreference } from "../hooks/useGrocerySortPreference";
 
 const Groceries = ({ navigation }) => {
-  const dispatch = useDispatch();
-  const queryClient = useQueryClient();
-  const checkedCount = useSelector((state) => state.grocery.checkedCount);
+  const currentGroceries = useSelector(
+    (state) => state.grocery.currentGroceries
+  );
+  const anyChecked = currentGroceries.some(
+    (groceryItem) => groceryItem.checked === true
+  );
 
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["Groceries"],
     queryFn: getGroceryList,
   });
 
-  useEffect(() => {
-    if (data) {
-      fetchSortPreference(data?.sortPreference);
-    }
-    console.log("reconfiguring data");
-  }, [data]);
+  const { handleAddFirstItem, handleSortPress, updateSortMutation } =
+    useGrocerySortPreference(data);
 
-  const fetchSortPreference = (preference) => {
-    if (preference === "Processed Score") {
-      dispatch(sortByProcessedScore(data?.groceries));
-    } else if (preference === "Manual") {
-      dispatch(setCurrentGroceries(data));
-    }
-    dispatch(setSortPreference(preference));
-  };
 
-  const handleAddFirstItem = () => {
-    navigation.navigate("ScanStack");
-  };
-
-  const updateSortMutation = useMutation({
-    mutationFn: updateSortPreference,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["Groceries"]);
-    },
-    onError: (err) => {
-      console.log(err);
-    },
-  });
-
-  const toastConfig = {
-    groceryToast: ({ text1, text2, props }) => (
-      <Pressable onPress={() => props.onUndo()} style={styles.toastContainer}>
-        <Text style={styles.toastLeftText}>{text1}</Text>
-        <Text style={styles.toastRightText}>{text2}</Text>
-      </Pressable>
-    ),
-  };
-
-  //Could put this and filter logic in a custom hook? 
-  const handleSortPress = (e) => {
-    if (e.nativeEvent.index === 0) {
-      updateSortMutation.mutate({ sortPreference: "Manual" });
-      dispatch(setCurrentGroceries(data));
-      dispatch(setSortPreference("Manual"));
-    }
-    if (e.nativeEvent.index === 1) {
-      updateSortMutation.mutate({ sortPreference: "Processed Score" });
-      dispatch(sortByProcessedScore(data?.groceries));
-      dispatch(setSortPreference("Processed Score"));
-    }
-  };
+  if (isLoading) return <ActivityIndicator />
 
   return (
     <SafeAreaView style={styles.container}>
@@ -98,25 +58,23 @@ const Groceries = ({ navigation }) => {
       {data && data?.groceries?.length > 0 && (
         <>
           <View>
-            {/* Top actions */}
             <TopActions />
             {/* Buttons */}
             <ScrollView
               horizontal={true}
-              scrollEnabled={checkedCount > 0}
+              scrollEnabled={anyChecked}
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.buttonsContainer}
             >
               <SortButton onPress={handleSortPress} />
               <FilterButton />
-              {checkedCount > 0 && <UnmarkButton />}
+              {anyChecked && <UnmarkButton />}
               <ShareList />
             </ScrollView>
           </View>
           <GroceryList data={data} />
         </>
       )}
-      <Toast position="bottom" config={toastConfig} />
     </SafeAreaView>
   );
 };

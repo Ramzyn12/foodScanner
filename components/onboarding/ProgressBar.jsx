@@ -21,10 +21,10 @@ const ProgressBar = ({ percent, hideBack }) => {
         marginTop: 20,
       }}
     >
-      {
+      {!hideBack && (
         <Pressable
           style={{ position: "absolute", left: 0 }}
-          hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+          hitSlop={{ top: 25, bottom: 25, left: 25, right: 25 }}
           onPress={() => navigation.goBack()}
         >
           <Svg
@@ -40,7 +40,7 @@ const ProgressBar = ({ percent, hideBack }) => {
             />
           </Svg>
         </Pressable>
-      }
+      )}
       <View
         style={{
           width: fullWidth,

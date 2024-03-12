@@ -16,6 +16,7 @@ import ListIcon from "../svgs/ListIcon";
 import DiaryStack from "./DiaryStack";
 import Groceries from "../screens/Groceries";
 import GroceriesStack from "./GroceriesStack";
+import HealthStack from "./HealthStack";
 const Tab = createBottomTabNavigator();
 
 function MainTabsStack() {
@@ -41,13 +42,15 @@ function MainTabsStack() {
         component={DiaryStack} 
       />
       <Tab.Screen
-        name="Health"
+        name="HealthStack"
         options={{
+          headerShown: false,
+          tabBarLabel: "Health",
           tabBarIcon: ({ color, size }) => (
             <HeartIcon color={color} size={size} />
           ),
         }}
-        component={Health}
+        component={HealthStack}
       />
 
       <Tab.Screen

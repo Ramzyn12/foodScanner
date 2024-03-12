@@ -6,12 +6,10 @@ import SeedOils from "../../svgs/SeedOils";
 import FastFood from "../../svgs/FastFood";
 import VeganBurger from "../../svgs/VeganBurger";
 import ImageCard from "../../components/onboarding/ImageCard";
-// import { SharedElement } from "react-navigation-shared-element";
 import Animated from "react-native-reanimated";
 
 const InfoOne = ({ navigation }) => {
   return (
-    // <View style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
     <View style={styles.container}>
       <View style={styles.contentContainer}>
         <Text style={styles.titleText}>
@@ -46,9 +44,7 @@ const InfoOne = ({ navigation }) => {
           </Svg>
         </Animated.View>
       </Pressable>
-      {/* </SharedElement> */}
     </View>
-    // </View>
   );
 };
 

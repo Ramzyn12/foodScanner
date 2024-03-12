@@ -1,6 +1,5 @@
 // ScanStack.js
 // import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import LoginSignUp from "../screens/LoginSignUp";
 import Welcome from "../screens/onboarding/Welcome";
 import Notifications from "../screens/onboarding/Notifications";
 import InfoOne from "../screens/onboarding/InfoOne";
@@ -60,7 +59,7 @@ const AuthStack = () => {
       <Stack.Screen
         name="QuestionIntro"
         component={QuestionIntro}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, gestureEnabled: false }}
       />
       <Stack.Screen
         name="BirthQuestion"

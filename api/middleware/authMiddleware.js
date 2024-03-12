@@ -10,17 +10,19 @@ const authMiddleware = async (req, res, next) => {
     }
 
     if (!firebaseUser) {
-      // Unauthorized
-      return res.sendStatus(401);
+      return res.status(401).json("Firebase user not verified...");
     }
 
+    // MAke this find one and update? 
     const user = await User.findOne({
       firebaseId: firebaseUser.user_id,
     });
 
     if (!user) {
-      // Unauthorized
-      return res.sendStatus(401);
+      // frontend should retry? 
+      //Maybe just create user here if not work
+      // return
+      return res.status(402).json("No user created yet");
     }
 
     req.user = user;
@@ -28,7 +30,8 @@ const authMiddleware = async (req, res, next) => {
     next();
   } catch (err) {
     //Unauthorized
-    res.sendStatus(401);
+    console.log(err);
+    res.status(403).json("Server error caught?");
   }
 };
 

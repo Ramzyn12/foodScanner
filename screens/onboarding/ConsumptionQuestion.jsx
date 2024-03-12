@@ -17,6 +17,7 @@ import { useDispatch } from "react-redux";
 import { setProcessedFoodConsumption } from "../../redux/onboardingSlice";
 
 const options = ["1", "2", "3", "4", "5", "6", "7"];
+
 const ConsumptionQuestion = ({ navigation }) => {
   const [selectedDays, setSelectedDays] = useState(null);
   const dispatch = useDispatch();
@@ -31,12 +32,7 @@ const ConsumptionQuestion = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* <Animated.View
-        sharedTransitionTag="progressBar"
-        style={{ width: "100%" }}
-      > */}
-        <ProgressBar percent={48} />
-      {/* </Animated.View> */}
+      <ProgressBar percent={48} />
       <Text style={styles.titleText}>
         On average, how many days per week do you consume processed food?
       </Text>

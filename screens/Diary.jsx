@@ -1,163 +1,53 @@
 import {
   View,
   Text,
-  Button,
   SafeAreaView,
   StyleSheet,
   ScrollView,
   Dimensions,
   Alert,
-  StatusBar,
+  ActivityIndicator,
 } from "react-native";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { InteractionManager } from "react-native";
-// import { BlurView } from 'expo-blur';
-
-import WeekDayProgress from "../components/WeekDayProgress";
-import Svg, { G, Path, ClipPath, Rect, Defs } from "react-native-svg";
-import StreakCard from "../components/StreakCard";
-import BenefitFactCard from "../components/BenefitFactCard";
-import FoodDiary from "../components/FoodDiary";
+import WeekDayProgress from "../components/diary/WeekDayProgress";
+import StreakCard from "../components/diary/StreakCard";
+import BenefitFactCard from "../components/shared/BenefitFactCard";
+import FoodDiary from "../components/diary/FoodDiary";
 import Carousel from "react-native-reanimated-carousel";
 import moment from "moment"; // make sure moment is installed
 import { BlurView } from "expo-blur";
 import { useQuery } from "@tanstack/react-query";
 import { getAllDiaryDays } from "../axiosAPI/diaryDayAPI";
-import { TouchableOpacity } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const windowWidth = Dimensions.get("window").width;
+import { useSelector } from "react-redux";
+import WeekHeader from "../components/diary/WeekHeader";
 
 const Diary = ({ navigation }) => {
-  const carouselRef = useRef(null);
-  const [currentIndex, setCurrentIndex] = useState(0); // Initialized to 0 or any default you see fit
-  const [weeksData, setWeeksData] = useState([]);
-  const [streak, setStreak] = useState(0);
-  const [token, setToken] = useState(null); // State to store the token
+  const userCreated = useSelector((state) => state.auth.userCreated);
+  const token = useSelector((state) => state.auth.token);
 
-  // Effect to retrieve the token from AsyncStorage
-  useEffect(() => {
-    const fetchToken = async () => {
-      const storedToken = await AsyncStorage.getItem("firebaseToken");
-      setToken(storedToken); // Set the retrieved token to state
-    };
-
-    fetchToken();
-  }, []); 
-
-  const { data } = useQuery({
+  const { data, refetch, isLoading, isError } = useQuery({
     queryKey: ["AllDiaryDays"],
     queryFn: getAllDiaryDays,
-    // retry: false,
-    enabled: !!token
+    retry: false,
+    enabled: !!token,
   });
 
-  const calculateCurrentStreak = (diaryDays) => {
-    // Ensure diaryDays are sorted by date in descending order (most recent first)
-
-    let currentStreak = 0;
-    let i = 1;
-
-    // console.log(diaryDays);
-    const sorted = [...diaryDays].reverse();
-
-    while (i < sorted.length && sorted[i].score >= 80) {
-      currentStreak++;
-      i++;
-    }
-
-    return currentStreak;
-  };
-
   useEffect(() => {
-    if (data) {
-      const processedWeeks = processDiaryDaysToWeeks(data);
-      const streakNum = calculateCurrentStreak(data);
-      setStreak(streakNum);
-      setWeeksData(processedWeeks); // Assuming you've adapted the state to hold this structure
-      // console.log(processedWeeks);
+    if (userCreated) {
+      refetch();
     }
-  }, [data]); // Re-run when data changes
+  }, [userCreated]);
 
-  const processDiaryDaysToWeeks = (diaryDays) => {
-    // Object to hold weeks data, keyed by week start date
-    const weeks = {};
-
-    diaryDays.forEach((day) => {
-      const dateMoment = moment(day.date);
-      const weekStart = dateMoment
-        .clone()
-        .startOf("isoWeek")
-        .format("YYYY-MM-DD");
-      if (!weeks[weekStart]) {
-        // Initialize the week with placeholders
-        weeks[weekStart] = Array(7).fill({ score: "none", _id: null });
-      }
-      const dayOfWeek = dateMoment.isoWeekday() - 1; // moment's isoWeekday returns 1 for Monday, so adjust for array index
-      weeks[weekStart][dayOfWeek] = { score: day.score, _id: day._id }; // Replace placeholder with actual data
-    });
-
-    // Convert weeks object to an array for rendering
-    return Object.entries(weeks).map(([start, days]) => ({
-      weekStart: start,
-      days,
-    }));
-  };
-
-  const determineDayType = (weekStart, dayIndex) => {
-    const day = moment(weekStart).add(dayIndex, "days");
-    if (day.isSame(moment(), "day")) {
-      return "current";
-    } else if (day.isBefore(moment(), "day")) {
-      return "past";
-    } else {
-      return "future";
-    }
-  };
-
-  const renderWeek = useCallback(
-    ({ item }) => {
-      // item is now a week object from your weeksData array
-      return (
-        <View style={styles.weekHeaderContainer}>
-          {item.days.map((day, index) => (
-            <WeekDayProgress
-              key={index}
-              dayType={determineDayType(item.weekStart, index)} // You'll need to implement determineDayType
-              date={moment(item.weekStart).add(index, "days")}
-              score={day.score}
-            />
-          ))}
-        </View>
-      );
-    },
-    [weeksData] // Make sure to include any other dependencies you might have
-  );
-
+  if (isLoading) return <ActivityIndicator />;
+  if (isError) return <Text>error</Text>;
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Week Header */}
-      <BlurView intensity={10} tint="systemThinMaterial"  style={{ position: "absolute", zIndex: 3000, paddingTop: 38 }}>
-        <Carousel
-          data={weeksData} // use the adjusted weeksData
-          renderItem={renderWeek}
-          loop={false}
-          defaultIndex={weeksData.length - 1} // start at the current week
-          ref={carouselRef}
-          width={windowWidth}
-          height={100}
-          onSnapToItem={(index) => {
-            if (index < weeksData.length - 2) Alert.alert("You need to pay");
-            // carouselRef.current.scrollTo({ index: weeksData.length - 1 });
-            // setCurrentIndex(weeksData.length - 1);
-          }}
-        />
-      </BlurView>
+      <WeekHeader diaryData={data} />
 
       {/* Main page */}
       <ScrollView style={styles.mainSectionContainer}>
-        <StreakCard streak={streak} />
+        <StreakCard diaryData={data} />
         <BenefitFactCard />
         <FoodDiary />
       </ScrollView>
@@ -180,7 +70,8 @@ const styles = StyleSheet.create({
   },
   mainSectionContainer: {
     padding: 18,
+    flex: 1,
+    paddingTop: 120,
     paddingBottom: 300,
-    paddingTop: 120
   },
 });

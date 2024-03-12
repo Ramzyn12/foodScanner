@@ -18,13 +18,14 @@ import { addUserNames } from "../../axiosAPI/userAPI";
 const CreateAccount = ({ navigation, route }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const token = route?.params?.token;
-  const firebaseId = route?.params?.firebaseId;
+  // const token = route?.params?.token;
+  // const firebaseId = route?.params?.firebaseId;
 
   const addNamesMutation = useMutation({
     mutationFn: addUserNames,
     onSuccess: async () => {
       navigation.goBack();
+      // Show toast saying welcome? 
     },
     onError: (err) => {
       console.log(err);
@@ -32,7 +33,6 @@ const CreateAccount = ({ navigation, route }) => {
   });
 
   const handleFinaliseAccount = async () => {
-    console.log('sending names..', {firstName, lastName});
     addNamesMutation.mutate({ firstName, lastName });
   };
 

@@ -9,14 +9,7 @@ import Animated from "react-native-reanimated";
 const QuestionIntro = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      {/* Inner container */}
-      {/* Progress Bar */}
-      {/* <Animated.View
-        sharedTransitionTag="progressBar"
-        style={{ width: "100%" }}
-      > */}
-        <ProgressBar percent={12} hideBack={true} />
-      {/* </Animated.View> */}
+      <ProgressBar percent={12} hideBack={true} />
       <View style={{ alignItems: "center", gap: 20 }}>
         <HumanOutline />
         <Text style={styles.title}>A few quick questions</Text>

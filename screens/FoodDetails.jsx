@@ -8,38 +8,38 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
+  StyleSheet,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { fetchFoodWithBarcode } from "../axiosAPI/openFoodFactsAPI";
 import { useQuery } from "@tanstack/react-query";
 import { ClipPath, Defs, G, Path, Rect, Svg } from "react-native-svg";
 import COLOURS from "../constants/colours";
-import FoodDetailsSimpleInfo from "../components/FoodDetailsSimpleInfo";
-import FoodDetailsScoreStrip from "../components/FoodDetailsScoreStrip";
-import FoodDetailsLessonCarousel from "../components/FoodDetailsLessonCarousel";
-import FoodDetailsIngredientsList from "../components/FoodDetailsIngredientsList";
+import FoodDetailsSimpleInfo from "../components/foodDetails/FoodDetailsSimpleInfo";
+import FoodDetailsScoreStrip from "../components/foodDetails/FoodDetailsScoreStrip";
+import FoodDetailsLessonCarousel from "../components/foodDetails/FoodDetailsLessonCarousel";
+import FoodDetailsIngredientsList from "../components/foodDetails/FoodDetailsIngredientsList";
 import { setCurrentFood } from "../redux/foodSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchFoodWithIvyId } from "../axiosAPI/searchSingleAPI";
 import Toast, { BaseToast } from "react-native-toast-message";
-import { saveRecentScan } from "../utils/RecentsStorageHelper";
-
-const DEFAULT_IMAGE =
-  "https://static4.depositphotos.com/1026550/376/i/450/depositphotos_3763236-stock-photo-gold-star.jpg";
+import {
+  clearRecentScans,
+  saveRecentScan,
+} from "../utils/RecentsStorageHelper";
+import { useFoodDetails } from "../hooks/useFoodDetails";
 
 const FoodDetails = ({ navigation, route }) => {
   const barcode = route?.params?.barcodeId;
   const singleFoodId = route?.params?.singleFoodId;
-  const dispatch = useDispatch();
   const currentFood = useSelector((state) => state.food.currentFood);
-
-  // Cant this be one level down?
-  const [modalVisible, setModalVisible] = useState(false);
+  const [showNewDetails, setShowNewDetails] = useState(false);
 
   const {
     data: foodDetails,
     isLoading,
     isError,
+    isFetching,
     error,
   } = useQuery({
     queryKey: ["FoodDetails", barcode],
@@ -48,6 +48,7 @@ const FoodDetails = ({ navigation, route }) => {
     queryFn: () => fetchFoodWithBarcode(barcode),
   });
 
+  // Need to add loading states here ASWELL!!
   const { data: singleFoodDetails } = useQuery({
     queryKey: ["FoodDetailsIvy", singleFoodId],
     retry: false,
@@ -55,50 +56,10 @@ const FoodDetails = ({ navigation, route }) => {
     queryFn: () => fetchFoodWithIvyId(singleFoodId),
   });
 
-  useEffect(() => {
-    if (foodDetails) {
-      const normalizedData = {
-        name: foodDetails.name,
-        brand: foodDetails?.brand || "Unknown Brand", // Default value if not present
-        isConsumedToday: foodDetails.isConsumedToday, // Not applicable for single foods
-        isInGroceryList: foodDetails?.isInGroceryList, // Not applicable for single foods
-        image_url: foodDetails?.image_url || DEFAULT_IMAGE,
-        description: "", // Empty since OFF doesn't provide it
-        barcode: foodDetails.barcode,
-        singleFoodId: "",
-        environment: {
-          hasPalmOil: foodDetails.hasPalmOil,
-          co2Footprint: foodDetails.co2Footprint,
-        },
-        ingredients: foodDetails?.ingredients, // Assuming comma-separated string
-        additives: foodDetails.additives || [],
-        processedScore: foodDetails?.processedScore, // Hypothetical function
-      };
-      dispatch(setCurrentFood(normalizedData));
-      saveRecentScan(normalizedData)
-    }
+  // handle the normalisation
+  const readyToShow = useFoodDetails(foodDetails, singleFoodDetails);
 
-    if (singleFoodDetails) {
-      const normalizedData = {
-        name: singleFoodDetails.name,
-        singleFoodId: singleFoodDetails._id,
-        environment: "",
-        brand: "Fresh", // Not applicable for single foods
-        isConsumedToday: singleFoodDetails.isConsumedToday, // Not applicable for single foods
-        isInGroceryList: singleFoodDetails?.isInGroceryList, // Not applicable for single foods
-        image_url: singleFoodDetails?.image_url || DEFAULT_IMAGE,
-        description: singleFoodDetails.description,
-        barcode: "", // Empty since single foods don't have barcodes
-        ingredients: [singleFoodDetails.name],
-        additives: [], // Assuming no additives for single foods
-        processedScore: singleFoodDetails.processedScore || 100, // Default to 0 if not present
-      };
-      dispatch(setCurrentFood(normalizedData));
-      saveRecentScan(normalizedData)
-    }
-  }, [foodDetails, singleFoodDetails]);
-
-  if (isLoading) {
+  if (isLoading || !readyToShow) {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
         <ActivityIndicator />
@@ -110,23 +71,22 @@ const FoodDetails = ({ navigation, route }) => {
     console.log(error);
     return <Text>Product doesnt exist...</Text>;
   }
+
   const toastConfig = {
     foodDetailToast: ({ text1, text2, props }) => (
-      <Pressable onPress={() => navigation.navigate('GroceriesStack')} style={{ height: 44, width: '90%', backgroundColor: COLOURS.nearBlack, borderRadius: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20 }}>
-        <Text style={{color: 'white', fontFamily: 'Mulish_500Medium', fontSize: 14}}>{text1}</Text>
-        <Text style={{color: 'white', fontFamily: 'Mulish_600SemiBold', fontSize: 14}}>{text2}</Text>
+      <Pressable
+        onPress={() => navigation.navigate("GroceriesStack")}
+        style={styles.toastContainer}
+      >
+        <Text style={styles.toastTextOne}>{text1}</Text>
+        <Text style={styles.toastTextTwo}>{text2}</Text>
       </Pressable>
-    )
+    ),
   };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      {/* Top simple info */}
-      <FoodDetailsSimpleInfo
-        modalVisible={modalVisible}
-        setModalVisible={setModalVisible}
-        foodItem={foodDetails}
-      />
+      <FoodDetailsSimpleInfo foodItem={foodDetails} />
       <ScrollView showsVerticalScrollIndicator={false}>
         {currentFood?.processedScore && <FoodDetailsScoreStrip />}
         {currentFood?.additives?.length > 0 && <FoodDetailsLessonCarousel />}
@@ -137,20 +97,38 @@ const FoodDetails = ({ navigation, route }) => {
         )}
         {currentFood?.environment && (
           <View>
-            <Text>
-              {currentFood?.environment?.hasPalmOil == "Yes"
-                ? "Has Palm Oil"
-                : currentFood?.environment?.hasPalmOil == "Unknown"
-                ? "Unsure palm oil"
-                : "No palm oil found"}
-            </Text>
+            <Text>{currentFood?.environment?.hasPalmOil}</Text>
             <Text>{currentFood?.environment?.co2Footprint}</Text>
           </View>
         )}
       </ScrollView>
-      <Toast position="bottom" config={toastConfig} />
+      {/* <Toast position="bottom" config={toastConfig} /> */}
+      <Toast position="bottom" bottomOffset={40} config={toastConfig} />
     </SafeAreaView>
   );
 };
 
 export default FoodDetails;
+
+const styles = StyleSheet.create({
+  toastContainer: {
+    height: 44,
+    width: "90%",
+    backgroundColor: COLOURS.nearBlack,
+    borderRadius: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+  },
+  toastTextOne: {
+    color: "white",
+    fontFamily: "Mulish_500Medium",
+    fontSize: 14,
+  },
+  toastTextTwo: {
+    color: "white",
+    fontFamily: "Mulish_600SemiBold",
+    fontSize: 14,
+  },
+});

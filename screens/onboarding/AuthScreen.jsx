@@ -23,72 +23,89 @@ import { KeyboardAvoidingView } from "react-native";
 import SignUpForm from "../../components/onboarding/SignUpForm";
 import TopUI from "../../components/onboarding/TopUI";
 import BottomAuthText from "../../components/onboarding/BottomAuthText";
+import { useSelector } from "react-redux";
+import { useKeyboardVisible } from "../../hooks/useKeyboardVisible";
 
-const AuthScreen = ({ route }) => {
-  //Look at route and if sign in, setshowsignin true to begin with
+const AuthState = {
+  SIGN_IN: "signIn",
+  SIGN_UP_FORM_HIDDEN: "signUpFormHidden",
+  SIGN_UP_FORM_SHOWN: "signUpFormShown",
+};
+
+const AuthScreen = ({ route, navigation }) => {
   const authType = route?.params?.authType;
-  const [showSignIn, setShowSignIn] = useState(false);
-  const [showSignUpForm, setShowSignUpForm] = useState(false);
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [authState, setAuthState] = useState(AuthState.SIGN_UP_FORM_HIDDEN);
+  const keyboardVisible = useKeyboardVisible();
+  const userInformation = useSelector(
+    (state) => state.onboarding.userInformation
+  );
 
   useLayoutEffect(() => {
-    if (authType === "Log In") setShowSignIn(true);
-  }, []);
-
-  useLayoutEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      "keyboardWillShow",
-      () => setKeyboardVisible(true)
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      "keyboardWillHide",
-      () => setKeyboardVisible(false)
-    );
-    return () => {
-      keyboardDidShowListener.remove();
-      keyboardDidHideListener.remove();
-    };
+    if (authType === "Log In") setAuthState(AuthState.SIGN_IN);
   }, []);
 
   const handleAuthTypePress = () => {
-    setShowSignIn((curr) => !curr);
-    setShowSignUpForm(false);
+    // If tried to go to sign up page when not filled in onboarding
+    if (!userInformation.gender && AuthState.SIGN_IN) {
+      navigation.navigate("Welcome");
+    } else {
+      setAuthState((prevState) =>
+        prevState === AuthState.SIGN_IN
+          ? AuthState.SIGN_UP_FORM_HIDDEN
+          : AuthState.SIGN_IN
+      );
+    }
   };
 
   return (
     <View style={styles.container}>
-      {/* Top of screen UI */}
-      {!keyboardVisible && (
-        <TopUI showSignIn={showSignIn} showSignUpForm={showSignUpForm} />
-      )}
+
+      {/* Design at top of page */}
+      <TopUI authState={authState} keyboardVisible={keyboardVisible} />
+
       <KeyboardAvoidingView
         behavior="padding"
         style={{ paddingTop: keyboardVisible ? 50 : 25 }}
       >
-        {/* Writing */}
+
+        {/* Main Title */}
         <View style={styles.writingContainer}>
           <Text style={styles.titleText}>
-            {showSignIn
+            {authState === AuthState.SIGN_IN
               ? "Welcome back. Sign in to Ivy."
               : "Sign up to begin changing your life."}
           </Text>
         </View>
+
         {/* Buttons */}
         <View
           style={[
             styles.buttonsContainer,
-            { marginTop: showSignIn || showSignUpForm ? 15 : 30 },
+            // DO i need the below styles? or just one value
+            {
+              marginTop:
+                authState === AuthState.SIGN_IN ||
+                authState === AuthState.SIGN_UP_FORM_SHOWN
+                  ? 15
+                  : 30,
+            },
           ]}
         >
           <AppleButton />
-          {!showSignIn && !showSignUpForm && (
-            <EmailButton onPress={() => setShowSignUpForm(true)} />
+          {authState === AuthState.SIGN_UP_FORM_HIDDEN && (
+            <EmailButton
+              onPress={() => setAuthState(AuthState.SIGN_UP_FORM_SHOWN)}
+            />
           )}
         </View>
-        {/* If we're signed in and the sign up form is cancelled show sign in form */}
-        {showSignIn && !showSignUpForm && <SignInForm />}
-        {showSignUpForm && !showSignIn && <SignUpForm />}
-        <BottomAuthText showSignIn={showSignIn} onPress={handleAuthTypePress} />
+
+        {/* Forms depending on auth type */}
+        {authState === AuthState.SIGN_IN && <SignInForm />}
+        {authState === AuthState.SIGN_UP_FORM_SHOWN && <SignUpForm />}
+
+        {/* Change Auth Type Text */}
+        <BottomAuthText authState={authState} onPress={handleAuthTypePress} />
+
       </KeyboardAvoidingView>
     </View>
   );

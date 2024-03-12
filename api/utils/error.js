@@ -12,4 +12,31 @@ class BadRequestError extends Error {
   }
 }
 
-module.exports = {NotFoundError, BadRequestError}
+class UnauthorizedError extends Error {
+  constructor(message) {
+    super(message);
+    this.statusCode = 401;
+  }
+}
+
+class ForbiddenError extends Error {
+  constructor(message) {
+    super(message);
+    this.statusCode = 403;
+  }
+}
+
+class TooManyRequestsError extends Error {
+  constructor(message) {
+    super(message);
+    this.statusCode = 403;
+  }
+}
+class ConflictError extends Error {
+  constructor(message) {
+    super(message);
+    this.statusCode = 403;
+  }
+}
+
+module.exports = {NotFoundError, TooManyRequestsError, ConflictError, UnauthorizedError, ForbiddenError, BadRequestError}

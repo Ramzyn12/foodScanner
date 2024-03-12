@@ -7,11 +7,12 @@ const {
 } = require("../controllers/diaryController");
 const authMiddleware = require("../middleware/authMiddleware");
 const { auth } = require("firebase-admin");
+const { addFoodValidator } = require("../middleware/validators/diaryValidator");
 const router = express.Router();
 
 router
   .route("/")
-  .post(authMiddleware, addFoodToDiaryDay)
+  .post(authMiddleware, addFoodValidator, addFoodToDiaryDay)
   .delete(authMiddleware, removeFoodFromDiaryDay);
 
 router.route("/all").get(authMiddleware, getAllDiaryDays);

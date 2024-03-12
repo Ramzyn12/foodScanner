@@ -1,9 +1,16 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  InputAccessoryView,
+} from "react-native";
 import React, { useState } from "react";
 import ClearIcon from "../../svgs/ClearIcon";
-import COLOURS from '../../constants/colours'
+import COLOURS from "../../constants/colours";
 import { TextInput } from "react-native";
-const EmailInput = ({email, setEmail}) => {
+const EmailInput = ({ email, setEmail }) => {
+  //Maybe add some animations here so nicer focus
   const [isEmailFocused, setIsEmailFocused] = useState(false);
 
   return (
@@ -31,15 +38,15 @@ const EmailInput = ({email, setEmail}) => {
           onBlur={() => setIsEmailFocused(false)}
           onChangeText={setEmail}
           value={email}
-          contextMenuHidden={true}
           autoCapitalize="none"
+          textContentType='emailAddress'
           autoCorrect={false}
           keyboardType="email-address"
-          autoComplete={"off"}
+          autoComplete="email"
           placeholder={isEmailFocused ? "" : "Email Address"}
           style={{
             fontSize: 14,
-            width: '100%',
+            width: "100%",
             flex: 1,
             fontFamily:
               isEmailFocused || email.length > 0
@@ -49,6 +56,7 @@ const EmailInput = ({email, setEmail}) => {
           }}
         />
       </View>
+
       {isEmailFocused && (
         <Pressable onPress={() => setEmail("")} style={{ alignSelf: "center" }}>
           <ClearIcon />

@@ -7,7 +7,6 @@ const grocerySlice = createSlice({
     virtuallyRemovedItem: null,
     virtuallyRemovedIndex: -1,
     deletionPendingItems: [], // Track items that are pending deletion
-    checkedCount: 0,
     sortPreference: "Manual",
   },
   reducers: {
@@ -29,9 +28,6 @@ const grocerySlice = createSlice({
     setSortPreference(state, action) {
       state.sortPreference = action.payload;
     },
-    restartCount(state, action) {
-      state.checkedCount = 0;
-    },
     checkGrocery(state, action) {
       const id = action.payload;
       const groceryIndex = state.currentGroceries.findIndex(
@@ -41,10 +37,13 @@ const grocerySlice = createSlice({
         state.currentGroceries[groceryIndex].checked =
           !state.currentGroceries[groceryIndex].checked;
         // Adjust the counter based on the new checked state
-        state.checkedCount += state.currentGroceries[groceryIndex].checked
-          ? 1
-          : -1;
       }
+    },
+    unmarkAllChecked(state) {
+      state.currentGroceries = state.currentGroceries.map(groceryItem => ({
+        ...groceryItem,
+        checked: false
+      }));
     },
     removeVirtualGroceryItem(state, action) {
       const itemId = action.payload;
@@ -106,7 +105,7 @@ export const {
   sortByProcessedScore,
   removeVirtualGroceryItem,
   addVirtualGroceryItem,
-  restartCount,
+  unmarkAllChecked,
   confirmDeletion,
   setSortPreference,
 } = grocerySlice.actions;

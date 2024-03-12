@@ -2,15 +2,11 @@ import { View, Text, SafeAreaView, Pressable, StyleSheet } from "react-native";
 import React from "react";
 import { Path, Svg } from "react-native-svg";
 import COLOURS from "../../constants/colours";
-import SeedOils from "../../svgs/SeedOils";
-import FastFood from "../../svgs/FastFood";
-import VeganBurger from "../../svgs/VeganBurger";
 import ImageCard from "../../components/onboarding/ImageCard";
 import Cancer from "../../svgs/Cancer";
 import HeartDisease from "../../svgs/HeartDisease";
 import Dementia from "../../svgs/Dementia";
 import Animated from "react-native-reanimated";
-// import { SharedElement } from "react-navigation-shared-element";
 
 const InfoTwo = ({ navigation }) => {
   return (
@@ -50,8 +46,6 @@ const InfoTwo = ({ navigation }) => {
           </Svg>
         </Animated.View>
       </Pressable>
-      {/* Button */}
-
     </View>
   );
 };

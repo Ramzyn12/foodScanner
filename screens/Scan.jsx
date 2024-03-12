@@ -14,8 +14,8 @@ import { Worklets } from "react-native-worklets-core";
 import { useIsFocused, useNavigationState } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import { useReducedMotion, useSharedValue } from "react-native-reanimated";
-import ScanSearchBottomSheet from "../components/ScanSearchBottomSheet";
-import ScannerOverlay from "../components/ScannerOverlay";
+import ScanSearchBottomSheet from "../components/searchScan/ScanSearchBottomSheet";
+import ScannerOverlay from "../components/searchScan/ScannerOverlay";
 
 export const Scan = ({ navigation }) => {
   const device = useCameraDevice("back");
@@ -102,6 +102,7 @@ export const Scan = ({ navigation }) => {
           />
           <CameraHighlights highlights={highlights} color="peachpuff" />
           <ScannerOverlay />
+          {/* Do we need setSheetIndex? */}
           <ScanSearchBottomSheet setSheetIndex={setSheetIndex} />
         </>
       )}

@@ -1,11 +1,12 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 
+// The Image Card for the Info screen on onboarding
 const ImageCard = ({svg, text}) => {
   return (
     <View style={styles.imageContainer}>
       {svg}
-      <Text style={{ fontSize: 14, fontFamily: "Mulish_700Bold" }}>
+      <Text style={styles.labelText}>
         {text}
       </Text>
     </View>
@@ -20,4 +21,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 20,
   },
+  labelText: { fontSize: 14, fontFamily: "Mulish_700Bold" }
 })

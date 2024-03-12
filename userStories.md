@@ -99,3 +99,7 @@ const fetchFoodDetailsAndStatus = async (req, res) => {
     isOnGroceryList,
   });
 };
+
+Memoization: Use React.memo for child components to prevent unnecessary re-renders if their props haven't changed. For functional components, you can wrap them in React.memo. This is particularly useful for FoodListItem, RecentSearchList, and SearchResultsList.
+
+Virtualized Lists: If RecentSearchList or SearchResultsList renders a list of items, make sure you are using FlatList or SectionList from React Native, which are optimized for long lists.

@@ -27,7 +27,7 @@ const options = [
 
 const MotivationQuestion = ({ navigation }) => {
   const [selectedMotivations, setSelectedMotivations] = useState([]);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const handleMotivationSelect = (value) => {
     setSelectedMotivations((currentSelectedMotivations) => {
@@ -40,16 +40,14 @@ const MotivationQuestion = ({ navigation }) => {
   };
 
   const handleNext = () => {
-    dispatch(setMotivations(selectedMotivations))
+    dispatch(setMotivations(selectedMotivations));
     navigation.navigate("ExcitementQuestion");
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.topContainer}>
-        {/* <Animated.View sharedTransitionTag="progressBar"> */}
-          <ProgressBar percent={75} />
-        {/* </Animated.View> */}
+        <ProgressBar percent={75} />
         <Text style={styles.titleText}>
           Why do you want to reduce your intake of processed foods?{" "}
         </Text>

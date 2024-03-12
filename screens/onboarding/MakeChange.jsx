@@ -11,16 +11,6 @@ const MakeChange = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <FullBrokenHeart />
-      {/* <View style={{ flexDirection: "row"}}>
-        <Animated.Image
-          sharedTransitionTag="leftHeart"
-          source={require("../../assets/smallLeftHeart.png")}
-        />
-        <Animated.Image
-          sharedTransitionTag="rightHeart"
-          source={require("../../assets/smallRightHeart.png")}
-        />
-      </View> */}
       <Text style={styles.title}>Make a change</Text>
       <Text style={styles.description}>
         You are what you eat, so it’s time to take control of the food that goes
