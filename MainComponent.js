@@ -70,13 +70,12 @@ function MainComponent() {
           <Stack.Screen name="MainTabsStack" options={{headerShown: false}} component={MainTabsStack} />
           <Stack.Screen
             name="FoodDetailsModal"
-            options={{ headerShown: false, presentation: 'modal' }}
+            options={{ headerShown: false, presentation: 'modal', contentStyle: {borderRadius: 20} }}
             component={FoodDetails}
           />
         </Stack.Navigator>
       )}
       {!loggedIn && <AuthStack />}
-      {/* <Toast /> */}
     </NavigationContainer>
   );
 }

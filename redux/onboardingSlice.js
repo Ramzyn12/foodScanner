@@ -14,7 +14,6 @@ const onboardingSlice = createSlice({
   },
   reducers: {
     setAge(state, action) {
-      console.log(action.payload, 'AGE');
       state.userInformation.age = action.payload;
     },
     setGender(state, action) {

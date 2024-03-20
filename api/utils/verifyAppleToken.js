@@ -13,13 +13,15 @@ function getKey(header, callback) {
   });
 }
 
+//I think its fine to not use service ID for when using apple
+
 const verifyToken = (idToken) => {
   return new Promise((resolve, reject) => {
     jwt.verify(
       idToken,
       getKey,
       {
-        audience: 'com.ramzyn12.someapppp', // Your app's identifier
+        audience: 'com.ramzyn12.Ivy.dev', // Your app's identifier
         issuer: 'https://appleid.apple.com',
         algorithms: ['RS256'],
       },

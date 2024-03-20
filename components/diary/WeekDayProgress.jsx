@@ -44,10 +44,13 @@ const WeekDayProgress = ({ dayType, date, score }) => {
         </View>
       )}
       {dayType === "past" && score < 80 && (
-        <CircularProgress progress={score} />
+        // <CircularProgress progress={score} />
+        <View style={[styles.progressCirclePast, {backgroundColor: 'red'}]}>
+         
+        </View>
       )}
-      {dayType === "past" && score === "none" && (
-        <View style={styles.progressCircleFuture}></View>
+      {dayType === "past" && !score && (
+        <View style={[styles.progressCircleFuture, {backgroundColor: 'orange'}]}></View>
       )}
       {dayType === "future" && (
         <View style={styles.progressCircleFuture}></View>

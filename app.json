@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "some-apppp",
-    "slug": "some-apppp",
+    "name": "ivy Dev",
+    "slug": "ivy",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,11 +16,12 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.ramzyn12.someapppp",
+      "bundleIdentifier": "com.ramzyn12.Ivy.dev",
+      "buildNumber": "2",
       "usesAppleSignIn": true,
       "infoPlist": {
-        "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera.",
-        "NSMicrophoneUsageDescription": "$(PRODUCT_NAME) needs access to your Microphone."
+        "NSCameraUsageDescription": "Ivy needs access to your Camera.",
+        "NSMicrophoneUsageDescription": "Ivy needs access to your Microphone."
       }
     },
     "android": {
@@ -39,14 +40,14 @@
     },
     "extra": {
       "eas": {
-        "projectId": "ff752444-1482-4b8f-be02-d82515c09a0c"
+        "projectId": "feacb2e0-be6f-44df-9585-db22a52774d8"
       }
     },
     "plugins": [
       [
         "react-native-vision-camera",
         {
-          "cameraPermissionText": "we needs access to your Camera.",
+          "cameraPermissionText": "Ivy needs access to your Camera.",
           "enableCodeScanner": true
         }
       ],
@@ -54,6 +55,12 @@
         "expo-apple-authentication"
       ],
       "expo-font"
-    ]
+    ],
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/feacb2e0-be6f-44df-9585-db22a52774d8"
+    }
   }
 }

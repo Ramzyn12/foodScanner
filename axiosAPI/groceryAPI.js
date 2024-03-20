@@ -15,9 +15,9 @@ groceryAPI.interceptors.request.use(async(config) => {
   return config;
 });
 
-export const addFoodToGroceryList = async ({ barcode, singleFoodId, name, brand, ingredients, additives, processedScore, image_url }) => {
+export const addFoodToGroceryList = async ({ barcode, singleFoodId, name, brand, ingredients, additives, processedScore, processedState, image_url }) => {
   try {
-    const res = await groceryAPI.post('/', { barcode, singleFoodId, name, brand, ingredients, additives, processedScore, image_url });
+    const res = await groceryAPI.post('/', { barcode, singleFoodId, name, brand, ingredients, additives, processedScore, processedState, image_url });
     return res.data
   } catch (error) {
     console.error("Error adding user info:", error);

@@ -15,9 +15,9 @@ diaryDayAPI.interceptors.request.use(async(config) => {
   return config;
 });
 
-export const addFoodToDiaryDay = async ({ barcode, singleFoodId, name, brand, ingredients, additives, processedScore, image_url }) => {
+export const addFoodToDiaryDay = async ({ barcode, singleFoodId, name, brand, ingredients, additives, processedScore, processedState, image_url, date }) => {
   try {
-    const res = await diaryDayAPI.post('/', { barcode, singleFoodId, name, brand, ingredients, additives, processedScore, image_url });
+    const res = await diaryDayAPI.post('/', { barcode, singleFoodId, name, brand, ingredients, additives, processedScore, processedState, image_url, date });
     return res.data
   } catch (error) {
     console.error("Error adding user info:", error);
@@ -25,9 +25,9 @@ export const addFoodToDiaryDay = async ({ barcode, singleFoodId, name, brand, in
   }
 };
 
-export const removeFoodFromDiaryDay = async ({ barcode, singleFoodId }) => {
+export const removeFoodFromDiaryDay = async ({ barcode, singleFoodId, date }) => {
   try {
-    const res = await diaryDayAPI.post(`/remove`, {barcode, singleFoodId});
+    const res = await diaryDayAPI.post(`/remove`, {barcode, singleFoodId, date});
     return res.data
   } catch (error) {
     console.error("Error deleting user info:", error);

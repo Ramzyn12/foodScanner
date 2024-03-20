@@ -13,16 +13,14 @@ import FoodList from "./FoodList";
 import { getDiaryDay } from "../../axiosAPI/diaryDayAPI";
 import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const FoodDiary = () => {
   const token = useSelector(state => state.auth.token)
   const userCreated = useSelector((state) => state.auth.userCreated);
-  const dateString = new Date().toISOString().split('T')[0]; // '2023-01-01'
+  const chosenDate = useSelector(state => state.diary.chosenDate)
 
   useEffect(() => {
     if (userCreated) {
-      console.log('refetching coz user created');
       refetch()
     }
   }, [userCreated])
@@ -34,9 +32,9 @@ const FoodDiary = () => {
     refetch,
     error,
   } = useQuery({
-    queryFn: () => getDiaryDay({ date: new Date() }),
+    queryFn: () => getDiaryDay({ date: chosenDate || new Date() }),
     // NEED TO ADD SECOND PARAM when fetching for different days 
-    queryKey: ["DiaryDay", dateString], 
+    queryKey: ["DiaryDay", chosenDate], 
     enabled: !!token,
     retry: false
   });
@@ -48,9 +46,9 @@ const FoodDiary = () => {
 
   return (
     <View style={{ width: "100%", marginTop: 25, marginBottom: 150 }}>
-      {!emptyFoodList && (
+      {/* {!emptyFoodList && (
         <TodayScore score={diaryFoodItems?.score} />
-      )}
+      )} */}
       <FoodList emptyFoodList={emptyFoodList} diaryFoodItems={diaryFoodItems} />
     </View>
   );

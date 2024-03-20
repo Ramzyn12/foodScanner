@@ -2,23 +2,33 @@ import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import COLOURS from "../../constants/colours";
 import { useSelector } from "react-redux";
+import { color } from "@rneui/base";
+import { Path, Svg } from "react-native-svg";
+import DangerTriangle from "../../svgs/DangerTriangle";
 
 const FoodDetailsScoreStrip = ({ processedScore }) => {
+  // const score = useSelector((state) => state.food.currentFood?.processedScore);
+  const currentFood = useSelector((state) => state.food.currentFood)
+  const processedState = currentFood?.processedState
+  const background = processedState === 'Processed' ? COLOURS.badFoodBackground : COLOURS.greatFoodBackground
+  const textColour = processedState === 'Processed' ? COLOURS.badFoodText : COLOURS.greatFoodText
 
-  const score = useSelector(state => state.food.currentFood?.processedScore)
-  //Darker
-  const background = score <= 75 && score > 50 ? COLOURS.okayFoodText : score <= 50 ? COLOURS.badFoodText : COLOURS.greatFoodText
-  //Lighter
-  const text = score <= 75 && score > 50 ? COLOURS.okayFoodBackground : score <= 50 ? COLOURS.badFoodBackground : COLOURS.greatFoodBackground
-
-  const message = score <= 75 && score > 50 ? 'Try to avoid this product' : score <= 50 ? 'This product is a bad choice' : 'This product is a great choice'
+  const message = processedState === 'Processed' ? 'Avoid' : 'Great choice'
 
   return (
-    <View style={[styles.container, {backgroundColor: text}]}>
-      <Text style={[styles.description, {color: background}]}>{message}</Text>
-      <View style={[styles.scoreBackground, {backgroundColor: background}]}>
-        <Text style={styles.scoreText}>{score}</Text>
+    <View style={[styles.container, { backgroundColor: COLOURS.lightGreen }]}>
+      <View style={styles.innerContainer}>
+        <Text style={[styles.description]}>{message}</Text>
+        <View style={[styles.scoreBackground, { backgroundColor: background }]}>
+          <Text style={[styles.scoreText, { color: textColour }]}>
+            {processedState}
+          </Text>
+        </View>
       </View>
+      {processedState === 'Processed' && <View style={styles.warningMessageContainer}>
+        <DangerTriangle />
+        <Text style={styles.warningMessageText}>This product is processed. If you choose to eat this, it will reset your 26 day streak. </Text>
+      </View>}
     </View>
   );
 };
@@ -27,28 +37,45 @@ export default FoodDetailsScoreStrip;
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: "row",
-    padding: 18,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
     backgroundColor: COLOURS.greatFoodBackground,
+    gap: 14
+  },
+  innerContainer: {
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
   description: {
-    color: COLOURS.greatFoodText,
     fontFamily: "Mulish_700Bold",
-    fontSize: 16,
+    fontSize: 18,
+    color: COLOURS.nearBlack,
   },
   scoreBackground: {
-    paddingVertical: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 14,
     alignItems: "center",
     justifyContent: "center",
-    width: 54,
     borderRadius: 6,
     backgroundColor: COLOURS.greatFoodText,
   },
   scoreText: {
-    color: "#FFFFFF",
-    fontFamily: "Mulish_600SemiBold",
+    fontFamily: "Mulish_700Bold",
     fontSize: 14,
   },
+  warningMessageContainer: {
+    backgroundColor: 'rgba(255, 74, 74, 0.12)',
+    flexDirection: 'row',
+    gap: 10,
+    padding: 12,
+    alignItems: 'flex-start',
+    borderRadius: 12
+  },
+  warningMessageText: {
+    fontFamily: 'Mulish_400Regular',
+    fontSize: 14,
+    flex: 1,
+    color: COLOURS.nearBlack
+  }
 });

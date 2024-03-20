@@ -40,7 +40,7 @@ DiaryDaySchema.methods.updateAverageScore = async function () {
     // Ensure the score does not exceed 100
     this.score = Math.min(averageScore, 100);
   } else {
-    this.score = 0; // Set to 0 if there are no food items
+    this.score = undefined; // Set to 0 if there are no food items
   }
 
   await this.save(); // Save the document with the updated score

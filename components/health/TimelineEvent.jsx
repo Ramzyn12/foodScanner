@@ -2,17 +2,12 @@ import { View, Text, StyleSheet, Pressable } from "react-native";
 import React from "react";
 import COLOURS from "../../constants/colours";
 import { Path, Svg } from "react-native-svg";
-import Shuttle from "../../svgs/Shuttle";
-import ArrowRight from "../../svgs/ArrowRight";
-import TimerCircle from "../../svgs/TimerCircle";
-import { useNavigation } from "@react-navigation/native";
+import TimelineEventCard from "./TimelineEventCard";
 
-const TimelineEvent = ({ unlocked }) => {
-
-  const navigation = useNavigation()
+const TimelineEvent = ({ unlocked, data }) => {
 
   return (
-    <Pressable onPress={() => navigation.navigate('UnlockedDetails')} style={styles.container}>
+    <View style={styles.container}>
       {/* Tick */}
       {unlocked && (
         <Svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -24,71 +19,24 @@ const TimelineEvent = ({ unlocked }) => {
           />
         </Svg>
       )}
+      {/* No Tick */}
       {!unlocked && (
         // If Day > 100, MarginRight: -9
-        <View style={{alignItems: 'center', marginRight: -1}}>
-          <Text style={{fontSize: 11, fontFamily: 'Mulish_700Bold'}}>Day</Text>
-          <Text style={{fontSize: 16, fontFamily: 'Mulish_600SemiBold'}}>6</Text>
+        <View style={{ alignItems: "center", marginRight: -1 }}>
+          <Text style={{ fontSize: 11, fontFamily: "Mulish_700Bold" }}>
+            Day
+          </Text>
+          <Text style={{ fontSize: 16, fontFamily: "Mulish_600SemiBold" }}>
+            {data.week}
+          </Text>
         </View>
       )}
+
+      {/* Green Dot */}
       <View style={styles.circle}></View>
-      {/* Card container */}
-      <View
-        style={[
-          styles.cardContainer,
-          { backgroundColor: unlocked ? COLOURS.lightGreen : "white" },
-          { borderWidth: unlocked ? 0 : 1, borderColor: COLOURS.lightGray },
-        ]}
-      >
-        {/* Icon */}
-        <View style={{ flexDirection: "row", gap: 14 }}>
-          <View
-            style={[
-              styles.iconContainer,
-              { backgroundColor: unlocked ? COLOURS.darkGreen : "white" },
-              { borderWidth: unlocked ? 0 : 1, borderColor: COLOURS.lightGray },
-            ]}
-          >
-            <Shuttle colour={unlocked ? "white" : COLOURS.darkGreen} />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={{ marginBottom: 8, fontFamily: "Mulish_600SemiBold" }}>
-              Fresh Start
-            </Text>
-            <Text style={{ marginBottom: 14, fontFamily: "Mulish_400Regular" }}>
-              Embark on a journey toward health, feeling empowered and
-              motivated.
-            </Text>
-            {unlocked && (
-              <View style={styles.tipsTextContainer}>
-                <Text style={{ fontSize: 11, fontFamily: "Mulish_700Bold" }}>
-                  5 tips available
-                </Text>
-              </View>
-            )}
-          </View>
-          <ArrowRight />
-        </View>
-        {!unlocked && (
-          <View
-            style={{
-              backgroundColor: COLOURS.lightGreen,
-              flexDirection: "row",
-              gap: 8,
-              justifyContent: "center",
-              alignItems: "center",
-              borderRadius: 12,
-              paddingVertical: 8,
-            }}
-          >
-            <TimerCircle />
-            <Text style={{ fontSize: 14, fontFamily: "Mulish_600SemiBold" }}>
-              Unlock In 10 Days
-            </Text>
-          </View>
-        )}
-      </View>
-    </Pressable>
+
+      <TimelineEventCard data={data} unlocked={unlocked} />
+    </View>
   );
 };
 

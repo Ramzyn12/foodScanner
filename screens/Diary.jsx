@@ -25,7 +25,7 @@ const Diary = ({ navigation }) => {
   const userCreated = useSelector((state) => state.auth.userCreated);
   const token = useSelector((state) => state.auth.token);
 
-  const { data, refetch, isLoading, isError } = useQuery({
+  const { data, refetch, isLoading, isError, error } = useQuery({
     queryKey: ["AllDiaryDays"],
     queryFn: getAllDiaryDays,
     retry: false,
@@ -39,7 +39,7 @@ const Diary = ({ navigation }) => {
   }, [userCreated]);
 
   if (isLoading) return <ActivityIndicator />;
-  if (isError) return <Text>error</Text>;
+  if (isError) return <Text>{error} is error</Text>;
 
   return (
     <SafeAreaView style={styles.container}>

@@ -4,6 +4,7 @@ import foodReducer from "./foodSlice";
 import searchReducer from "./searchSlice";
 import groceryReducer from "./grocerySlice";
 import onboardingReducer from "./onboardingSlice";
+import diaryReducer from "./diarySlice";
 
 const store = configureStore({
   reducer: {
@@ -11,7 +12,8 @@ const store = configureStore({
     food: foodReducer,
     search: searchReducer,
     grocery: groceryReducer,
-    onboarding: onboardingReducer
+    onboarding: onboardingReducer,
+    diary: diaryReducer
   },
 });
 

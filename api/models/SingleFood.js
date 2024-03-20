@@ -7,6 +7,7 @@ const SingleFoodSchema = new mongoose.Schema(
     description: String,
     image_url: String,
     processedScore: { type: Number, required: true, min: 0, max: 100 },
+    processedState: { type: String, default: 'Perfect'},
   },
   {
     timestamps: true,

@@ -14,6 +14,7 @@ export const useFoodDetailsActions = () => {
   const [addedToGroceries, SetAddedToGroceries] = useState(
     currentFood?.isInGroceryList
   );
+  const chosenDate = useSelector(state => state.diary.chosenDate)
   
   // This is the schema the backend expects to add to database
   const foodItemSchema = {
@@ -26,6 +27,7 @@ export const useFoodDetailsActions = () => {
     ingredients: currentFood?.ingredients || [],
     additives: currentFood?.additives || [],
     processedScore: currentFood?.processedScore,
+    processedState: currentFood?.processedState
   };
 
   useEffect(() => {
@@ -80,8 +82,8 @@ export const useFoodDetailsActions = () => {
 
   const handleAddToDiary = () => {
     if (removeFoodFromDiaryMutation.isPending) return null;
-
-    addFoodToDiaryMutation.mutate(foodItemSchema);
+  
+    addFoodToDiaryMutation.mutate({...foodItemSchema, date: chosenDate || new Date()});
     setAddedToDiary(true);
   };
 
@@ -91,6 +93,7 @@ export const useFoodDetailsActions = () => {
     removeFoodFromDiaryMutation.mutate({
       barcode: currentFood?.barcode,
       singleFoodId: currentFood?.singleFoodId,
+      // date: chosenDate || new Date()
     });
     setAddedToDiary(false);
   };

@@ -10,9 +10,9 @@ function getNormalizedDate(date = new Date()) {
 }
 
 async function addFoodToDiary({ userId, foodDetails }) {
-  const today = getNormalizedDate();
 
-  const { barcode, singleFoodId } = foodDetails; //Includes all foodItem model fields
+  const { barcode, singleFoodId, date } = foodDetails; //Includes all foodItem model fields
+  const normalizedDay = getNormalizedDate(date);
 
   let foodItem;
   let diaryDay;
@@ -25,7 +25,7 @@ async function addFoodToDiary({ userId, foodDetails }) {
     }
 
     diaryDay = await DiaryDay.findOneAndUpdate(
-      { userId: userId, date: today },
+      { userId: userId, date: normalizedDay },
       { $addToSet: { consumedFoods: foodItem._id } }, // Use $addToSet to only add if the foodItem isn't already in the array
       { new: true, upsert: true } // Create the document if it doesn't exist and return the updated document
     );
@@ -33,7 +33,7 @@ async function addFoodToDiary({ userId, foodDetails }) {
     foodItem = await SingleFood.findById(singleFoodId);
 
     diaryDay = await DiaryDay.findOneAndUpdate(
-      { userId: userId, date: today },
+      { userId: userId, date: normalizedDay },
       { $addToSet: { consumedSingleFoods: foodItem._id } }, // Use $addToSet to only add if the foodItem isn't already in the array
       { new: true, upsert: true } // Create the document if it doesn't exist and return the updated document
     );
@@ -46,8 +46,8 @@ async function addFoodToDiary({ userId, foodDetails }) {
   return diaryDay;
 }
 
-async function removeFoodFromDiaryDay({ userId, barcode, singleFoodId }) {
-  const today = getNormalizedDate();
+async function removeFoodFromDiaryDay({ userId, barcode, singleFoodId, date }) {
+  const normalizedDay = getNormalizedDate(date);
 
   let update = {};
 
@@ -66,7 +66,7 @@ async function removeFoodFromDiaryDay({ userId, barcode, singleFoodId }) {
   }
 
   const diaryDay = await DiaryDay.findOneAndUpdate(
-    { userId: userId, date: today },
+    { userId: userId, date: normalizedDay },
     update,
     { new: true }
   );
@@ -82,7 +82,6 @@ async function removeFoodFromDiaryDay({ userId, barcode, singleFoodId }) {
 
 async function getDiaryDay({ userId, date }) {
   const queryDate = getNormalizedDate(date);
-
   
   let diaryDay = await DiaryDay.findOne({
     userId: userId,

@@ -29,7 +29,7 @@ export const Scan = ({ navigation }) => {
   const currentRouteName = state.routes[state.index].name;
   const isActive = isFocused || currentRouteName === "FoodDetails";
   const { hasPermission, requestPermission } = useCameraPermission();
-  
+
   const format = useCameraFormat(device, [
     { videoResolution: { width: 1280, height: 720 } },
   ]);
@@ -58,7 +58,7 @@ export const Scan = ({ navigation }) => {
 
     const now = Date.now();
     const timeSinceLastScan = now - lastScanTimestamp.current;
-    if (timeSinceLastScan < debounceDelay) return 
+    if (timeSinceLastScan < debounceDelay) return;
 
     lastScanTimestamp.current = now; // Update timestamp of last scan
 
@@ -84,10 +84,12 @@ export const Scan = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container]}>
       {!hasPermission && (
         //REMEBER TO MAKE THIS BETTER
-        <Text>Grant Permission to use scanner settings</Text>
+        <View style={{ flex: 1, justifyContent: "center" }}>
+          <Text>Grant Permission to use scanner settings</Text>
+        </View>
       )}
       {hasPermission && (
         <>

@@ -10,7 +10,7 @@ const ScanStack = () => {
   return (
     <Stack.Navigator >
       <Stack.Screen name="Scan" component={Scan} options={{ headerShown: false }} />
-      <Stack.Screen name="FoodDetails" component={FoodDetails} options={{ presentation: 'modal', headerShown: false }} />
+      <Stack.Screen name="FoodDetails" component={FoodDetails} options={{ presentation: 'modal', contentStyle: {borderRadius: 20} , headerShown: false }} />
     </Stack.Navigator>
   );
 };

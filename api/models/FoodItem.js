@@ -9,6 +9,7 @@ const FoodItemSchema = new mongoose.Schema(
     additives: [String],
     image_url: String,
     processedScore: { type: Number, required: true, min: 0, max: 100 },
+    processedState: { type: String},
   },
   {
     timestamps: true,

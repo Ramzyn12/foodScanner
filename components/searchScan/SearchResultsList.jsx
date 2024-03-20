@@ -20,7 +20,6 @@ const SearchResultsList = ({ DataOFF, DataIvy }) => {
           <Pressable
             onPress={() => {
               Keyboard.dismiss();
-              console.log(item, 'FROM SEARCH RESULTS LIST');
               navigation.navigate("FoodDetails", { singleFoodId: item._id });
             }}
             key={item._id}

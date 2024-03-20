@@ -2,14 +2,14 @@ import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import Animated, { FadeIn, Easing } from "react-native-reanimated";
 
-const CurrentIndexLabel = ({ currentTipIndex }) => {
+const CurrentIndexLabel = ({ currentTipIndex, numItems }) => {
   return (
     <Animated.View
       entering={FadeIn.duration(1000).easing(Easing.out(Easing.exp))}
       style={styles.indexLabelContainer}
     >
       <View style={styles.indexLabelTextContainer}>
-        <Text style={styles.indexLabelText}>{currentTipIndex} out of 5</Text>
+        <Text style={styles.indexLabelText}>{currentTipIndex} out of {numItems}</Text>
       </View>
     </Animated.View>
   );

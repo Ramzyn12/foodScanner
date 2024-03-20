@@ -8,31 +8,8 @@ const openFoodFactsAPI = axios.create({
   baseURL: "https://world.openfoodfacts.org",
 });
 
-//Is it bad to have this type of synchronosity in the backend???
-function extractIngredients(data) {
-  let ingredientsSet = new Set();
-
-  function cleanText(text) {
-    // Remove underscores, trim whitespace, and correct the casing if necessary
-    return text.replace(/_/g, "").trim(); // Add more replacements as needed
-  }
-
-  function traverse(ingredientList) {
-    ingredientList?.forEach((ingredient) => {
-      if (ingredient.ingredients) {
-        traverse(ingredient.ingredients);
-      } else if (ingredient.text) {
-        ingredientsSet.add(cleanText(ingredient.text));
-      }
-    });
-  }
-
-  traverse(data);
-
-  return Array.from(ingredientsSet);
-}
-
 async function checkIsInGroceryList(userId, identifier, isBarcode = true) {
+  //ERROR HANDLING? 
   const groceries = await Grocery.findOne({ userId: userId }).populate(
     "groceries.item"
   );
@@ -48,6 +25,7 @@ async function checkIsInGroceryList(userId, identifier, isBarcode = true) {
 async function checkIsConsumedToday(userId, identifier, isBarcode = true) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  
   const diaryDay = await DiaryDay.findOne({
     userId: userId,
     date: today,
@@ -63,24 +41,36 @@ async function checkIsConsumedToday(userId, identifier, isBarcode = true) {
 }
 
 async function fetchOFFWithBarcode({ userId, barcode }) {
-  const response = await openFoodFactsAPI.get(`/api/v3/product/${barcode}`);
-  const product = response.data.product;
-  const ingredients = extractIngredients(product?.ingredients);
-  const additives = product.additives_tags.map((ing) => ing.split(":")[1]);
+  
+  const [isInGroceryList, isConsumedToday, fullResponse, knowledgeResponse] = await Promise.all([
+    checkIsInGroceryList(userId, barcode, true),
+    checkIsConsumedToday(userId, barcode, true),
+    openFoodFactsAPI.get(`/api/v3/product/${barcode}`),
+    openFoodFactsAPI.get(`/api/v2/product/${barcode}?fields=knowledge_panels`),
+  ]);
 
-  const isInGroceryList = await checkIsInGroceryList(userId, barcode, true);
-  const isConsumedToday = await checkIsConsumedToday(userId, barcode, true);
+  const product = fullResponse.data.product
+  const knowledgePanels = knowledgeResponse.data.product.knowledge_panels
 
+  const ingredients = product.ingredients_text_en
+  const additives = knowledgePanels?.additives?.elements.map(el => knowledgePanels[el.panel_element.panel_id].title_element.title)
+  // Maybe unknown should be the last one instead of "No"
   const hasPalmOil = product.ingredients_analysis_tags.includes("en:palm-oil")
     ? "Yes"
     : product.ingredients_analysis_tags.includes("en:palm-oil-content-unknown")
     ? "Unknown"
     : "No";
+  const co2Footprint = [knowledgePanels?.carbon_footprint?.title_element?.subtitle, knowledgePanels?.carbon_footprint?.title_element?.title] 
+  // const co2Footprint = product.ecoscore_data.agribalyse?.co2_total
+  const processedState = product.nova_group === 1 ? 'Perfect' : product.nova_group === 2 ? 'Good' : 'Processed'
+  const hasVegetableOil = product?.ingredients_hierarchy?.includes('en:vegetable-oil-and-fat')
+  const ecoscore = knowledgePanels?.ecoscore_total?.title_element?.grade?.toUpperCase()
 
   return {
     name: product.product_name,
     processedScore: 100 - (product.nova_group - 1) * 25,
-    brand: product.brands,
+    processedState,
+    brand: product.brands, 
     image_url: product.image_url,
     ingredients: ingredients,
     additives: additives,
@@ -88,7 +78,9 @@ async function fetchOFFWithBarcode({ userId, barcode }) {
     isConsumedToday,
     isInGroceryList,
     hasPalmOil,
-    co2Footprint: product.ecoscore_data.agribalyse?.co2_total,
+    hasVegetableOil,
+    co2Footprint,
+    ecoscore
   };
 }
 
@@ -111,9 +103,12 @@ async function fetchOFFWithSearch({ search_term }) {
 
   const foodList = products.map((product) => {
     const processedScore = 100 - (product.nova_group - 1) * 25;
+    const processedState = product.nova_group === 1 ? 'Perfect' : product.nova_group === 2 ? 'Good' : 'Processed'
+
     return {
       name: product.product_name,
       processedScore: processedScore,
+      processedState,
       brand: product.brands,
       image_url: product.image_url,
       barcode: product.code,
@@ -144,7 +139,7 @@ async function fetchSingleFoodsWithSearch({ searchTerm }) {
       $limit: 10,
     },
     {
-      $project: { name: 1, image_url: 1, processedScore: 1 }, // Adjust based on the fields you want to return
+      $project: { name: 1, image_url: 1, processedScore: 1, processedState: 1 }, // Adjust based on the fields you want to return
     },
   ]);
 

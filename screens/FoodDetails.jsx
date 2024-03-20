@@ -28,12 +28,13 @@ import {
   saveRecentScan,
 } from "../utils/RecentsStorageHelper";
 import { useFoodDetails } from "../hooks/useFoodDetails";
+import FoodDetailsMainInfo from "../components/foodDetails/FoodDetailsMainInfo";
+import FoodDetailsEnvironment from "../components/foodDetails/FoodDetailsEnvironment";
 
 const FoodDetails = ({ navigation, route }) => {
   const barcode = route?.params?.barcodeId;
   const singleFoodId = route?.params?.singleFoodId;
   const currentFood = useSelector((state) => state.food.currentFood);
-  const [showNewDetails, setShowNewDetails] = useState(false);
 
   const {
     data: foodDetails,
@@ -55,6 +56,7 @@ const FoodDetails = ({ navigation, route }) => {
     enabled: !!singleFoodId,
     queryFn: () => fetchFoodWithIvyId(singleFoodId),
   });
+
 
   // handle the normalisation
   const readyToShow = useFoodDetails(foodDetails, singleFoodDetails);
@@ -85,22 +87,18 @@ const FoodDetails = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
       <FoodDetailsSimpleInfo foodItem={foodDetails} />
       <ScrollView showsVerticalScrollIndicator={false}>
         {currentFood?.processedScore && <FoodDetailsScoreStrip />}
-        {currentFood?.additives?.length > 0 && <FoodDetailsLessonCarousel />}
-        {currentFood?.description && <Text>{currentFood?.description}</Text>}
-        {currentFood?.ingredients && <FoodDetailsIngredientsList />}
-        {!currentFood?.ingredients && (
-          <Button title="Add Missing ingredients" />
-        )}
-        {currentFood?.environment && (
-          <View>
-            <Text>{currentFood?.environment?.hasPalmOil}</Text>
-            <Text>{currentFood?.environment?.co2Footprint}</Text>
-          </View>
-        )}
+        {/* {currentFood?.additives?.length > 0 && <FoodDetailsLessonCarousel />} */}
+        {/* {currentFood?.description && <Text>{currentFood?.description}</Text>} */}
+        <View style={{ paddingHorizontal: 20 }}>
+          <FoodDetailsMainInfo />
+          {currentFood?.ingredients && <FoodDetailsIngredientsList />}
+
+          <FoodDetailsEnvironment />
+        </View>
       </ScrollView>
       {/* <Toast position="bottom" config={toastConfig} /> */}
       <Toast position="bottom" bottomOffset={40} config={toastConfig} />

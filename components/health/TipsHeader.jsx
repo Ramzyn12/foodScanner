@@ -6,7 +6,7 @@ import ArrowDown from "../../svgs/ArrowDown";
 import { StyleSheet } from "react-native";
 import COLOURS from "../../constants/colours";
 
-const TipsHeader = ({ handleScrollToStart, cardHeight, cardWidth }) => {
+const TipsHeader = ({ handleScrollToStart, cardHeight, cardWidth, numItems }) => {
   return (
     <View
       style={[
@@ -34,7 +34,7 @@ const TipsHeader = ({ handleScrollToStart, cardHeight, cardWidth }) => {
           onPress={handleScrollToStart}
           style={styles.headerViewButton}
         >
-          <Text style={styles.headerViewButtonText}>View 5 tips</Text>
+          <Text style={styles.headerViewButtonText}>View {numItems} tips</Text>
           <ArrowDown />
         </Pressable>
       </View>

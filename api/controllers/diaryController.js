@@ -15,7 +15,7 @@ const addFoodToDiaryDay = async (req, res) => {
   const userId = req.user._id;
   const diaryDay = await diaryService.addFoodToDiary({
     userId,
-    foodDetails: req.body,
+    foodDetails: req.body
   });
   res.status(200).json(diaryDay);
 };
@@ -24,12 +24,13 @@ const addFoodToDiaryDay = async (req, res) => {
 const removeFoodFromDiaryDay = async (req, res) => {
   const userId = req.user._id;
 
-  const { barcode, singleFoodId } = req.body;
+  const { barcode, singleFoodId, date } = req.body;
 
   const diaryDay = await diaryService.removeFoodFromDiaryDay({
     userId,
     barcode,
     singleFoodId,
+    date
   });
 
   res.status(200).json(diaryDay);

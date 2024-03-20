@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, Dimensions } from "react-native";
 import React from "react";
 import SaladBowl from "../../svgs/SaladBowl";
+import { SvgXml } from "react-native-svg";
 
 
 
@@ -9,10 +10,11 @@ const TipCard = ({item, cardHeight, cardMargin}) => {
     <View style={[styles.cardContainer, {height: cardHeight,
       marginVertical: cardMargin / 2,}]}>
       <View style={styles.iconContainer}>
-        <SaladBowl />
+        {/* <SaladBowl /> */}
+        <SvgXml xml={item.svg} />
       </View>
       <Text style={{ fontSize: 18, fontFamily: "Mulish_400Regular" }}>
-        {item.text}
+        {item.info}
       </Text>
     </View>
   );

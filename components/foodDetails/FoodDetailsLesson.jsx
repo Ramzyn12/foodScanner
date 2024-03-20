@@ -1,11 +1,10 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import React from "react";
-import { ClipPath, Defs, G, Path, Rect, Svg } from "react-native-svg";
-import { LinearGradient } from "expo-linear-gradient";
-import BadgeIcon from "../../svgs/BadgeIcon";
 import PotionIcon from "../../svgs/PotionIcon";
+import COLOURS from "../../constants/colours";
+import DangerTriangle from "../../svgs/DangerTriangle";
 
-const FoodDetailsLesson = ({additive}) => {
+const FoodDetailsLesson = ({ additive }) => {
   const angle = 122;
   const angleRad = (Math.PI * angle) / 180;
   const start = {
@@ -18,26 +17,22 @@ const FoodDetailsLesson = ({additive}) => {
   };
 
   return (
-    <LinearGradient
-      colors={["#F2E5CC", "#F3D2D2"]}
-      start={start}
-      end={end}
-      style={styles.container}
-    >
-      <PotionIcon />
-      <Text style={styles.chemicalNameText}>
-        Carotenoids {additive}
-      </Text>
+    <View style={styles.container}>
+      <View style={{ flexDirection: "row", gap: 8, alignItems: 'center' }}>
+        <DangerTriangle />
+        <Text style={styles.chemicalNameText}>{additive.split(' - ')[1]} ({additive.split(' - ')[0]})</Text>
+      </View>
+
       <Text style={styles.chemicalDescription}>
         Extracted using chemical processes which alter their natural form.
       </Text>
-      <Pressable style={styles.lessonButton}>
+      {/* <Pressable style={styles.lessonButton}>
         <BadgeIcon />
         <Text style={styles.lessonButtonText}>
           Take lesson
         </Text>
-      </Pressable>
-    </LinearGradient>
+      </Pressable> */}
+    </View>
   );
 };
 
@@ -45,14 +40,24 @@ export default FoodDetailsLesson;
 
 const styles = StyleSheet.create({
   container: {
-    width: 290,
-    backgroundColor: "blue",
-    padding: 25,
-    borderRadius: 25,
+    width: "100%",
+    borderWidth: 1,
+    borderColor: COLOURS.lightGray,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderRadius: 20,
     gap: 12,
   },
-  chemicalNameText: { fontFamily: "Mulish_700Bold", fontSize: 20 },
-  chemicalDescription: { fontFamily: "Mulish_500Medium", fontSize: 16 },
-  lessonButton: {flexDirection: 'row', gap: 8, justifyContent: 'center', backgroundColor: 'white', height: 36, alignItems: 'center', borderRadius: 20},
-  lessonButtonText: { fontFamily: "Mulish_600SemiBold", fontSize: 15 }
-})
+  chemicalNameText: { fontFamily: "Mulish_600SemiBold", fontSize: 16 },
+  chemicalDescription: { fontFamily: "Mulish_400Regular", fontSize: 14 },
+  lessonButton: {
+    flexDirection: "row",
+    gap: 8,
+    justifyContent: "center",
+    backgroundColor: "white",
+    height: 36,
+    alignItems: "center",
+    borderRadius: 20,
+  },
+  lessonButtonText: { fontFamily: "Mulish_600SemiBold", fontSize: 15 },
+});

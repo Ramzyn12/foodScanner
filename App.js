@@ -1,4 +1,5 @@
 // App.js
+import "@expo/metro-runtime";
 import "react-native-gesture-handler";
 import "react-native-get-random-values";
 import React, { useMemo } from "react";

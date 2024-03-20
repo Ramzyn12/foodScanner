@@ -81,7 +81,7 @@ function Settings() {
       <SvgXml xml={xml} width={50} height={50} fill={COLOURS.darkGreen} />
         {/* <Carousel
         data={DATA}
-        renderItem={renderItem}
+        renderItem={renderItem}s
         style={{ flexGrow: 1 }}
         vertical
         // onProgressChange={() => console.log('Scroll begib')}

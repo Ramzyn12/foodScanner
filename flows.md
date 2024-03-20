@@ -12,4 +12,17 @@ Food Items Fetch, Display and Add flows
 Note: On the frontend, we only control the adding to diaryList and groceryList from the foodDetails page (buttons), hence this is why it is where we use the big normalised data. And it is only normalised because the singleFoods and FoodItem have different structures
 
 
+Diary Days
 
+1. When someone first joins theres no diary day documents for them so for the get diary day (by date) endpoint we just return a 'fake' diary day document, other wise we would have to create one everytime they click on a different day.
+2. For the get all diary days endpoint, we get all the diary days then if there arent 
+any we create a real one and send that to the frontend who creates weeks surrounding each of the diary day dates and if any day has no diary day its rendered as a "none" day.
+3. problem is, if we create a diary day and dont add anything, 
+
+
+List item is rendered when:
+1. Groceries list item
+2. Diary list item
+3. Search results list
+4. Recents results list
+This all comes from the FoodItem and singleFood models in mongoDB so we could just add a processedState when we addFoodToDiary or addFoodToGroceryList (since this is when we add it to our database)
