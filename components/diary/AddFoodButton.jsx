@@ -16,9 +16,9 @@ const AddFoodButton = () => {
 
 
   return (
-    <View style={{ paddingVertical: 15 }}>
+    <View style={{ paddingBottom: 14, paddingTop: 28 }}>
       <Pressable onPress={handleFoodPress} style={styles.addFoodButton}>
-        <PlusIcon />
+        <PlusIcon size={13} />
         <Text style={styles.addFoodButtonText}>Add more food</Text>
       </Pressable>
     </View>
@@ -29,19 +29,20 @@ export default AddFoodButton;
 
 const styles = StyleSheet.create({
   addFoodButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    // paddingHorizontal: 20,
+    // paddingVertical: 12,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center", // Center children horizontally
     borderColor: COLOURS.lightGray,
     borderWidth: 1,
-    borderRadius: 30,
+    borderRadius: 12,
     gap: 12,
+    height: 44
   },
   addFoodButtonText: {
-    fontSize: 16,
-    fontFamily: "Mulish_600SemiBold",
+    fontSize: 14,
+    fontFamily: "Mulish_700Bold",
     color: COLOURS.nearBlack
   },
 });

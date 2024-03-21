@@ -13,9 +13,9 @@ openFoodFactsAPI.interceptors.request.use(async(config) => {
   return config;
 });
 
-export const fetchFoodWithBarcode = async (barcode) => {
+export const fetchFoodWithBarcode = async (barcode, date) => {
   try {
-    const res = await openFoodFactsAPI.get(`products/${barcode}`);
+    const res = await openFoodFactsAPI.get(`products/${barcode}/date/${date}`);
     return res.data;
   } catch {
     //else jsut show we dont have that product in DB

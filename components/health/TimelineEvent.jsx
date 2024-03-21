@@ -5,7 +5,6 @@ import { Path, Svg } from "react-native-svg";
 import TimelineEventCard from "./TimelineEventCard";
 
 const TimelineEvent = ({ unlocked, data }) => {
-
   return (
     <View style={styles.container}>
       {/* Tick */}
@@ -35,7 +34,7 @@ const TimelineEvent = ({ unlocked, data }) => {
       {/* Green Dot */}
       <View style={styles.circle}></View>
 
-      <TimelineEventCard data={data} unlocked={unlocked} />
+      <TimelineEventCard destination={'UnlockedDetails'} data={data} unlocked={unlocked} />
     </View>
   );
 };

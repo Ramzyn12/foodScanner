@@ -7,13 +7,13 @@ import TimerCircle from "../../svgs/TimerCircle";
 import { useNavigation } from "@react-navigation/native";
 import { SvgXml } from "react-native-svg";
 
-const TimelineEventCard = ({ unlocked, data }) => {
+const TimelineEventCard = ({ unlocked, data, destination }) => {
   const navigation = useNavigation();
 
 
   return (
     <Pressable
-      onPress={() => navigation.navigate("UnlockedDetails")}
+      onPress={() => navigation.navigate(destination)}
       style={[
         styles.cardContainer,
         { backgroundColor: unlocked ? COLOURS.lightGreen : "white" },

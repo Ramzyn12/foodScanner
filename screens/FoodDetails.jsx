@@ -35,6 +35,7 @@ const FoodDetails = ({ navigation, route }) => {
   const barcode = route?.params?.barcodeId;
   const singleFoodId = route?.params?.singleFoodId;
   const currentFood = useSelector((state) => state.food.currentFood);
+  const chosenDate = useSelector(state => state.diary.chosenDate)
 
   const {
     data: foodDetails,
@@ -46,7 +47,7 @@ const FoodDetails = ({ navigation, route }) => {
     queryKey: ["FoodDetails", barcode],
     retry: false,
     enabled: !!barcode,
-    queryFn: () => fetchFoodWithBarcode(barcode),
+    queryFn: () => fetchFoodWithBarcode(barcode, chosenDate || new Date()),
   });
 
   // Need to add loading states here ASWELL!!
@@ -54,7 +55,7 @@ const FoodDetails = ({ navigation, route }) => {
     queryKey: ["FoodDetailsIvy", singleFoodId],
     retry: false,
     enabled: !!singleFoodId,
-    queryFn: () => fetchFoodWithIvyId(singleFoodId),
+    queryFn: () => fetchFoodWithIvyId(singleFoodId, chosenDate || new Date()),
   });
 
 

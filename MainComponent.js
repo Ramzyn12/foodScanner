@@ -50,8 +50,8 @@ function MainComponent() {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, backgroundColor: "red" }}>
-        <Text>Loading screen</Text>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <Text style={{fontSize: 20}}>Loading Signing User in screen</Text>
       </View>
     );
   }

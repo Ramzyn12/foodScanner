@@ -93,7 +93,7 @@ export const useFoodDetailsActions = () => {
     removeFoodFromDiaryMutation.mutate({
       barcode: currentFood?.barcode,
       singleFoodId: currentFood?.singleFoodId,
-      // date: chosenDate || new Date()
+      date: chosenDate || new Date()
     });
     setAddedToDiary(false);
   };

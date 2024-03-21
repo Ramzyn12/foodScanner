@@ -13,7 +13,7 @@ const windowWidth = Dimensions.get("window").width;
 const WeekHeader = ({ diaryData }) => {
   const [weeksData, setWeeksData] = useState([]);
   const carouselRef = useRef(null);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (diaryData) {
@@ -31,25 +31,33 @@ const WeekHeader = ({ diaryData }) => {
     const weeks = [];
     let currentWeekStart = earliestDate.clone().startOf("isoWeek");
 
-    while (currentWeekStart.isSameOrBefore(latestDate, 'week')) {
-      let week = Array(7).fill(null).map((_, index) => ({
-        date: currentWeekStart.clone().add(index, "days").format("YYYY-MM-DD"),
-        score: undefined, // Default score
-        _id: null // Default ID
-      }));
+    while (currentWeekStart.isSameOrBefore(latestDate, "week")) {
+      let week = Array(7)
+        .fill(null)
+        .map((_, index) => ({
+          date: currentWeekStart
+            .clone()
+            .add(index, "days")
+            .format("YYYY-MM-DD"),
+          diaryDayState: 'empty', // Default score
+          _id: null, // Default ID
+        }));
 
       // Map actual diary data onto the week structure
       diaryDays.forEach((day) => {
         const dateMoment = moment(day.date);
-        if (dateMoment.isSameOrAfter(currentWeekStart) && dateMoment.isBefore(currentWeekStart.clone().add(1, "week"))) {
+        if (
+          dateMoment.isSameOrAfter(currentWeekStart) &&
+          dateMoment.isBefore(currentWeekStart.clone().add(1, "week"))
+        ) {
           const dayOfWeek = dateMoment.isoWeekday() - 1; // Adjust for 0-indexed array
-          week[dayOfWeek] = { score: day.score, _id: day._id, date: day.date };
+          week[dayOfWeek] = { diaryDayState: day.diaryDayState, _id: day._id, date: day.date };
         }
       });
 
       weeks.push({
         weekStart: currentWeekStart.format("YYYY-MM-DD"),
-        days: week
+        days: week,
       });
 
       // Proceed to the next week
@@ -70,20 +78,35 @@ const WeekHeader = ({ diaryData }) => {
     }
   };
 
+  const handleDayPressChange = (item, index) => {
+    const pressedDate = moment(item.weekStart).add(index, "days");
+    const currentDate = moment().startOf("day");
+
+    // If pressedDate is after the current date, dispatch the current date instead
+    if (pressedDate.isAfter(currentDate)) {
+      dispatch(setChosenDate(currentDate.toISOString()));
+    } else {
+      dispatch(setChosenDate(pressedDate.toISOString()));
+    }
+  };
+
   const renderWeek = useCallback(
     ({ item, index }) => {
       // item is a week object from your weeksData array (cant change name)
       return (
         <View style={styles.weekHeaderContainer}>
           {item.days.map((day, index) => (
-            <Pressable key={index} onPress={() => dispatch(setChosenDate(moment(item.weekStart).add(index, "days").toISOString()))}>
+            <Pressable
+              key={index}
+              onPress={() => handleDayPressChange(item, index)}
+            >
               <WeekDayProgress
-              dayType={determineDayType(item.weekStart, index)}
-              date={moment(item.weekStart).add(index, "days")}
-              score={day.score}
-            />
+                dayType={determineDayType(item.weekStart, index)}
+                date={moment(item.weekStart).add(index, "days")}
+                score={day.score}
+                diaryDayState={day.diaryDayState}
+              />
             </Pressable>
-            
           ))}
         </View>
       );
@@ -94,7 +117,7 @@ const WeekHeader = ({ diaryData }) => {
   return (
     <BlurView
       intensity={30}
-      tint='systemThickMaterial'
+      tint="systemThickMaterial"
       style={{ position: "absolute", zIndex: 3000, paddingTop: 38 }}
     >
       <Carousel

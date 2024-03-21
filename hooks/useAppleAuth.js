@@ -1,5 +1,10 @@
 // hooks/useAppleAuth.js
-import { signInWithCredential, OAuthProvider, signOut } from "firebase/auth";
+import {
+  signInWithCredential,
+  OAuthProvider,
+  signOut,
+  revokeAccessToken,
+} from "firebase/auth";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { auth } from "../firebaseConfig";
 import { signUpApple } from "../axiosAPI/authAPI";
@@ -74,5 +79,50 @@ export const useAppleAuth = () => {
     }
   };
 
-  return { handleAppleLogin, signUpAppleMutation };
+  const handleAppleAccountRevoke = async () => {
+    try {
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      })
+
+      const { identityToken, authorizationCode } = credential;
+
+      if (identityToken) {
+        const provider = new OAuthProvider("apple.com")
+        const token = provider.credential({accessToken: authorizationCode})
+      
+        provider.addScope("email");
+        provider.addScope("name");
+        const authCredential = provider.credential({ idToken: identityToken })
+        signInWithCredential(auth, authCredential)
+          .then(async (userCredential) => {
+            
+            const credential = OAuthProvider.credentialFromResult(userCredential);
+            const accessToken = credential.accessToken;
+            console.log(credential);
+
+            revokeAccessToken(auth, 'didiuhdifh')
+              .then(() => {
+                //Sign in, delete mongoDB, delete firebase
+                console.log(
+                  "Token revoked, delete mongoDB user and firebase user data"
+                );
+              })
+              .catch((err) => console.log(err, "Err revoking access token"));
+          })
+          .catch((error) => {
+            console.error("Error during Apple sign in:", error);
+          });
+      } else {
+        console.log("No identity token...");
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  return { handleAppleLogin, signUpAppleMutation, handleAppleAccountRevoke };
 };

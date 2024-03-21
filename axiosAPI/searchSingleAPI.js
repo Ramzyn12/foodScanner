@@ -22,9 +22,9 @@ export const fetchFoodWithSearchIvy = async (search_term) => {
   }
 };
 
-export const fetchFoodWithIvyId = async (IvyId) => {
+export const fetchFoodWithIvyId = async (IvyId, date) => {
   try {
-    const res = await searchSingleAPI.get(`${IvyId}`);
+    const res = await searchSingleAPI.get(`${IvyId}/date/${date}`);
     return res.data;
   } catch {
     console.error(error, "MY ERROR");

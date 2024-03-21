@@ -10,7 +10,6 @@ function getNormalizedDate(date = new Date()) {
 }
 
 async function addFoodToDiary({ userId, foodDetails }) {
-
   const { barcode, singleFoodId, date } = foodDetails; //Includes all foodItem model fields
   const normalizedDay = getNormalizedDate(date);
 
@@ -41,7 +40,7 @@ async function addFoodToDiary({ userId, foodDetails }) {
 
   if (!diaryDay) throw new NotFoundError("Error when creating diary day");
 
-  await diaryDay.updateAverageScore();
+  await diaryDay.updateDiaryDayState();
 
   return diaryDay;
 }
@@ -75,14 +74,14 @@ async function removeFoodFromDiaryDay({ userId, barcode, singleFoodId, date }) {
     throw new NotFoundError("Update failed for the diary day?");
   }
 
-  await diaryDay.updateAverageScore();
+  await diaryDay.updateDiaryDayState();
 
   return diaryDay;
 }
 
 async function getDiaryDay({ userId, date }) {
   const queryDate = getNormalizedDate(date);
-  
+
   let diaryDay = await DiaryDay.findOne({
     userId: userId,
     date: queryDate,
@@ -100,6 +99,7 @@ async function getDiaryDay({ userId, date }) {
       consumedFoods: [],
       consumedSingleFoods: [],
       score: 0,
+      hasProcessed: false,
     };
   }
 
@@ -111,13 +111,13 @@ async function getAllDiaryDays({ userId }) {
 
   let diaryDays = await DiaryDay.find({ userId: userId })
     .sort("date")
-    .select("_id score date")
+    .select("_id score date diaryDayState")
     .lean();
 
   if (!diaryDays.length) {
     // Create a diary day and send it in array!?
     const newDiaryDay = await DiaryDay.create({ userId, date: today });
-    diaryDays = [newDiaryDay]
+    diaryDays = [newDiaryDay];
   }
 
   return diaryDays;

@@ -13,10 +13,10 @@ const searchSingleFood = async (req, res) => {
 };
 
 const fetchFoodWithIvyId = async (req, res) => {
-  const IvyId = req.params.IvyId;
+  const {IvyId, date} = req.params;
   const userId = req.user._id;
 
-  const {singleFood, isConsumedToday, isInGroceryList} = await foodService.fetchSingleFoodsWithIvyId({IvyId, userId})
+  const {singleFood, isConsumedToday, isInGroceryList} = await foodService.fetchSingleFoodsWithIvyId({IvyId, userId, date})
 
   res.json({ ...singleFood, isConsumedToday, isInGroceryList });
 };

@@ -1,15 +1,37 @@
 import { View, Text, StyleSheet } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Svg, { Path } from "react-native-svg";
 import COLOURS from "../../constants/colours";
 import CircularProgress from "./CircularProgress";
+import { useSelector } from "react-redux";
 
-const WeekDayProgress = ({ dayType, date, score }) => {
+const WeekDayProgress = ({
+  dayType,
+  date,
+  score,
+  diaryDayState,
+  hasProcessed,
+}) => {
+  const chosenDate =
+    useSelector((state) => state.diary.chosenDate) ||
+    new Date().setHours(0, 0, 0, 0);
+  const chosenDateObj = chosenDate ? new Date(chosenDate) : new Date();
+  const thisDateObj = new Date(date);
+  const [showUnderline, setShowUnderline] = useState(false);
+
+  useEffect(() => {
+    if (chosenDateObj.getTime() === thisDateObj.getTime()) {
+      setShowUnderline(true);
+    } else {
+      setShowUnderline(false);
+    }
+  }, [chosenDate, thisDateObj]);
+
   return (
     <View
       style={[
         styles.weekDayContainer,
-        dayType === "current" && {
+        showUnderline && {
           borderBottomWidth: 4,
           borderBottomColor: "#126668",
         },
@@ -33,7 +55,7 @@ const WeekDayProgress = ({ dayType, date, score }) => {
           {date.date()}
         </Text>
       </View>
-      {dayType === "past" && score >= 80 && (
+      {dayType === "past" && diaryDayState === "unprocessed" && (
         <View style={styles.progressCirclePast}>
           <Svg width="15" height="11" viewBox="0 0 15 11" fill="none">
             <Path
@@ -43,19 +65,29 @@ const WeekDayProgress = ({ dayType, date, score }) => {
           </Svg>
         </View>
       )}
-      {dayType === "past" && score < 80 && (
+      {dayType === "past" && diaryDayState === "processed" && (
         // <CircularProgress progress={score} />
-        <View style={[styles.progressCirclePast, {backgroundColor: 'red'}]}>
-         
-        </View>
+        <View
+          style={[styles.progressCirclePast, { backgroundColor: "red" }]}
+        ></View>
       )}
-      {dayType === "past" && !score && (
-        <View style={[styles.progressCircleFuture, {backgroundColor: 'orange'}]}></View>
+      {dayType === "past" && diaryDayState === "empty" && (
+        <View
+          style={[styles.progressCircleFuture, { backgroundColor: "orange" }]}
+        ></View>
       )}
       {dayType === "future" && (
         <View style={styles.progressCircleFuture}></View>
       )}
-      {dayType === "current" && <CircularProgress progress={score} />}
+      {dayType === "current" && diaryDayState === "processed" && (
+        <View
+          style={[styles.progressCirclePast, { backgroundColor: "red" }]}
+        ></View>
+      )}
+      {dayType === "current" &&
+        (diaryDayState === "empty" || diaryDayState === "unprocessed") && (
+          <View style={styles.progressCircleFuture}></View>
+        )}
     </View>
   );
 };

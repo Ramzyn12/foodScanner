@@ -1,10 +1,10 @@
 const foodService = require("../services/foodService");
 
 const fetchFoodWithBarcode = async (req, res) => {
-  const barcode = req.params.barcode;
+  const {barcode, date} = req.params;
   const userId = req.user._id; // Assuming you have user information from authentication middleware
 
-  const foodData = await foodService.fetchOFFWithBarcode({ barcode, userId });
+  const foodData = await foodService.fetchOFFWithBarcode({ barcode, userId, date });
 
   res.json(foodData);
 };

@@ -22,13 +22,15 @@ async function checkIsInGroceryList(userId, identifier, isBarcode = true) {
   );
 }
 
-async function checkIsConsumedToday(userId, identifier, isBarcode = true) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
+async function checkIsConsumedToday(userId, identifier, isBarcode = true, date) {
+
+  const decodedDate = decodeURIComponent(date)
+  const decodedDateObj = new Date(decodedDate)
+  decodedDateObj.setHours(0,0,0,0)
+
   const diaryDay = await DiaryDay.findOne({
     userId: userId,
-    date: today,
+    date: decodedDateObj,
   }).populate(isBarcode ? "consumedFoods" : "consumedSingleFoods");
   if (!diaryDay) return false;
 
@@ -40,11 +42,11 @@ async function checkIsConsumedToday(userId, identifier, isBarcode = true) {
   );
 }
 
-async function fetchOFFWithBarcode({ userId, barcode }) {
+async function fetchOFFWithBarcode({ userId, barcode, date }) {
   
   const [isInGroceryList, isConsumedToday, fullResponse, knowledgeResponse] = await Promise.all([
     checkIsInGroceryList(userId, barcode, true),
-    checkIsConsumedToday(userId, barcode, true),
+    checkIsConsumedToday(userId, barcode, true, date),
     openFoodFactsAPI.get(`/api/v3/product/${barcode}`),
     openFoodFactsAPI.get(`/api/v2/product/${barcode}?fields=knowledge_panels`),
   ]);
@@ -146,16 +148,16 @@ async function fetchSingleFoodsWithSearch({ searchTerm }) {
   return results;
 }
 
-async function fetchSingleFoodsWithIvyId({ IvyId, userId }) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+async function fetchSingleFoodsWithIvyId({ IvyId, userId, date }) {
+
+  // console.log(date.setHours(0,0,0,0));
 
   const singleFood = await SingleFood.findById(IvyId).lean();
 
   if (!singleFood) throw new Error("No single food with this IvyId");
 
   const isInGroceryList = await checkIsInGroceryList(userId, IvyId, false);
-  const isConsumedToday = await checkIsConsumedToday(userId, IvyId, false);
+  const isConsumedToday = await checkIsConsumedToday(userId, IvyId, false, date);
 
   return { singleFood, isConsumedToday, isInGroceryList };
 }
