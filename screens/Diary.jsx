@@ -95,7 +95,7 @@ const Diary = ({ navigation }) => {
   }, [userCreated]);
 
   if (isLoading) return <ActivityIndicator />;
-  if (isError) return <Text>{error} is error</Text>;
+  if (isError) return <Text>is error</Text>;
 
   return (
     <SafeAreaView style={styles.container}>

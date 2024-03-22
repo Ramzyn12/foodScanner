@@ -17,11 +17,11 @@ import { signUp } from "../../axiosAPI/authAPI";
 import { useMutation } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { addUserInformation } from "../../axiosAPI/userAPI";
-
+import auth from "@react-native-firebase/auth";
 const SignUpForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState('')
+  const [errorMessage, setErrorMessage] = useState("");
 
   const navigation = useNavigation();
   const userInformation = useSelector(

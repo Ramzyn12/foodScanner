@@ -2,17 +2,18 @@ const admin = require("firebase-admin");
 
 const serviceAccount = {
   "type": "service_account",
-  "project_id": "foodscans-2c874",
-  "private_key_id": "0625e5faa7672ebeb542bd23f5f8cdc99c0387f4",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCskbriY5/KC0Ut\nuRoYZvnnykm/xqC7aql61XT88rxkJZzP1jYESxNhhk30A+ATy6I8iFjElifO7g8Q\n08+Zzx3O2MWYMsURgfsR9y+wBF0SJUYnpigUMMiVcRwM8JcEvVroqNlQNQHWWUXB\nHUE8f+85GNApXG4YDpIXEmzcZkZs7BAFHvGhSIRd+7tS/Xr7GXY29ern750Lel51\nAgkLENcaXSbwO1C2ABDEU07x16jk3xF7iFNR92L3EGACp13A/mZSvjX0MxPUm1gw\nJg2gC1Ku8ObvNjd2UiCNyujr4d6kOz+LYxQ6wjim9lAf4iVhD5YJ9eRNOUakuZSB\nIF1QtBczAgMBAAECggEAHPj+kmG9gxNvUuTf37byQBszVJJJjA21VJ0f3hP20y2J\nbU9+lCvyng4Jam14Inquy1Ds7lxzZIeNWfrlwOIIFCFK02m6slzLRVHl3Lxuz8wY\nQjHgSruCAa0S041VHYOZDrTCf3fWziEA2BJMUJb+F+z1jewpw7o2hs8eHcbCDikx\nR17yQgmITGEleGo+oxK7bNifyFkfWeptllCCSkBb8J/H8UkBdlJYOAqA7+FqtmcO\nUkGYxqUxurW15Ic3pWWxepwF3xKFy4Ab2EzRGa820S4lPnJ3B9220sJy4BCViJ1q\nma+m2G2BB7XEeqbxYPUkr6s/Nyul7ay9G7VTJouqKQKBgQDbTOs5gYHvhk1yTU+r\nHDXSxUe+hEsWNVxmSPORxxXfA3De1Ul5kRgVKdYW9O5zPj94ElVnwyiWmJOyBdXD\ndbBQog1f/8u/o5qxtlUAaxYKc0aHT2FBgZZkzSS54Avt7e/oqOO3uN+7mmIONzF0\nbE+4PYjeAUjd16sI3tfZ5/tlpwKBgQDJcssNa0etw0oCuKyCA5Jbfa9GipHN5Br0\n0+XgEBq/HE3TDPCFJVRYVZSgDK1ms1sEMkTVoqGnHzE2dm341Z2ip3cxmUiG+zx1\nywYuxMKkkXMVLnA0ynDkhwkHIeehz6fjV22wlxh0sQfXJyyDoq1C9xMgQJCkhK7P\nMGhSXdZLlQKBgQDUeWUalWDYOq6ExWUgKzf224+Uhkbd4JuCusHLBzIongPY0pva\nvfqwXpWALpVtcO07n7/BxfNoXbIT9NVVCIzowunkjkjRh2kVL8yRmC+FtoSqCv32\n4uBdD+m6cdn9D+C28hOX6PZUpNLGZTF0VJC0uGIIfwQjdJbRBF/sT3hi1wKBgQDH\nlrifnv7xpl+ZuqcQWcGUbD5QwdIcEDi1AYzsJoiZeM2SoWtcP9QFgSU0Pds/ucwf\nqD6S/AL1te3obAYhWGRKV2m89oXpVtpcSr7hb4j5zDIddlkttLWNdkz3iBwbMcbB\ndEn1gH52fz+pZ+KuuWq4wltsxQuKNPuNxARYNyiu0QKBgEmk+xBBbTSRhkMrEsmX\nMFwd7U0Pv5yMM6W//Divn+vEII9Kw6QOEsIyo4aKvfW+eiqeBOjbTKvA3/OhVdO5\nb48q9ZgqonFJVmbmsi15ut4FTChqiW+UDQMephSUk5tKUzeip4fFQMWd9/HLuyKD\n8MgWmkv13esEEm+FG7ntp3FU\n-----END PRIVATE KEY-----\n",
-  "client_email": "firebase-adminsdk-qeg4r@foodscans-2c874.iam.gserviceaccount.com",
-  "client_id": "102274562815197919492",
+  "project_id": "ivyqpf",
+  "private_key_id": "bec066377ca33bc96488a435745cdfca2fbba998",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDSSP6TpDKf0raM\nFWKN/G6HM4QKT2+wyv0xXarO0Xb6HfAkH1pmrp75sSvCsdbL+BDhu4l5eK/HmzIn\nYTJ0zVFczUn1XUJkbDuU4kEyYnT5Q7OrI1yjshhdLrMGeN1vZBdikNgBNBuw1Z5Z\nrB2lt9j3Gjcbq5Y2zmhsjAyD+GEn1Ki5U2yIDk5vXCQlfuGmG3Mnzkajl3PW5vpg\nu93sDRSovCWY8eh4MEI2SR9ahNs5HrwUiNzXpuZLiBdq3VaRr8U6kLYauAPmxLmH\nGwuJvyipJup/TNBYkpXaj1KGRro7eQ8GQ+WvsRIzDdBBXEPPEmXYAkGvD6QmDv0s\n/QLb13vpAgMBAAECggEAAUhcMyrYezSWE/cqbXrJcs4r40M2R3IJhtRPLylEbESj\n+xhs3Pz6L8Q2o96hVIesFLBn54OGsPU/olFbtS4ubZ478gDyX3nwiBk0NBo5I+8X\niLbzwPTcZK8c/PBeS2hlIx8GjkVS2OqIp3vfB2x+aI1yohrTFPz/0o+tIN3yO8Oz\nt2XJHXVDDJtLrbuDkBl4kxpp8xZuwGZQGeWvGaNAYlM/EeS6KeYzMZ3nyDP3ZyKk\nVHHhOXdItqJBm8JC6AK6y4RMOf7cGqdEXETqo2ptBeMODU11vYOV5wffJYJOMD9u\n5UMqEH8Mp1SHpsHgZCHE9KK6u7OE9ebU6yOXEbD6YQKBgQD9K6ua9SUttYE6dGXR\ncGjhXPx65WksXFWlJxaTpbVq5UQzOVBkQyFcavio7Uf2VMieZodn94khgvFFofQq\nihAFngVIJTiDZwD4VGb94JMicrTyzVPCGo2PA/E3XGCF9TL06amkdhFZ5TlRHNvH\nJkYCIyz+3HlsTHKnyvALlXV1uQKBgQDUoqCbJNcxI/DS8IjIu4T9VP5FGQhwQGj8\ntyRATXtZ/A9397IhWDUaGqkQDai711bwUNpxnLVtveHAUwAe4zG5Xq/GyWpODyMB\nX/6PIQu5KhFOZo7hwEriQtRtNhj9U3v2w7VsMGzfSRHTps4zVACvp5YbAIiqiEC2\nGikCnzVPsQKBgQCSCJ2s/Zkbe6X2POv6Wnf0/vkYPrpi/0PbxudL9XrnFSY40eeg\nXeShdYbHkk8/NPqf/A5BF1T/gpN/kgLQguDpDJSJYAbwLPsvQyhBa0gTx8y+fVfC\nECT1iNWcFGoM+zoQcbQMDJrHmuRr+FSB1H7vfrDWtgBISvSb+wBp/iVJ6QKBgQCA\nIc+uLbEPB51jP1btvzIQhlsCwGb5XZbmUmYh6Y7fVqjrnfNVbJXzOQWPiuuW5diZ\nz98Sf2BE1RtojZuRAU9BaPF7VHwetbheZ745+ava1KLBH8QR/ZIibisb9HFylhAp\nTx3QKA4zLxDy/Z1cCM6xCsfFVbkFKj30ficgUVgKwQKBgQDH/DjWo9hkldQVw8Ct\noirGuoQX5luyyvxg0lQ5mSeelI/5qjg/tIwfXnSz2IhIbE1rqeqKm7Q+yh4zd2T0\nvw6/fplJdKkLbsLmlpy+NTxy6VzZq5OwKfRy3Yrmy+1QWcistXP+vlGYdwWhudLN\n3QqJvyaReEHR0cWNUd7Bq8paFA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-esnod@ivyqpf.iam.gserviceaccount.com",
+  "client_id": "112246412514121452061",
   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
   "token_uri": "https://oauth2.googleapis.com/token",
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-qeg4r%40foodscans-2c874.iam.gserviceaccount.com",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-esnod%40ivyqpf.iam.gserviceaccount.com",
   "universe_domain": "googleapis.com"
 }
+
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),

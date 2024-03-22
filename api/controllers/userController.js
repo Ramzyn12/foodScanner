@@ -25,6 +25,19 @@ const addUserNames = async (req, res) => {
   res.json({ message: "Name updated successfully" });
 };
 
+const removeUser = async (req, res) => {
+  const userId = req.user._id;
+  const { firebaseId } = req.params;
+
+
+  const message = await userService.removeUser(
+    firebaseId
+  );
+
+  res.json({ message, userId });
+};
+
 module.exports = {
   addUserNames,
+  removeUser
 };

@@ -6,18 +6,21 @@ import {
   revokeAccessToken,
 } from "firebase/auth";
 import * as AppleAuthentication from "expo-apple-authentication";
-import { auth } from "../firebaseConfig";
 import { signUpApple } from "../axiosAPI/authAPI";
 import { useMutation } from "@tanstack/react-query";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserCreatedStatus } from "../redux/authSlice";
+import { appleAuth } from "@invertase/react-native-apple-authentication";
+import auth from "@react-native-firebase/auth";
+import { removeUserAccount } from "../axiosAPI/userAPI";
 
 export const useAppleAuth = () => {
   const userInformation = useSelector(
     (state) => state.onboarding.userInformation
   );
   const dispatch = useDispatch();
+
   const signUpAppleMutation = useMutation({
     mutationFn: signUpApple,
     onSuccess: () => {
@@ -26,7 +29,8 @@ export const useAppleAuth = () => {
     onError: (err) => {
       console.log(err, "APPLE Hooks");
       // Need to add an error toast here as wont know why got logged out!
-      signOut(auth)
+      auth()
+        .signOut()
         .then(() => {
           console.log("User signed out cos error signign in to apple");
         })
@@ -36,91 +40,91 @@ export const useAppleAuth = () => {
     },
   });
 
+  const removeUserMutation = useMutation({
+    mutationFn: removeUserAccount,
+    onSuccess: () => {
+      console.log("successfully removed accounts");
+    },
+    onError: (err) => {
+      console.log(err);
+    },
+  });
+
   const handleAppleLogin = async () => {
     try {
-      const credential = await AppleAuthentication.signInAsync({
-        requestedScopes: [
-          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-          AppleAuthentication.AppleAuthenticationScope.EMAIL,
-        ],
+      // Performs the Apple sign-in request
+      const appleAuthResponse = await appleAuth.performRequest({
+        requestedOperation: appleAuth.Operation.LOGIN,
+        requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
       });
 
-      const { identityToken } = credential;
-
-      if (identityToken) {
-        const provider = new OAuthProvider("apple.com");
-        provider.addScope("email");
-        provider.addScope("name");
-        const authCredential = provider.credential({ idToken: identityToken });
-        signInWithCredential(auth, authCredential)
-          .then(async (userCredential) => {
-            // User is signed in
-            const user = userCredential.user;
-            const token = await user.getIdToken(); // Get Firebase token
-            // console.log(token) Worked
-            await AsyncStorage.setItem("firebaseToken", token); // Store token
-            signUpAppleMutation.mutate({
-              email: user.email,
-              uid: user.uid,
-              idToken: identityToken,
-              userInformation,
-            });
-            // Could potentially get operationType to know if first time signing
-            // Up or just signing in?
-          })
-          .catch((error) => {
-            console.error("Error during Apple sign in:", error);
-          });
-      } else {
-        console.log("No identity token...");
+      // Check for identity token
+      if (!appleAuthResponse.identityToken) {
+        throw new Error("Apple Sign-In failed - no identity token returned");
       }
-    } catch (e) {
-      console.log(e);
+
+      // Create a Firebase credential
+      const { identityToken, nonce } = appleAuthResponse;
+      const appleCredential = auth.AppleAuthProvider.credential(
+        identityToken,
+        nonce
+      );
+
+      // Sign in the user with Firebase
+      const userCredential = await auth().signInWithCredential(appleCredential);
+      const firebaseToken = await userCredential.user.getIdToken();
+
+      // Store the Firebase token and proceed with any further sign-up process
+      await AsyncStorage.setItem("firebaseToken", firebaseToken);
+
+      // Call your backend API or perform further actions with the signed-in user
+      signUpAppleMutation.mutate({
+        email: userCredential.user.email,
+        uid: userCredential.user.uid,
+        idToken: identityToken,
+        userInformation,
+      });
+    } catch (error) {
+      console.error("Error during Apple sign-in:", error);
+      auth().signOut();
     }
   };
 
   const handleAppleAccountRevoke = async () => {
+    // Get an authorizationCode from Apple
+
     try {
-      const credential = await AppleAuthentication.signInAsync({
-        requestedScopes: [
-          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-          AppleAuthentication.AppleAuthenticationScope.EMAIL,
-        ],
-      })
+      const { authorizationCode } = await appleAuth.performRequest({
+        requestedOperation: appleAuth.Operation.REFRESH,
+      });
 
-      const { identityToken, authorizationCode } = credential;
-
-      if (identityToken) {
-        const provider = new OAuthProvider("apple.com")
-        const token = provider.credential({accessToken: authorizationCode})
-      
-        provider.addScope("email");
-        provider.addScope("name");
-        const authCredential = provider.credential({ idToken: identityToken })
-        signInWithCredential(auth, authCredential)
-          .then(async (userCredential) => {
-            
-            const credential = OAuthProvider.credentialFromResult(userCredential);
-            const accessToken = credential.accessToken;
-            console.log(credential);
-
-            revokeAccessToken(auth, 'didiuhdifh')
-              .then(() => {
-                //Sign in, delete mongoDB, delete firebase
-                console.log(
-                  "Token revoked, delete mongoDB user and firebase user data"
-                );
-              })
-              .catch((err) => console.log(err, "Err revoking access token"));
-          })
-          .catch((error) => {
-            console.error("Error during Apple sign in:", error);
-          });
-      } else {
-        console.log("No identity token...");
+      // Ensure Apple returned an authorizationCode
+      if (!authorizationCode) {
+        throw new Error(
+          "Apple Revocation failed - no authorizationCode returned"
+        );
       }
-    } catch (e) {
-      console.log(e);
+
+      // Revoke the token
+      await auth().revokeToken(authorizationCode);
+
+      console.log("Done started other processed");
+
+      if (auth().currentUser) {
+        //Show toast saying account deleted?
+
+        const firebaseId = auth().currentUser.uid;
+
+        removeUserMutation.mutate({ firebaseId });
+
+        await auth()
+          .currentUser.delete()
+          .catch((err) => console.log(err, "1"));
+
+        await AsyncStorage.removeItem("firebaseToken"); // Example of cleaning up
+      }
+    } catch (err) {
+      console.log(err);
     }
   };
 

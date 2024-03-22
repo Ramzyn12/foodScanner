@@ -24,3 +24,13 @@ export const addUserNames = async ({ firstName, lastName }) => {
     throw error;
   }
 };
+
+export const removeUserAccount = async ({ firebaseId }) => {
+  try {
+    const res = await userAPI.delete(`/removeUser/${firebaseId}`);
+    return res.data;
+  } catch (error) {
+    console.error("Error adding user info:", error);
+    throw error;
+  }
+};

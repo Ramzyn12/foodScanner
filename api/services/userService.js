@@ -9,6 +9,7 @@ const {
   ConflictError,
 } = require("../utils/error");
 const verifyAppleToken = require("../utils/verifyAppleToken");
+const { startSession } = require('mongoose');
 
 function handleFirebaseError(err) {
   console.error(err); // Log the original error for debugging purposes
@@ -67,7 +68,8 @@ async function createUser(email, password, userInfo) {
     date: today,
   });
 
-  const customToken = await admin.auth().createCustomToken(newFirebaseUser.uid);
+
+  const customToken = await admin.auth().createCustomToken(newFirebaseUser.uid)
 
   return {
     token: customToken,
@@ -108,4 +110,26 @@ async function updateFirstLastName(firstName, lastName, userId) {
   return user;
 }
 
-module.exports = { createUser, createAppleUser, updateFirstLastName };
+async function removeUser(firebaseId, userId) {
+  const session = await startSession();
+  try {
+    session.startTransaction();
+    // Maybe just need userId not firebaseId? 
+    const user = await User.findOneAndDelete({ firebaseId }, { session });
+
+    if (!user) throw new NotFoundError("Firebase Id invalid");
+
+    // Assuming there's a relationship via the user's ID
+    await DiaryDay.deleteMany({ userId }, { session });
+
+    await session.commitTransaction();
+    session.endSession();
+    return { message: "User and associated data deleted successfully." };
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error; // Rethrow the error to be handled by the caller
+  }
+}
+
+module.exports = { createUser, createAppleUser, updateFirstLastName, removeUser };

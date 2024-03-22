@@ -6,10 +6,9 @@ import ScanStack from "./navigation/ScanStack";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AuthStack from "./navigation/AuthStack";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "./firebaseConfig";
 import { Text, View } from "react-native";
-import { useDispatch } from "react-redux";
-
+import { useDispatch, useSelector } from "react-redux";
+import auth from '@react-native-firebase/auth'
 import { setToken } from "./redux/authSlice";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MainTabsStack from "./navigation/MainTabsStack";
@@ -24,11 +23,11 @@ function MainComponent() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true); // Add loading state
   const dispatch = useDispatch();
-
+ 
 
   useEffect(() => {
     // This function runs when the component mounts, and sets up the auth state changed listener
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = auth().onAuthStateChanged(async (user) => {
       if (user) {
         user.getIdToken().then(async (token) => {
           dispatch(setToken(token));
@@ -46,6 +45,7 @@ function MainComponent() {
     // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
+  
   
 
   if (loading) {

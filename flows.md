@@ -26,3 +26,10 @@ List item is rendered when:
 3. Search results list
 4. Recents results list
 This all comes from the FoodItem and singleFood models in mongoDB so we could just add a processedState when we addFoodToDiary or addFoodToGroceryList (since this is when we add it to our database)
+
+
+Files that include firebase 
+Frontend:
+MainComponent has the onAuthStateChanged listner
+SignIn has signInWithEmailAndPassword
+Sign up calls the backend which has service account

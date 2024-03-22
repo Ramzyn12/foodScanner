@@ -17,6 +17,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ramzyn12.Ivy.dev",
+      "googleServicesFile": "./GoogleService-Info.plist",
       "buildNumber": "2",
       "usesAppleSignIn": true,
       "infoPlist": {
@@ -54,7 +55,17 @@
       [
         "expo-apple-authentication"
       ],
-      "expo-font"
+      "expo-font",
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ]
     ],
     "runtimeVersion": {
       "policy": "appVersion"

@@ -12,8 +12,9 @@ import EmailInput from "./EmailInput";
 import PasswordInput from "./PasswordInput";
 import FormSubmissionButton from "./FormSubmissionButton";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../firebaseConfig";
+// import { auth } from "../../firebaseConfig";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import auth from '@react-native-firebase/auth'
 
 const SignInForm = () => {
   const [email, setEmail] = useState("");
@@ -45,7 +46,7 @@ const SignInForm = () => {
   };
 
   const handleSignIn = () => {
-    signInWithEmailAndPassword(auth, email, password)
+    auth().signInWithEmailAndPassword(email, password)
       .then(async (userCredential) => {
         const token = await userCredential.user.getIdToken();
         await AsyncStorage.setItem("firebaseToken", token);

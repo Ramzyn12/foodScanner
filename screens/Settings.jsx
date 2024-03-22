@@ -15,7 +15,6 @@ import {
   View,
 } from "react-native";
 import { sendPasswordResetEmail, signOut, updatePassword } from "firebase/auth";
-import { auth } from "../firebaseConfig";
 import { useSelector } from "react-redux";
 import BottomSheet from "@gorhom/bottom-sheet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -24,14 +23,17 @@ import { SearchBar } from "@rneui/base";
 import COLOURS from "../constants/colours";
 import { SvgXml } from "react-native-svg";
 import { useAppleAuth } from "../hooks/useAppleAuth";
+import auth from "@react-native-firebase/auth";
+
 function Settings() {
   //If need
   // const token = useSelector(state => state.auth.token)
 
-  const signInWith = auth.currentUser.providerData[0].providerId;
+  const signInWith = auth().currentUser.providerData[0].providerId;
 
   const handleLogout = () => {
-    signOut(auth)
+    auth()
+      .signOut()
       .then(async () => {
         await AsyncStorage.removeItem("firebaseToken");
         console.log("Signed out!");
@@ -42,7 +44,7 @@ function Settings() {
   };
 
   const handlePasswordReset = () => {
-    sendPasswordResetEmail(auth, auth.currentUser.email)
+    auth().sendPasswordResetEmail(auth().currentUser.email)
       .then(() => {
         console.log("email sent! Check Junk FOlder!");
       })
@@ -52,7 +54,7 @@ function Settings() {
   };
 
   const handlePasswordUpdate = () => {
-    updatePassword(auth.currentUser, "Ramzy2002.123")
+    auth().currentUser.updatePassword("Ramzy2002.123")
       .then(() => {
         console.log("Password updated!");
       })
@@ -61,15 +63,15 @@ function Settings() {
       });
   };
 
-  const handleEmailUpdate = () => {
-    updatePassword(auth.currentUser, "ramzy.football1@hotmail.com")
-      .then(() => {
-        console.log("Email updated!");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+  // const handleEmailUpdate = () => {
+  //   auth().currentUser.updateEmail("ramzy.football1@hotmail.com")
+  //     .then(() => {
+  //       console.log("Email updated!");
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // };
 
   const { handleAppleAccountRevoke } = useAppleAuth();
 
@@ -104,7 +106,7 @@ function Settings() {
           <Text>Update password (to Ramzy2002.123)</Text>
         </Pressable>
       )}
-      {signInWith === "password" && (
+      {/* {signInWith === "password" && (
         <Pressable
           style={{ margin: 30 }}
           hitSlop={{ left: 20, right: 20, top: 20, bottom: 20 }}
@@ -112,7 +114,8 @@ function Settings() {
         >
           <Text>Update email (to ramzy.football1@hotmail.com)</Text>
         </Pressable>
-      )}
+      )} */}
+       
       {signInWith !== "password" && (
         <Pressable
           style={{ margin: 30 }}
