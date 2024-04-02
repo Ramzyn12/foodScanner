@@ -4,17 +4,21 @@ const authSlice = createSlice({
   name: "auth",
   initialState: {
     token: null,
-    userCreated: null
+    waitingForBackend: null,
+    authLoading: null
   },
   reducers: {
     setToken(state, action) {
       state.token = action.payload;
     },
-    setUserCreatedStatus(state, action) {
+    setWaitingForBackend(state, action) {
       state.userCreated = action.payload
-    }
+    },
+    setLoadingAuth(state, action) {
+      state.authLoading = action.payload
+    },
   },
 });
 
-export const { setToken, setUserCreatedStatus } = authSlice.actions;
+export const { setToken, setWaitingForBackend, setLoadingAuth } = authSlice.actions;
 export default authSlice.reducer;

@@ -40,7 +40,7 @@ export const getDiaryDay = async ({ date }) => {
     const res = await diaryDayAPI.get(`/${date}`);
     return res.data
   } catch (error) {
-    console.error("Error getting diary DAy", error.response.data.message);
+    console.error("Error getting diary DAy", error);
     throw error;
   }
 };
@@ -50,7 +50,7 @@ export const getAllDiaryDays = async () => {
     const res = await diaryDayAPI.get(`/all`);
     return res.data
   } catch (error) {
-    console.error("Error getting diary DAysss:", error.response.data.message);
+    console.error("Error getting diary DAysss:", error);
     throw error;
   }
 };

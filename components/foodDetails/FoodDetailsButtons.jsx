@@ -30,7 +30,7 @@ const FoodDetailsButtons = () => {
   } = useFoodDetailsActions();
 
   return (
-    <View style={{ flexDirection: "row", gap: 12, marginTop: 15 }}>
+    <View style={{ flexDirection: "row", gap: 8, marginTop: 15}}>
       {/* Could reduce down to single button to be neater if needed */}
       {!addedToDiary && (
         <Pressable onPress={handleAddToDiary} style={styles.addButton}>

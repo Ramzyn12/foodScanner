@@ -1,8 +1,7 @@
-// App.js
 import "@expo/metro-runtime";
 import "react-native-gesture-handler";
 import "react-native-get-random-values";
-import React, { useMemo } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import store from "./redux/store";
 import MainComponent from "./MainComponent";
@@ -15,13 +14,28 @@ import {
   Mulish_600SemiBold,
   Mulish_700Bold,
 } from "@expo-google-fonts/mulish";
-import COLOURS from './constants/colours'
-
+import { toastConfig } from "./toastConfig";
 import { Lato_400Regular, Lato_700Bold } from "@expo-google-fonts/lato";
-import Toast, { BaseToast } from "react-native-toast-message";
-import { Pressable, Text } from "react-native";
+import Toast from "react-native-toast-message";
+import * as SplashScreen from "expo-splash-screen";
+import { useAuthentication } from "./hooks/useAuthentication";
+
+SplashScreen.preventAutoHideAsync(); // Prevent auto-hide
 
 const App = () => {
+  return (
+    <Provider store={store}>
+      {/* Only necessary if want to use redux in App, else remove. */}
+      <AppInitializer />
+    </Provider>
+  );
+};
+
+const AppInitializer = () => {
+  const [appIsReady, setAppIsReady] = useState(false);
+  const { isLoggedIn, isLoading } = useAuthentication();
+  const queryClient = new QueryClient();
+
   let [fontsLoaded] = useFonts({
     Mulish_400Regular,
     Mulish_500Medium,
@@ -31,34 +45,31 @@ const App = () => {
     Lato_700Bold,
   });
 
-  const toastConfig = useMemo(() => ({
-    groceryToast: ({ text1, text2, props }) => (
-      <Pressable onPress={() => props.onUndo()} style={{ height: 44, width: '90%', backgroundColor: COLOURS.nearBlack, borderRadius: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20 }}>
-        <Text style={{color: 'white', fontFamily: 'Mulish_500Medium', fontSize: 14}}>{text1}</Text>
-        <Text style={{color: 'white', fontFamily: 'Mulish_600SemiBold', fontSize: 14}}>{text2}</Text>
-      </Pressable>
-    ),
-    foodDetailToast: ({ text1, text2, onViewPress, props }) => (
-      <Pressable onPress={onViewPress} style={{ height: 44, width: '90%', backgroundColor: COLOURS.nearBlack, borderRadius: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20 }}>
-        <Text style={{color: 'white', fontFamily: 'Mulish_500Medium', fontSize: 14}}>{text1}</Text>
-        <Text style={{color: 'white', fontFamily: 'Mulish_600SemiBold', fontSize: 14}}>{text2}</Text>
-      </Pressable>
-    )
-  }), []); 
+  useEffect(() => {
+    if (fontsLoaded && !isLoading) {
+      setAppIsReady(true);
+    }
+  }, [fontsLoaded, isLoading]);
 
+  const onLayoutRootView = useCallback(async () => {
+    if (appIsReady) {
+      await SplashScreen.hideAsync();
+    }
+  }, [appIsReady]);
 
-  if (!fontsLoaded) {
+  if (!appIsReady) {
     return null;
   }
-
-  const queryClient = new QueryClient();
 
   return (
     <>
       <QueryClientProvider client={queryClient}>
         <Provider store={store}>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <MainComponent />
+          <GestureHandlerRootView
+            onLayout={onLayoutRootView}
+            style={{ flex: 1 }}
+          >
+            <MainComponent loggedIn={isLoggedIn} />
           </GestureHandlerRootView>
         </Provider>
       </QueryClientProvider>

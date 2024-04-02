@@ -94,8 +94,20 @@ const Diary = ({ navigation }) => {
     }
   }, [userCreated]);
 
-  if (isLoading) return <ActivityIndicator />;
-  if (isError) return <Text>is error</Text>;
+  if (isLoading)
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "yellow",
+        }}
+      >
+        <Text style={{ fontSize: 34 }}>Loading diary screen data</Text>
+      </View>
+    );
+  if (isError) return <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}><Text>Server error, try again later</Text></View>;
 
   return (
     <SafeAreaView style={styles.container}>

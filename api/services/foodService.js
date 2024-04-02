@@ -44,15 +44,14 @@ async function checkIsConsumedToday(userId, identifier, isBarcode = true, date) 
 
 async function fetchOFFWithBarcode({ userId, barcode, date }) {
   
-  const [isInGroceryList, isConsumedToday, fullResponse, knowledgeResponse] = await Promise.all([
+  const [isInGroceryList, isConsumedToday, fullResponse] = await Promise.all([
     checkIsInGroceryList(userId, barcode, true),
     checkIsConsumedToday(userId, barcode, true, date),
-    openFoodFactsAPI.get(`/api/v3/product/${barcode}`),
-    openFoodFactsAPI.get(`/api/v2/product/${barcode}?fields=knowledge_panels`),
+    openFoodFactsAPI.get(`/api/v3/product/${barcode}?fields=knowledge_panels,ingredients_text_en,ingredients_analysis_tags,nova_group,ingredients_hierarchy,brands,image_url,product_name`),
   ]);
 
   const product = fullResponse.data.product
-  const knowledgePanels = knowledgeResponse.data.product.knowledge_panels
+  const knowledgePanels = product.knowledge_panels
 
   const ingredients = product.ingredients_text_en
   const additives = knowledgePanels?.additives?.elements.map(el => knowledgePanels[el.panel_element.panel_id].title_element.title)

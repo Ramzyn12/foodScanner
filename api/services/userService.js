@@ -68,7 +68,6 @@ async function createUser(email, password, userInfo) {
     date: today,
   });
 
-
   const customToken = await admin.auth().createCustomToken(newFirebaseUser.uid)
 
   return {
@@ -81,14 +80,15 @@ async function createUser(email, password, userInfo) {
 async function createAppleUser(email, uid, idToken, userInformation) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  //ALSO NEED TO VALIDATE A NONCE TO HELP AVOID REPLAY ATTACKS
 
   try {
+    // Is this still correct?
     await verifyAppleToken(idToken);
   } catch (error) {
     throw new BadRequestError("Invalid Apple ID token.");
   }
 
+  // Isnt it bad to update the userInfo if they dont fill it out second time loggin in...
   let user = await User.findOneAndUpdate(
     { email, firebaseId: uid },
     { $setOnInsert: { email, firebaseId: uid, userInformation } },
@@ -112,6 +112,9 @@ async function updateFirstLastName(firstName, lastName, userId) {
 
 async function removeUser(firebaseId, userId) {
   const session = await startSession();
+
+  console.log(firebaseId);
+  
   try {
     session.startTransaction();
     // Maybe just need userId not firebaseId? 

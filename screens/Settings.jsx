@@ -24,12 +24,16 @@ import COLOURS from "../constants/colours";
 import { SvgXml } from "react-native-svg";
 import { useAppleAuth } from "../hooks/useAppleAuth";
 import auth from "@react-native-firebase/auth";
+import { removeUserAccount } from "../axiosAPI/userAPI";
+import { useMutation } from "@tanstack/react-query";
+import { useEmailAuth } from "../hooks/useEmailAuth";
 
 function Settings() {
   //If need
   // const token = useSelector(state => state.auth.token)
+  const [password, setPassword] = useState("");
 
-  const signInWith = auth().currentUser.providerData[0].providerId;
+  const signInWith = auth()?.currentUser?.providerData[0]?.providerId;
 
   const handleLogout = () => {
     auth()
@@ -44,7 +48,8 @@ function Settings() {
   };
 
   const handlePasswordReset = () => {
-    auth().sendPasswordResetEmail(auth().currentUser.email)
+    auth()
+      .sendPasswordResetEmail(auth().currentUser.email)
       .then(() => {
         console.log("email sent! Check Junk FOlder!");
       })
@@ -54,7 +59,8 @@ function Settings() {
   };
 
   const handlePasswordUpdate = () => {
-    auth().currentUser.updatePassword("Ramzy2002.123")
+    auth()
+      .currentUser.updatePassword("Ramzy2002.123")
       .then(() => {
         console.log("Password updated!");
       })
@@ -75,9 +81,7 @@ function Settings() {
 
   const { handleAppleAccountRevoke } = useAppleAuth();
 
-  const handleRevokeApple = () => {
-    handleAppleAccountRevoke();
-  };
+  const { handleEmailAccountDeletion } = useEmailAuth(password);
 
   return (
     <View style={styles.container}>
@@ -115,15 +119,36 @@ function Settings() {
           <Text>Update email (to ramzy.football1@hotmail.com)</Text>
         </Pressable>
       )} */}
-       
+
       {signInWith !== "password" && (
         <Pressable
           style={{ margin: 30 }}
           hitSlop={{ left: 20, right: 20, top: 20, bottom: 20 }}
-          onPress={handleRevokeApple}
+          onPress={handleAppleAccountRevoke}
         >
           <Text>delete apple account</Text>
         </Pressable>
+      )}
+
+      {signInWith === "password" && (
+        <View>
+          <TextInput
+            placeholder="enter password"
+            onChangeText={setPassword}
+            style={{
+              backgroundColor: "white",
+              marginTop: 30,
+              padding: 10,
+              marginBottom: 10,
+            }}
+          />
+          <Pressable
+            hitSlop={{ left: 20, right: 20, top: 20, bottom: 20 }}
+            onPress={handleEmailAccountDeletion}
+          >
+            <Text>delete Your account</Text>
+          </Pressable>
+        </View>
       )}
     </View>
   );

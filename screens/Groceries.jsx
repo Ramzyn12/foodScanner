@@ -20,12 +20,6 @@ import UnmarkButton from "../components/groceries/UnmarkButton";
 import GroceryList from "../components/groceries/GroceryList";
 import { getGroceryList, updateSortPreference } from "../axiosAPI/groceryAPI";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  addVirtualGroceryItem,
-  setCurrentGroceries,
-  setSortPreference,
-  sortByProcessedScore,
-} from "../redux/grocerySlice";
 import Toast from "react-native-toast-message";
 import TopActions from "../components/groceries/TopActions";
 import FoodDetails from "./FoodDetails";

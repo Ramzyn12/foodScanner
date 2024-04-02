@@ -19,6 +19,7 @@ const authMiddleware = async (req, res, next) => {
     });
 
     if (!user) {
+      console.log(req.body);
       // frontend should retry? 
       //Maybe just create user here if not work
       // return

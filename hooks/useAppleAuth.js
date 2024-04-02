@@ -10,10 +10,11 @@ import { signUpApple } from "../axiosAPI/authAPI";
 import { useMutation } from "@tanstack/react-query";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
-import { setUserCreatedStatus } from "../redux/authSlice";
+import { setUserCreatedStatus, setWaitingForBackend } from "../redux/authSlice";
 import { appleAuth } from "@invertase/react-native-apple-authentication";
 import auth from "@react-native-firebase/auth";
 import { removeUserAccount } from "../axiosAPI/userAPI";
+import Toast from "react-native-toast-message";
 
 export const useAppleAuth = () => {
   const userInformation = useSelector(
@@ -24,7 +25,7 @@ export const useAppleAuth = () => {
   const signUpAppleMutation = useMutation({
     mutationFn: signUpApple,
     onSuccess: () => {
-      dispatch(setUserCreatedStatus(true));
+      dispatch(setWaitingForBackend(false));
     },
     onError: (err) => {
       console.log(err, "APPLE Hooks");
@@ -46,11 +47,12 @@ export const useAppleAuth = () => {
       console.log("successfully removed accounts");
     },
     onError: (err) => {
-      console.log(err);
+      console.log(err, "Error removing user from mongoDB");
     },
   });
 
   const handleAppleLogin = async () => {
+    dispatch(setWaitingForBackend(true))
     try {
       // Performs the Apple sign-in request
       const appleAuthResponse = await appleAuth.performRequest({
@@ -79,7 +81,7 @@ export const useAppleAuth = () => {
 
       // Call your backend API or perform further actions with the signed-in user
       signUpAppleMutation.mutate({
-        email: userCredential.user.email,
+        email: userCredential.additionalUserInfo.profile.email,
         uid: userCredential.user.uid,
         idToken: identityToken,
         userInformation,
@@ -91,12 +93,11 @@ export const useAppleAuth = () => {
   };
 
   const handleAppleAccountRevoke = async () => {
-    // Get an authorizationCode from Apple
-
     try {
-      const { authorizationCode } = await appleAuth.performRequest({
-        requestedOperation: appleAuth.Operation.REFRESH,
-      });
+      const { authorizationCode, identityToken, nonce } =
+        await appleAuth.performRequest({
+          requestedOperation: appleAuth.Operation.REFRESH,
+        });
 
       // Ensure Apple returned an authorizationCode
       if (!authorizationCode) {
@@ -105,10 +106,28 @@ export const useAppleAuth = () => {
         );
       }
 
+      if (!identityToken || !nonce) {
+        throw new Error(
+          "Apple Sign-In failed - no identity token or nonce returned"
+        );
+      }
+
+      const appleCredential = auth.AppleAuthProvider.credential(
+        identityToken,
+        nonce
+      );
+
+      Toast.show({
+        text1: "Account Deleting...",
+        autoHide: false,
+      });
+
       // Revoke the token
       await auth().revokeToken(authorizationCode);
 
-      console.log("Done started other processed");
+      // [Error: [auth/requires-recent-login]
+
+      await auth().currentUser.reauthenticateWithCredential(appleCredential);
 
       if (auth().currentUser) {
         //Show toast saying account deleted?
@@ -119,7 +138,13 @@ export const useAppleAuth = () => {
 
         await auth()
           .currentUser.delete()
-          .catch((err) => console.log(err, "1"));
+          .catch((err) => console.log(err, "Err deleting user from firebase"));
+
+        // DONT NEEDS THIS SINCE DELETE DOES IT ANYWAY
+        // await auth()
+        //   .signOut()
+        //   .catch((err) => console.log(err, 'COuldnt sign'));
+        Toast.hide();
 
         await AsyncStorage.removeItem("firebaseToken"); // Example of cleaning up
       }
