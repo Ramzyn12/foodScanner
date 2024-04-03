@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { storage } from "../utils/MMKVStorage";
 
 const userAPI = axios.create({
   baseURL: "http://192.168.0.145:3000/api/v1/users", // Replace with your API's base URL
@@ -8,7 +9,8 @@ const userAPI = axios.create({
 });
 
 userAPI.interceptors.request.use(async (config) => {
-  const token = await AsyncStorage.getItem("firebaseToken");
+  // const token = await AsyncStorage.getItem("firebaseToken");
+  const token = storage.getString('firebaseToken') 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

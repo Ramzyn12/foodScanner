@@ -15,6 +15,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 // import { auth } from "../../firebaseConfig";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import auth from '@react-native-firebase/auth'
+import { storage } from "../../utils/MMKVStorage";
 
 const SignInForm = () => {
   const [email, setEmail] = useState("");
@@ -49,7 +50,8 @@ const SignInForm = () => {
     auth().signInWithEmailAndPassword(email, password)
       .then(async (userCredential) => {
         const token = await userCredential.user.getIdToken();
-        await AsyncStorage.setItem("firebaseToken", token);
+        // await AsyncStorage.setItem("firebaseToken", token);
+        storage.set('firebaseToken', token) 
       })
       .catch((error) => {
         const errorCode = error.code;

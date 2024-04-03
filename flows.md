@@ -14,10 +14,7 @@ Note: On the frontend, we only control the adding to diaryList and groceryList f
 
 Diary Days
 
-1. When someone first joins theres no diary day documents for them so for the get diary day (by date) endpoint we just return a 'fake' diary day document, other wise we would have to create one everytime they click on a different day.
-2. For the get all diary days endpoint, we get all the diary days then if there arent 
-any we create a real one and send that to the frontend who creates weeks surrounding each of the diary day dates and if any day has no diary day its rendered as a "none" day.
-3. problem is, if we create a diary day and dont add anything, 
+1. When someone first joins via apple, we log them in using the credentials and then sign them up on the backend. Then when this backend succeeds we log them in and then for the get all diary days we just create one using their userId which is available since the backend is responsible for creating a user. If we already had an apple account then we dont
 
 
 List item is rendered when:

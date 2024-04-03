@@ -3,6 +3,7 @@ import auth from '@react-native-firebase/auth';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch } from 'react-redux';
 import { setToken } from '../redux/authSlice';
+import { storage } from '../utils/MMKVStorage';
 
 export const useAuthentication = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -14,10 +15,12 @@ export const useAuthentication = () => {
       if (user) {
         const token = await user.getIdToken();
         dispatch(setToken(token));
-        await AsyncStorage.setItem('firebaseToken', token);
+        storage.set('firebaseToken', token)
+        // await AsyncStorage.setItem('firebaseToken', token);
         setIsLoggedIn(true);
       } else {
-        await AsyncStorage.removeItem('firebaseToken');
+        // await AsyncStorage.removeItem('firebaseToken');
+        storage.delete('firebaseToken')
         setIsLoggedIn(false);
       }
       setIsLoading(false);

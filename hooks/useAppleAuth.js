@@ -15,6 +15,7 @@ import { appleAuth } from "@invertase/react-native-apple-authentication";
 import auth from "@react-native-firebase/auth";
 import { removeUserAccount } from "../axiosAPI/userAPI";
 import Toast from "react-native-toast-message";
+import { storage } from "../utils/MMKVStorage";
 
 export const useAppleAuth = () => {
   const userInformation = useSelector(
@@ -52,7 +53,7 @@ export const useAppleAuth = () => {
   });
 
   const handleAppleLogin = async () => {
-    dispatch(setWaitingForBackend(true))
+    dispatch(setWaitingForBackend(true));
     try {
       // Performs the Apple sign-in request
       const appleAuthResponse = await appleAuth.performRequest({
@@ -77,7 +78,10 @@ export const useAppleAuth = () => {
       const firebaseToken = await userCredential.user.getIdToken();
 
       // Store the Firebase token and proceed with any further sign-up process
-      await AsyncStorage.setItem("firebaseToken", firebaseToken);
+      // Do we need this? 
+      // await AsyncStorage.setItem("firebaseToken", firebaseToken);
+      storage.set('firebaseToken', firebaseToken) 
+
 
       // Call your backend API or perform further actions with the signed-in user
       signUpAppleMutation.mutate({
@@ -122,15 +126,11 @@ export const useAppleAuth = () => {
         autoHide: false,
       });
 
-      // Revoke the token
       await auth().revokeToken(authorizationCode);
-
-      // [Error: [auth/requires-recent-login]
 
       await auth().currentUser.reauthenticateWithCredential(appleCredential);
 
       if (auth().currentUser) {
-        //Show toast saying account deleted?
 
         const firebaseId = auth().currentUser.uid;
 
@@ -140,16 +140,28 @@ export const useAppleAuth = () => {
           .currentUser.delete()
           .catch((err) => console.log(err, "Err deleting user from firebase"));
 
-        // DONT NEEDS THIS SINCE DELETE DOES IT ANYWAY
-        // await auth()
-        //   .signOut()
-        //   .catch((err) => console.log(err, 'COuldnt sign'));
         Toast.hide();
 
-        await AsyncStorage.removeItem("firebaseToken"); // Example of cleaning up
+        // await AsyncStorage.removeItem("firebaseToken"); // Example of cleaning up
+        storage.delete('firebaseToken')
       }
     } catch (err) {
-      console.log(err);
+      if (err.code === "auth/requires-recent-login") {
+        Toast.show({
+          text1: "Please sign in again to confirm account deletion.",
+          text2: "For security reasons, a recent login is required.",
+          autoHide: true,
+          type: "error",
+        });
+      } else {
+        Toast.show({
+          text1: "An error occurred",
+          text2: "Please try again or contact support if the problem persists.",
+          autoHide: true,
+          type: "error",
+        });
+      }
+      console.log(err, "Error processing account revocation");
     }
   };
 

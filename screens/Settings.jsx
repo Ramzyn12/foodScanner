@@ -27,6 +27,7 @@ import auth from "@react-native-firebase/auth";
 import { removeUserAccount } from "../axiosAPI/userAPI";
 import { useMutation } from "@tanstack/react-query";
 import { useEmailAuth } from "../hooks/useEmailAuth";
+import { storage } from "../utils/MMKVStorage";
 
 function Settings() {
   //If need
@@ -39,7 +40,8 @@ function Settings() {
     auth()
       .signOut()
       .then(async () => {
-        await AsyncStorage.removeItem("firebaseToken");
+        // await AsyncStorage.removeItem("firebaseToken");
+        storage.delete('firebaseToken')
         console.log("Signed out!");
       })
       .catch((error) => {

@@ -88,7 +88,7 @@ async function createAppleUser(email, uid, idToken, userInformation) {
     throw new BadRequestError("Invalid Apple ID token.");
   }
 
-  // Isnt it bad to update the userInfo if they dont fill it out second time loggin in...
+  // Set on insert means userInfo wont keep being overrided...
   let user = await User.findOneAndUpdate(
     { email, firebaseId: uid },
     { $setOnInsert: { email, firebaseId: uid, userInformation } },

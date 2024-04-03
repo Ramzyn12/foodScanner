@@ -8,12 +8,22 @@ import moment from "moment";
 import { StyleSheet } from "react-native";
 import { useDispatch } from "react-redux";
 import { setChosenDate } from "../../redux/diarySlice";
+import { AccessibilityInfo } from "react-native";
 const windowWidth = Dimensions.get("window").width;
 
 const WeekHeader = ({ diaryData }) => {
   const [weeksData, setWeeksData] = useState([]);
   const carouselRef = useRef(null);
   const dispatch = useDispatch();
+
+  const [isReduceTransparencyEnabled, setIsReduceTransparencyEnabled] =
+    useState(false);
+
+  useEffect(() => {
+    AccessibilityInfo.isReduceTransparencyEnabled().then((isEnabled) => {
+      setIsReduceTransparencyEnabled(isEnabled);
+    });
+  }, []);
 
   useEffect(() => {
     if (diaryData) {
@@ -39,7 +49,7 @@ const WeekHeader = ({ diaryData }) => {
             .clone()
             .add(index, "days")
             .format("YYYY-MM-DD"),
-          diaryDayState: 'empty', // Default score
+          diaryDayState: "empty", // Default score
           _id: null, // Default ID
         }));
 
@@ -51,7 +61,11 @@ const WeekHeader = ({ diaryData }) => {
           dateMoment.isBefore(currentWeekStart.clone().add(1, "week"))
         ) {
           const dayOfWeek = dateMoment.isoWeekday() - 1; // Adjust for 0-indexed array
-          week[dayOfWeek] = { diaryDayState: day.diaryDayState, _id: day._id, date: day.date };
+          week[dayOfWeek] = {
+            diaryDayState: day.diaryDayState,
+            _id: day._id,
+            date: day.date,
+          };
         }
       });
 
@@ -116,8 +130,8 @@ const WeekHeader = ({ diaryData }) => {
 
   return (
     <BlurView
-      intensity={30}
-      tint="systemThickMaterial"
+      intensity={isReduceTransparencyEnabled ? 10 : 70}
+      tint={isReduceTransparencyEnabled ? 'systemThickMaterialLight' : 'default'}
       style={{ position: "absolute", zIndex: 3000, paddingTop: 38 }}
     >
       <Carousel

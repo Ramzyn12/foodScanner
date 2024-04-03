@@ -3,6 +3,8 @@ import { useMutation } from "@tanstack/react-query";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import auth from "@react-native-firebase/auth";
 import { removeUserAccount } from "../axiosAPI/userAPI";
+import Toast from "react-native-toast-message";
+import { storage } from "../utils/MMKVStorage";
 
 export const useEmailAuth = (password) => {
 
@@ -21,6 +23,11 @@ export const useEmailAuth = (password) => {
     const email = user.email
     const credential = auth.EmailAuthProvider.credential(email, password)
 
+    Toast.show({
+      text1: "Account Deleting...",
+      autoHide: false,
+    });
+
     try {
       const firebaseId = user.uid;
 
@@ -29,16 +36,22 @@ export const useEmailAuth = (password) => {
       // Backend relies on firebase session so must go before deletion
       removeUserMutation.mutate({ firebaseId });
 
-      // Handle situation where mongo success but firebase deletion fails? 
       await user.delete()
       
-      await AsyncStorage.removeItem("firebaseToken");
+      // await AsyncStorage.removeItem("firebaseToken");
+      storage.delete('firebaseToken')
 
-      console.log('SUCCESS');
+      Toast.hide()
 
     } catch (err) {
-      console.log(err);
+      Toast.show({
+        text1: "An error occurred",
+        text2: "Please try again or contact support if the problem persists.",
+        type: "error",
+      });
+      console.log(err, 'Error deleting email account');
     }
+
   }
   
 
