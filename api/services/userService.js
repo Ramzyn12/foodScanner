@@ -112,8 +112,6 @@ async function updateFirstLastName(firstName, lastName, userId) {
 
 async function removeUser(firebaseId, userId) {
   const session = await startSession();
-
-  console.log(firebaseId);
   
   try {
     session.startTransaction();

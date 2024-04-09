@@ -53,7 +53,9 @@ export const useAppleAuth = () => {
   });
 
   const handleAppleLogin = async () => {
+
     dispatch(setWaitingForBackend(true));
+
     try {
       // Performs the Apple sign-in request
       const appleAuthResponse = await appleAuth.performRequest({
@@ -80,7 +82,7 @@ export const useAppleAuth = () => {
       // Store the Firebase token and proceed with any further sign-up process
       // Do we need this? 
       // await AsyncStorage.setItem("firebaseToken", firebaseToken);
-      storage.set('firebaseToken', firebaseToken) 
+      // storage.set('firebaseToken', firebaseToken) 
 
 
       // Call your backend API or perform further actions with the signed-in user

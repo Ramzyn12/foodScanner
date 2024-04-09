@@ -39,11 +39,13 @@ export const signUp = async ({ email, password, userInfo }) => {
 
     const data = response.data;
 
+    // Does it make sense to have data.token and user.getIdToken()?
     if (data.token) {
       const userCredential = await auth().signInWithCustomToken(data.token);
       const user = userCredential.user;
       const token = await user.getIdToken(); // Get Firebase token
       // await AsyncStorage.setItem("firebaseToken", token); // Store token
+      storage.set('firebaseToken', token)
       return { user, token, firebaseId: data.firebaseId };
     }
   } catch (error) {

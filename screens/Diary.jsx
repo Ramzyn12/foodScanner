@@ -22,6 +22,7 @@ import { getAllDiaryDays } from "../axiosAPI/diaryDayAPI";
 import { useSelector } from "react-redux";
 import WeekHeader from "../components/diary/WeekHeader";
 import TimelineEventCard from "../components/health/TimelineEventCard";
+import { storage } from "../utils/MMKVStorage";
 
 const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
 <g clip-path="url(#clip0_1126_4878)">
@@ -79,7 +80,8 @@ const HealthData = {
 
 const Diary = ({ navigation }) => {
   const userCreated = useSelector((state) => state.auth.userCreated);
-  const token = useSelector((state) => state.auth.token);
+  // const token = useSelector((state) => state.auth.token);
+  const token = storage.getString('firebaseToken')
 
   const { data, refetch, isLoading, isError, error } = useQuery({
     queryKey: ["AllDiaryDays"],
@@ -146,7 +148,7 @@ const styles = StyleSheet.create({
   mainSectionContainer: {
     padding: 18,
     flex: 1,
-    paddingTop: 120,
+    paddingTop: 90,
     paddingBottom: 300,
   },
 });

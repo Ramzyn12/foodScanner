@@ -19,7 +19,7 @@ const TipsHeader = ({
   const shareAchievement = () => {
     viewShotRef.current.capture().then((uri) => {
       Share.open({
-        message: 'New Ivy App Achievement!',
+        message: "New Ivy App Achievement!",
         url: `file://${uri}`,
         type: "image/png",
       }).catch((error) => {
@@ -53,10 +53,10 @@ const TipsHeader = ({
       </ViewShot>
       {/* Buttons */}
       <View style={styles.headerButtonsContainer}>
-        <Pressable onPress={shareAchievement} style={styles.headerShareButton}>
+        {/* <Pressable onPress={shareAchievement} style={styles.headerShareButton}>
           <ShareIcon colour={"#F7F6EF"} size={13} />
           <Text style={styles.headerShareButtonText}>Share achievement</Text>
-        </Pressable>
+        </Pressable> */}
         <Pressable
           onPress={handleScrollToStart}
           style={styles.headerViewButton}

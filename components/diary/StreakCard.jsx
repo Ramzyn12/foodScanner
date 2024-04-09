@@ -15,12 +15,16 @@ const StreakCard = ({ diaryData }) => {
 
   const calculateCurrentStreak = (diaryDays) => {
     let currentStreak = 0;
-    let i = 1;
+    let i = 0;
     const sorted = [...diaryDays].reverse();
 
-    while (i < sorted.length && sorted[i].score >= 80) {
-      currentStreak++;
-      i++;
+    while (i < sorted.length && sorted[i].diaryDayState !== "processed") {
+      if (sorted[i].diaryDayState === "empty") {
+        i++;
+      } else if (sorted[i].diaryDayState === "unprocessed") {
+        currentStreak++;
+        i++;
+      }
     }
 
     return currentStreak;
@@ -48,6 +52,8 @@ const StreakCard = ({ diaryData }) => {
 
     return numbers;
   };
+
+  if (streak < 3) return null
 
   return (
     <View style={styles.streakCardContainer}>
@@ -104,6 +110,7 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     paddingHorizontal: 25,
     gap: 10,
+    marginTop: 20,
     borderRadius: 20,
     position: "relative",
   },

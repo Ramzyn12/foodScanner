@@ -2,11 +2,11 @@ import { View, Text } from "react-native";
 import React from "react";
 import { Path, Svg } from "react-native-svg";
 
-const HeartIcon = ({color, size}) => {
+const HeartIcon = ({color, width, height}) => {
   return (
     <Svg
-      width="21"
-      height="18"
+      width={width || "21"}
+      height={height || "18"}
       viewBox="0 0 21 18"
       fill="none"
     >

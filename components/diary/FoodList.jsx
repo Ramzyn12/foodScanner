@@ -19,11 +19,12 @@ import FruitBowlIcon from "../../svgs/FruitBowlIcon";
 import { useNavigation } from "@react-navigation/native";
 import { Swipeable } from "react-native-gesture-handler";
 import { useSelector } from "react-redux";
+import { Skeleton } from "moti/skeleton";
 
-const FoodList = ({ diaryFoodItems, emptyFoodList }) => {
+const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary }) => {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
-  const chosenDate = useSelector(state => state.diary.chosenDate)
+  const chosenDate = useSelector((state) => state.diary.chosenDate);
 
   const removeFoodFromDiaryMutation = useMutation({
     mutationFn: removeFoodFromDiaryDay,
@@ -39,7 +40,7 @@ const FoodList = ({ diaryFoodItems, emptyFoodList }) => {
     removeFoodFromDiaryMutation.mutate({
       barcode: barcode,
       singleFoodId: singleFoodId,
-      date: chosenDate || new Date()
+      date: chosenDate || new Date(),
     });
   };
 
@@ -61,6 +62,29 @@ const FoodList = ({ diaryFoodItems, emptyFoodList }) => {
       </Animated.View>
     );
   };
+
+  if (loadingFoodDiary) {
+    return (
+      <View
+        style={[
+          styles.foodListContainer,
+          { borderTopLeftRadius: 20, borderTopRightRadius: 20 },
+        ]}
+      >
+        <View style={{ width: "100%", gap: 6 }}>
+          {Array.from({ length: 3 }, (_, index) => (
+            <Skeleton
+              key={index}
+              colorMode="light"
+              height={50} // Approximate height of your list items
+              width="100%"
+            />
+          ))}
+        </View>
+        <AddFoodButton />
+      </View>
+    );
+  }
 
   return (
     <View
@@ -117,9 +141,8 @@ const FoodList = ({ diaryFoodItems, emptyFoodList }) => {
             }
             key={item._id}
             style={{ paddingHorizontal: 8 }}
-
           >
-            <FoodListItem foodItem={{ ...item, brand: "Fresh" }}  />
+            <FoodListItem foodItem={{ ...item, brand: "Fresh" }} />
           </Pressable>
         </Swipeable>
       ))}

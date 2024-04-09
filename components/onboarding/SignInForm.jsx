@@ -21,6 +21,7 @@ const SignInForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [signInLoading, setSignInLoading] = useState(false)
 
   const handleFirebaseError = (code) => {
     let message;
@@ -47,15 +48,18 @@ const SignInForm = () => {
   };
 
   const handleSignIn = () => {
+    setSignInLoading(true)
     auth().signInWithEmailAndPassword(email, password)
       .then(async (userCredential) => {
         const token = await userCredential.user.getIdToken();
         // await AsyncStorage.setItem("firebaseToken", token);
         storage.set('firebaseToken', token) 
+        setSignInLoading(false)
       })
       .catch((error) => {
         const errorCode = error.code;
         handleFirebaseError(errorCode);
+        setSignInLoading(false)
       });
   };
 
@@ -68,6 +72,7 @@ const SignInForm = () => {
         <FormSubmissionButton
           email={email}
           password={password}
+          isLoading={signInLoading}
           text={"Sign In"}
           onPress={handleSignIn}
         />

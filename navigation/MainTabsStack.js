@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Button } from "react-native";
 import Diary from "../screens/Diary";
 import Health from "../screens/Health";
-import Settings from "../screens/Settings";
+import Settings from "../screens/SettingsOne";
 import COLOURS from "../constants/colours";
 import DiaryIcon from "../svgs/DiaryIcon";
 import AddLog from "../screens/AddLog";
@@ -17,6 +17,8 @@ import DiaryStack from "./DiaryStack";
 import Groceries from "../screens/Groceries";
 import GroceriesStack from "./GroceriesStack";
 import HealthStack from "./HealthStack";
+import MeStack from "./MeStack";
+import MeProfile from "../svgs/MeProfile";
 const Tab = createBottomTabNavigator();
 
 function MainTabsStack() {
@@ -39,7 +41,7 @@ function MainTabsStack() {
           ),
           tabBarLabel: "Diary",
         }}
-        component={DiaryStack} 
+        component={DiaryStack}
       />
       <Tab.Screen
         name="HealthStack"
@@ -74,13 +76,16 @@ function MainTabsStack() {
         component={GroceriesStack}
       />
       <Tab.Screen
-        name="Settings"
+        name="MeStack"
         options={{
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
-            <SettingsIcon color={color} size={size} />
+            <MeProfile color={color} size={size} />
           ),
+          tabBarLabel: "Me",
+
         }}
-        component={Settings}
+        component={MeStack}
       />
     </Tab.Navigator>
   );

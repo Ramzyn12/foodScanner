@@ -1,213 +1,153 @@
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  useMemo,
-  useCallback,
-} from "react";
-import {
-  Button,
-  Image,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
-import { sendPasswordResetEmail, signOut, updatePassword } from "firebase/auth";
-import { useSelector } from "react-redux";
-import BottomSheet from "@gorhom/bottom-sheet";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import SearchIcon from "../svgs/SearchIcon";
-import { SearchBar } from "@rneui/base";
+import { View, Text, ScrollView, Pressable } from "react-native";
+import React from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import ArrowLeft from "../svgs/ArrowLeft";
 import COLOURS from "../constants/colours";
-import { SvgXml } from "react-native-svg";
-import { useAppleAuth } from "../hooks/useAppleAuth";
-import auth from "@react-native-firebase/auth";
-import { removeUserAccount } from "../axiosAPI/userAPI";
-import { useMutation } from "@tanstack/react-query";
-import { useEmailAuth } from "../hooks/useEmailAuth";
-import { storage } from "../utils/MMKVStorage";
-
-function Settings() {
-  //If need
-  // const token = useSelector(state => state.auth.token)
-  const [password, setPassword] = useState("");
-
-  const signInWith = auth()?.currentUser?.providerData[0]?.providerId;
-
-  const handleLogout = () => {
-    auth()
-      .signOut()
-      .then(async () => {
-        // await AsyncStorage.removeItem("firebaseToken");
-        storage.delete('firebaseToken')
-        console.log("Signed out!");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  const handlePasswordReset = () => {
-    auth()
-      .sendPasswordResetEmail(auth().currentUser.email)
-      .then(() => {
-        console.log("email sent! Check Junk FOlder!");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  const handlePasswordUpdate = () => {
-    auth()
-      .currentUser.updatePassword("Ramzy2002.123")
-      .then(() => {
-        console.log("Password updated!");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  // const handleEmailUpdate = () => {
-  //   auth().currentUser.updateEmail("ramzy.football1@hotmail.com")
-  //     .then(() => {
-  //       console.log("Email updated!");
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // };
-
-  const { handleAppleAccountRevoke } = useAppleAuth();
-
-  const { handleEmailAccountDeletion } = useEmailAuth(password);
+import ProBanner from "../components/settings/ProBanner";
+import Divider from "../components/settings/Divider";
+import { Path, Svg } from "react-native-svg";
+import ArrowRight from "../svgs/ArrowRight";
+import SettingOption from "../components/settings/SettingOption";
+import ProfileCircle from "../svgs/ProfileCircle";
+import NotificationBell from "../svgs/NotificationBell";
+import Palette from "../svgs/Palette";
+import Vibrate from "../svgs/Vibrate";
+import PaperPlane from "../svgs/PaperPlane";
+import Star from "../svgs/Star";
+import Instagram from "../svgs/Instagram";
+import Twitter from "../svgs/Twitter";
+import Mail from "../svgs/Mail";
+import LoveHearts from "../svgs/LoveHearts";
+import HeartIcon from "../svgs/HeartIcon";
+import Header from "../components/settings/Header";
+const Settings = ({ navigation }) => {
+  const insets = useSafeAreaInsets();
 
   return (
-    <View style={styles.container}>
-      <Button
-        hitSlop={{ left: 20, right: 20, top: 20, bottom: 20 }}
-        onPress={handleLogout}
-        title="logout"
-      />
-
-      {signInWith === "password" && (
-        <Pressable
-          style={{ margin: 30 }}
-          hitSlop={{ left: 20, right: 20, top: 20, bottom: 20 }}
-          onPress={handlePasswordReset}
-        >
-          <Text>Reset password</Text>
-        </Pressable>
-      )}
-
-      {signInWith === "password" && (
-        <Pressable
-          style={{ margin: 30 }}
-          hitSlop={{ left: 20, right: 20, top: 20, bottom: 20 }}
-          onPress={handlePasswordUpdate}
-        >
-          <Text>Update password (to Ramzy2002.123)</Text>
-        </Pressable>
-      )}
-      {/* {signInWith === "password" && (
-        <Pressable
-          style={{ margin: 30 }}
-          hitSlop={{ left: 20, right: 20, top: 20, bottom: 20 }}
-          onPress={handleEmailUpdate}
-        >
-          <Text>Update email (to ramzy.football1@hotmail.com)</Text>
-        </Pressable>
-      )} */}
-
-      {signInWith !== "password" && (
-        <Pressable
-          style={{ margin: 30 }}
-          hitSlop={{ left: 20, right: 20, top: 20, bottom: 20 }}
-          onPress={handleAppleAccountRevoke}
-        >
-          <Text>delete apple account</Text>
-        </Pressable>
-      )}
-
-      {signInWith === "password" && (
-        <View>
-          <TextInput
-            placeholder="enter password"
-            onChangeText={setPassword}
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: "white",
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+      }}
+    >
+      <Header headerText={'Settings'} onNavigate={() => navigation.goBack()} />
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={{ paddingHorizontal: 20, paddingBottom: 15, gap: 13 }}>
+          {/* Title */}
+          <Text style={{ fontSize: 34, fontFamily: "Mulish_700Bold" }}>
+            Settings
+          </Text>
+          <ProBanner />
+          <Text
             style={{
-              backgroundColor: "white",
-              marginTop: 30,
+              fontSize: 14,
+              fontFamily: "Mulish_700Bold",
+              color: COLOURS.darkGreen,
               padding: 10,
-              marginBottom: 10,
+              textAlign: "center",
             }}
-          />
-          <Pressable
-            hitSlop={{ left: 20, right: 20, top: 20, bottom: 20 }}
-            onPress={handleEmailAccountDeletion}
           >
-            <Text>delete Your account</Text>
-          </Pressable>
+            Restore Purchases
+          </Text>
         </View>
-      )}
+        <Divider />
+        {/* First options */}
+        <View style={{ paddingVertical: 14 }}>
+          <SettingOption
+            optionText="Account"
+            optionSvg={<ProfileCircle />}
+            showArrow={true}
+            onPress={() => navigation.navigate('Account')}
+          />
+          <SettingOption
+            optionText="Notifications"
+            optionSvg={<NotificationBell />}
+            onPress={() => navigation.navigate('Notifications')}
+            showArrow={true}
+          />
+          <SettingOption
+            optionText="Appearance"
+            optionSvg={<Palette />}
+            showArrow={true}
+          />
+          <SettingOption
+            optionText="Haptic Feedback"
+            optionSvg={<Vibrate />}
+            showArrow={false}
+          />
+        </View>
+        <Divider />
+        {/* Second options */}
+        <View style={{ paddingVertical: 14 }}>
+          <SettingOption
+            optionText="Invite friends & family"
+            optionSvg={<PaperPlane />}
+            showArrow={true}
+          />
+          <SettingOption
+            optionText="Loving Ivy? Rate us."
+            optionSvg={<Star />}
+            showArrow={true}
+          />
+          <SettingOption
+            optionText="Follow us on Instagram"
+            optionSvg={<Instagram />}
+            showArrow={true}
+          />
+          <SettingOption
+            optionText="Follow us on Twitter"
+            optionSvg={<Twitter />}
+            showArrow={true}
+          />
+          <SettingOption
+            optionText="Need help? Got a feature request?"
+            optionSvg={<Mail />}
+            showArrow={true}
+          />
+        </View>
+        <View
+          style={{
+            padding: 40,
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 18,
+          }}
+        >
+          <LoveHearts />
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 4,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 17,
+                fontFamily: "Mulish_600SemiBold",
+                color: "#607A8C",
+              }}
+            >
+              Made with
+            </Text>
+            <HeartIcon color={"#607A8C"} width={17} height={14} />
+            <Text
+              style={{
+                fontSize: 17,
+                fontFamily: "Mulish_600SemiBold",
+                color: "#607A8C",
+              }}
+            >
+              in England
+            </Text>
+          </View>
+        </View>
+      </ScrollView>
     </View>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 24,
-    backgroundColor: "grey",
-  },
-  searchContainerStyle: {
-    borderWidth: 0,
-    backgroundColor: "white",
-    height: 40,
-    paddingTop: 0,
-    paddingBottom: 0,
-    marginVertical: 15,
-    borderWidth: 0,
-  },
-  searchInputStyle: {
-    backgroundColor: "#EEEEF0",
-    // paddingRight: 7,
-    borderWidth: 0,
-  },
-  searchInputContainerStyle: {
-    backgroundColor: "#EEEEF0",
-    height: 40,
-    flex: 1,
-    // overflow: 'hidden',
-    marginLeft: 0,
-    borderWidth: 0,
-  },
-  exitButtonContainer: {
-    width: 30,
-    height: 30,
-    borderRadius: 40,
-    backgroundColor: "#E9E9EB", //One off colour
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  containerHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  foodListContainer: {
-    borderTopWidth: 1,
-    borderTopColor: COLOURS.lightGray,
-    marginBottom: 80,
-  },
-  foodListItemContainer: {
-    borderBottomWidth: 1,
-    borderBottomColor: COLOURS.lightGray,
-    paddingVertical: 2,
-  },
-  recentText: { fontSize: 16, paddingBottom: 10, fontFamily: "Mulish_700Bold" },
-});
+};
 
 export default Settings;

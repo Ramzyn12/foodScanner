@@ -74,7 +74,7 @@ const FoodDetailsButtons = () => {
           <Text style={styles.addToListText}>{"Add to list"}</Text>
         </Pressable>
       )}
-      <Pressable style={[styles.addButton, styles.addToListButton]}>
+      {/* <Pressable style={[styles.addButton, styles.addToListButton]}>
         <Svg
           xmlns="http://www.w3.org/2000/svg"
           width="16"
@@ -88,7 +88,7 @@ const FoodDetailsButtons = () => {
           />
         </Svg>
         <Text style={styles.addToListText}>Share</Text>
-      </Pressable>
+      </Pressable> */}
     </View>
   );
 };
@@ -100,7 +100,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 14,
-    // justifyContent: "center",
+    justifyContent: "center",
+    flex: 1,
+    
     borderRadius: 20,
     gap: 8,
     height: 36,

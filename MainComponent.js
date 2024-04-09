@@ -9,8 +9,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import MainTabsStack from "./navigation/MainTabsStack";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import Toast from "react-native-toast-message";
+
 import FoodDetails from "./screens/FoodDetails";
 
 const Tab = createBottomTabNavigator();

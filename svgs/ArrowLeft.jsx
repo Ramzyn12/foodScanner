@@ -2,12 +2,12 @@ import { View, Text } from "react-native";
 import React from "react";
 import { Path, Svg } from "react-native-svg";
 
-const ArrowLeft = () => {
+const ArrowLeft = ({width, height}) => {
   return (
     <Svg
       xmlns="http://www.w3.org/2000/svg"
-      width="10"
-      height="20"
+      width={width || "10"}
+      height={height || "20"}
       viewBox="0 0 10 20"
       fill="none"
     >

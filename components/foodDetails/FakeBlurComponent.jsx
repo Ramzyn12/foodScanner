@@ -17,6 +17,7 @@ const FakeBlurComponent = ({ processedState }) => {
       setIsReduceTransparencyEnabled(isEnabled);
     });
   }, []);
+  
   return (
     <View style={{ gap: 14 }}>
       <Text
