@@ -7,13 +7,30 @@ import Me from "../screens/Me";
 import Settings from "../screens/Settings";
 import Account from "../screens/Account";
 import Notifications from "../screens/Notifications";
+import Clock from "../svgs/Clock";
+import SettingsIcon from "../svgs/SettingsIcon";
+import SettingsIconNoFill from "../svgs/SettingsIconNoFill";
+import { Pressable } from "react-native";
 
 const Stack = createNativeStackNavigator();
 
 const MeStack = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Me" component={Me} />
+      <Stack.Screen
+        name="Me"
+        component={Me}
+        options={({ navigation }) => ({
+          headerTitle: "",
+          headerRight: () => (
+            <Pressable onPress={() => navigation.navigate("Settings")}>
+              <SettingsIconNoFill />
+            </Pressable>
+          ),
+          headerShown: false,
+          headerShadowVisible: false,
+        })}
+      />
       <Stack.Screen
         name="Settings"
         component={Settings}
