@@ -5,6 +5,7 @@ import { CartesianChart, useAreaPath, useLinePath } from "victory-native";
 import COLOURS from "../../constants/colours";
 import { Group, LinearGradient, Path, vec } from "@shopify/react-native-skia";
 import HealthBar from "./HealthBar";
+import { useNavigation } from "@react-navigation/native";
 
 const DATA = Array.from({ length: 31 }, (_, i) => ({
   day: i,
@@ -12,11 +13,12 @@ const DATA = Array.from({ length: 31 }, (_, i) => ({
   highTmp: 40 + 30 - i,
 }));
 
-const HealthCard = ({ isGraph }) => {
+const HealthCard = ({ isGraph, onLog }) => {
   let progress = 85;
   let barOneRange = 33; // each bar represents 33 percent range
   let barTwoRange = 66;
   let barThreeRange = 100;
+  const navigation = useNavigation();
 
   let barOneProgress = Math.min(100, (progress / barOneRange) * 100);
   let barTwoProgress =
@@ -35,7 +37,10 @@ const HealthCard = ({ isGraph }) => {
       : 0;
 
   return (
-    <View
+    <Pressable
+      onPress={() =>
+        navigation.navigate("HealthStatInfo", { statFor: "Weight" })
+      }
       style={{
         borderWidth: 1,
         borderColor: COLOURS.lightGray,
@@ -63,7 +68,7 @@ const HealthCard = ({ isGraph }) => {
           </Text>
           <ArrowRight />
         </View>
-        <View style={{flexDirection: 'row', gap: 2}}>
+        <View style={{ flexDirection: "row", gap: 2 }}>
           <Text
             style={{
               fontFamily: "Mulish_400Regular",
@@ -94,7 +99,7 @@ const HealthCard = ({ isGraph }) => {
             // axisOptions={{ font, lineColor: "transparent" }} // 👈 we'll generate axis labels using given font.
           >
             {({ points, chartBounds }) => {
-              return <StockChart points={points} chartBounds={chartBounds} />;
+              return <StockChart colourOne={'#CFDACC'} colourTwo={'white'} points={points.highTmp} chartBounds={chartBounds} />;
             }}
           </CartesianChart>
           <View style={{ flexDirection: "row", alignItems: "baseline" }}>
@@ -139,6 +144,7 @@ const HealthCard = ({ isGraph }) => {
         </View>
       )}
       <Pressable
+        onPress={onLog}
         style={{
           borderWidth: 1,
           borderColor: COLOURS.lightGray,
@@ -148,19 +154,19 @@ const HealthCard = ({ isGraph }) => {
           borderRadius: 12,
         }}
       >
-        <Text style={{ fontSize: 14, fontFamily: "Mulish_700Bold" }}>
+        <Text style={{ fontSize: 14, fontFamily: "Mulish_700Bold", color: COLOURS.nearBlack }}>
           Update
         </Text>
       </Pressable>
-    </View>
+    </Pressable>
   );
 };
 
-const StockChart = ({ points, chartBounds }) => {
-  const { path: areaPath } = useAreaPath(points.highTmp, chartBounds.bottom, {
+export const StockChart = ({ points, chartBounds, lineColour, colourOne, colourTwo }) => {
+  const { path: areaPath } = useAreaPath(points, chartBounds.bottom, {
     curveType: "natural",
   });
-  const { path: linePath } = useLinePath(points.highTmp, {
+  const { path: linePath } = useLinePath(points, {
     curveType: "natural",
   });
 
@@ -171,14 +177,14 @@ const StockChart = ({ points, chartBounds }) => {
           <LinearGradient
             start={vec(0, 0)}
             end={vec(chartBounds.top, chartBounds.bottom)}
-            colors={["#CFDACC", "white"]}
+            colors={[colourOne, colourTwo]}
           />
         </Path>
         <Path
           path={linePath}
           style="stroke"
           strokeWidth={4}
-          color={COLOURS.darkGreen}
+          color={lineColour || COLOURS.darkGreen}
         />
       </Group>
     </>

@@ -19,6 +19,7 @@ import { Lato_400Regular, Lato_700Bold } from "@expo-google-fonts/lato";
 import Toast from "react-native-toast-message";
 import * as SplashScreen from "expo-splash-screen";
 import { useAuthentication } from "./hooks/useAuthentication";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 SplashScreen.preventAutoHideAsync(); // Prevent auto-hide
 
@@ -69,7 +70,9 @@ const AppInitializer = () => {
             onLayout={onLayoutRootView}
             style={{ flex: 1 }}
           >
-            <MainComponent loggedIn={isLoggedIn} />
+            <BottomSheetModalProvider>
+              <MainComponent loggedIn={isLoggedIn} />
+            </BottomSheetModalProvider>
           </GestureHandlerRootView>
         </Provider>
       </QueryClientProvider>

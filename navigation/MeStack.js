@@ -11,6 +11,7 @@ import Clock from "../svgs/Clock";
 import SettingsIcon from "../svgs/SettingsIcon";
 import SettingsIconNoFill from "../svgs/SettingsIconNoFill";
 import { Pressable } from "react-native";
+import HealthStatInfo from "../screens/HealthStatInfo";
 
 const Stack = createNativeStackNavigator();
 
@@ -48,6 +49,13 @@ const MeStack = () => {
       <Stack.Screen
         name="Notifications"
         component={Notifications}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="HealthStatInfo"
+        component={HealthStatInfo}
         options={{
           headerShown: false,
         }}

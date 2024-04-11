@@ -1,5 +1,13 @@
-import { View, Text, Button, Pressable, Modal, ScrollView } from "react-native";
-import React from "react";
+import {
+  View,
+  Text,
+  Button,
+  Pressable,
+  Modal,
+  ScrollView,
+  Dimensions,
+} from "react-native";
+import React, { useCallback, useRef, useState } from "react";
 import {
   Area,
   CartesianChart,
@@ -19,15 +27,28 @@ import { Mulish_300Light_Italic } from "@expo-google-fonts/mulish";
 import COLOURS from "../constants/colours";
 import ProBanner from "../components/settings/ProBanner";
 import ArrowRight from "../svgs/ArrowRight";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
+
 import HealthCard from "../components/me/HealthCard";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import SettingsIconNoFill from "../svgs/SettingsIconNoFill";
+import LogModal from "../components/me/LogModal";
+import InviteFriendsCard from "../components/me/InviteFriendsCard";
 
 const Me = ({ navigation }) => {
   const font = useFont(Mulish_300Light_Italic, 12);
+  const bottomSheetModalRef = useRef(null);
 
   const insets = useSafeAreaInsets();
+
+  const handlePresentModalPress = useCallback((e) => {
+    e.stopPropagation()
+    bottomSheetModalRef.current?.present();
+  }, []);
+
+  const handleHideModal = useCallback(() => {
+    // console.log('close');
+    bottomSheetModalRef.current?.close();
+  }, []);
 
   return (
     <View
@@ -48,7 +69,7 @@ const Me = ({ navigation }) => {
         </Pressable>
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={{ gap: 20, flex: 1 }}>
+        <View style={{ gap: 20, flex: 1, paddingBottom: 100 }}>
           <Text
             style={{
               fontSize: 34,
@@ -59,11 +80,12 @@ const Me = ({ navigation }) => {
             Me
           </Text>
           <ProBanner />
-
-          <HealthCard />
+          <HealthCard onLog={handlePresentModalPress} />
           <HealthCard isGraph={true} />
+          <InviteFriendsCard />
         </View>
       </ScrollView>
+      <LogModal onClose={handleHideModal} ref={bottomSheetModalRef} />
     </View>
   );
 };
