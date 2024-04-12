@@ -1,9 +1,9 @@
 import { View, Text } from "react-native";
 import React from "react";
 import { TextInput } from "react-native";
-import COLOURS from '../../constants/colours'
+import COLOURS from "../../constants/colours";
 
-const InformationInput = ({inputText}) => {
+const InformationInput = ({ inputText, defaultValue }) => {
   return (
     <View
       style={{
@@ -27,8 +27,9 @@ const InformationInput = ({inputText}) => {
         {inputText}
       </Text>
       <TextInput
-        style={{ fontFamily: "Mulish_400Regular", fontSize: 14 }}
-        defaultValue="Farid"
+        readOnly
+        style={{ fontFamily: "Mulish_400Regular", fontSize: 14, color: '#636566' }}
+        defaultValue={defaultValue}
       />
     </View>
   );

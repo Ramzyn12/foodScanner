@@ -17,14 +17,13 @@ const DiaryStack = () => {
         component={Diary}
         options={{
           headerShown: false,
-          
         }}
       />
       <Stack.Screen
         name="CreateAccount"
         component={CreateAccount}
         options={{
-          presentation: 'modal',
+          presentation: "modal",
           headerShown: false,
         }}
       />

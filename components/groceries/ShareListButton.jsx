@@ -12,16 +12,14 @@ const ShareList = () => {
   );
 
   const shareGroceries = async () => {
-    // Step 2: Enhance the share function
     const bulletPoint = '\u2022'; // Unicode character for a bullet point
     const itemsString = currentGroceries
       .map(item => `${bulletPoint} ${item.item.name}`) // Prefix each item with a bullet point
       .join('\n');
   
-    // Adding a footer message with the app name and a link
-    const footer = `\n\nShared via Ivy App\nDownload the app: exp+ivy://expo-development-client/?url=http%3A%2F%2F192.168.0.145%3A8081`;
+    const footer = `\n\nShared Via Ivy - Quit Processed Food App\nexp+ivy://expo-development-client/?url=http%3A%2F%2F192.168.0.145%3A8081`;
   
-    const message = `Here's my grocery list:\n${itemsString}${footer}`;
+    const message = `My Grocery List:\n\n${itemsString}${footer}`;
   
     try {
       await Share.open({

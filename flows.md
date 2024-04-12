@@ -24,9 +24,44 @@ List item is rendered when:
 4. Recents results list
 This all comes from the FoodItem and singleFood models in mongoDB so we could just add a processedState when we addFoodToDiary or addFoodToGroceryList (since this is when we add it to our database)
 
+Backend Logic for the Logging of data
 
-Files that include firebase 
-Frontend:
-MainComponent has the onAuthStateChanged listner
-SignIn has signInWithEmailAndPassword
-Sign up calls the backend which has service account
+Lets say we log some info for a specific model like this
+
+const healthMetricSchema = new mongoose.Schema({
+  metricType: {
+    type: String,
+    required: true,
+    enum: ['Weight', 'Anxiety', 'BrainFog',...],
+  },
+  date: {
+    type: Date,
+    required: true,
+    default: Date.now,
+  },
+  metricValue: {
+    type: Number,
+    required: true,
+    // Add custom validation if needed, depending on the metricType like 1 - 10 if not weight
+  },
+  unitOfMeasure: {
+    type: String,
+    enum: ['kg', 'lbs', 'N/A'], // N/A for non-quantitative metrics like Anxiety, BrainFog
+    required: function() { return this.metricType === 'Weight'; }, // Conditional requirement
+  },
+  runningAverage: {
+    type: Number,
+    required: true, // Assuming pre-calculation before document save
+    // No default value; should be calculated dynamically based on previous records
+  },
+}, {
+  timestamps: true, // Adds createdAt and updatedAt fields automatically
+});
+
+// Custom validation or methods can be added here
+// For example, a pre-save hook to calculate the running average
+
+For each card on me page just get the latest document
+For the graphs just use the amount of days as the time frame chosen from dropdown
+
+

@@ -33,7 +33,8 @@ const LogModal = forwardRef(({ onClose }, ref) => {
       ref={ref}
       backdropComponent={renderBackdrop}
       enablePanDownToClose={true}
-      snapPoints={["45%"]}
+      snapPoints={[390]}
+      // enableDynamicSizing={true}
       handleStyle={{ display: "none" }}
     >
       <BottomSheetView>

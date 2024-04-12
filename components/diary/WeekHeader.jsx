@@ -9,12 +9,17 @@ import { StyleSheet } from "react-native";
 import { useDispatch } from "react-redux";
 import { setChosenDate } from "../../redux/diarySlice";
 import { AccessibilityInfo } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import COLOURS from '../../constants/colours'
+import TickIcon from "../../svgs/TickIcon";
+
 const windowWidth = Dimensions.get("window").width;
 
 const WeekHeader = ({ diaryData }) => {
   const [weeksData, setWeeksData] = useState([]);
   const carouselRef = useRef(null);
   const dispatch = useDispatch();
+  const insets = useSafeAreaInsets()
 
   const [isReduceTransparencyEnabled, setIsReduceTransparencyEnabled] =
     useState(false);
@@ -109,6 +114,7 @@ const WeekHeader = ({ diaryData }) => {
       // item is a week object from your weeksData array (cant change name)
       return (
         <View style={styles.weekHeaderContainer}>
+
           {item.days.map((day, index) => (
             <Pressable
               key={index}
@@ -132,8 +138,20 @@ const WeekHeader = ({ diaryData }) => {
     <BlurView
       intensity={isReduceTransparencyEnabled ? 10 : 70}
       tint={isReduceTransparencyEnabled ? 'systemThickMaterialLight' : 'default'}
-      style={{ position: "absolute", zIndex: 3000, paddingTop: 38 }}
+      style={{ position: "absolute", zIndex: 3000, paddingTop: insets.top + 5 }}
     >
+      <View style={{flexDirection: 'row', paddingHorizontal: 18, justifyContent: 'space-between', alignItems: 'center'}}>
+        <View style={{gap: 6}}>
+          <Text>Current Date</Text>
+          <View style={{flexDirection: 'row', gap: 4}}>
+            <View style={{width: 12, height: 12, borderRadius: 12, backgroundColor: COLOURS.darkGreen, alignItems: 'center', justifyContent: 'center'}}>
+              <TickIcon width />
+            </View>
+            <Text>All good so far</Text>
+          </View>
+        </View>
+        <Text>Today</Text>
+      </View>
       <Carousel
         data={weeksData}
         renderItem={renderWeek}

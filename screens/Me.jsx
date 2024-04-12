@@ -33,15 +33,17 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import SettingsIconNoFill from "../svgs/SettingsIconNoFill";
 import LogModal from "../components/me/LogModal";
 import InviteFriendsCard from "../components/me/InviteFriendsCard";
+import { Animated } from "react-native";
 
 const Me = ({ navigation }) => {
   const font = useFont(Mulish_300Light_Italic, 12);
   const bottomSheetModalRef = useRef(null);
-
+  const [showSmallMe, setShowSmallMe] = useState(false);
+  const scrollY = useRef(new Animated.Value(0)).current; // Use Animated.Value to track scroll position
   const insets = useSafeAreaInsets();
 
   const handlePresentModalPress = useCallback((e) => {
-    e.stopPropagation()
+    e.stopPropagation();
     bottomSheetModalRef.current?.present();
   }, []);
 
@@ -49,6 +51,17 @@ const Me = ({ navigation }) => {
     // console.log('close');
     bottomSheetModalRef.current?.close();
   }, []);
+
+  const handleScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+    {
+      listener: (event) => {
+        const offsetY = event.nativeEvent.contentOffset.y;
+        setShowSmallMe(offsetY > 34);
+      },
+      useNativeDriver: false, // Use native driver for better performance
+    }
+  );
 
   return (
     <View
@@ -59,7 +72,20 @@ const Me = ({ navigation }) => {
         paddingHorizontal: 20,
       }}
     >
-      <View>
+      <View style={{ flexDirection: "row", width: "100%", alignItems: 'center', justifyContent: 'space-between' }}>
+      <View style={{ width: 28 }}></View>
+        {showSmallMe && (
+          <Text
+            style={{
+              fontSize: 19,
+              fontFamily: "Mulish_700Bold",
+              textAlign: 'center',
+              color: COLOURS.nearBlack,
+            }}
+          >
+            Me
+          </Text>
+        )}
         <Pressable
           onPress={() => navigation.navigate("Settings")}
           hitSlop={40}
@@ -68,7 +94,11 @@ const Me = ({ navigation }) => {
           <SettingsIconNoFill />
         </Pressable>
       </View>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        scrollEventThrottle={16}
+        onScroll={handleScroll}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={{ gap: 20, flex: 1, paddingBottom: 100 }}>
           <Text
             style={{

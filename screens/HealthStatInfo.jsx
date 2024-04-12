@@ -5,15 +5,26 @@ import {
   Pressable,
   TextInput,
   KeyboardAvoidingView,
+  Platform,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Header from "../components/settings/Header";
 import COLOURS from "../constants/colours";
 import { Bar, CartesianChart, Line, useChartPressState } from "victory-native";
 import { StockChart } from "../components/me/HealthCard";
-import { Circle, useFont } from "@shopify/react-native-skia";
-import { Mulish_700Bold } from "@expo-google-fonts/mulish";
+import {
+  Circle,
+  Group,
+  useFont,
+  Text as SkiaText,
+  matchFont,
+} from "@shopify/react-native-skia";
+import {
+  Mulish_300Light,
+  Mulish_500Medium,
+  Mulish_700Bold,
+} from "@expo-google-fonts/mulish";
 import ArrowDown from "../svgs/ArrowDown";
 import ArrowDownShort from "../svgs/ArrowDownShort";
 import ScientificDescription from "../components/me/ScientificDescription";
@@ -21,6 +32,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import Sources from "../components/me/Sources";
 import HealthSlider from "../components/me/HealthSlider";
 import WeightInput from "../components/me/WeightInput";
+import { useDerivedValue } from "react-native-reanimated";
 
 const DATA = Array.from({ length: 31 }, (_, i) => ({
   day: i,
@@ -44,8 +56,44 @@ const DATAOne = [
   // { date: "2024-04-10", weight: 49 },
 ];
 
-function ToolTip({ x, y }) {
-  return <Circle cx={x} cy={y} r={8} color="white" />;
+function ToolTip({ x, y, value }) {
+  const fontFamily = Platform.select({ ios: "Helvetica", default: "serif" });
+  const fontStyle = {
+    fontFamily,
+    fontSize: 14,
+    fontStyle: "italic",
+    fontWeight: "bold",
+  };
+  const font = matchFont(fontStyle);
+
+  if (!font) {
+    console.log("no font!");
+  }
+
+  const activeValueDisplay = useDerivedValue(
+    () => value.value.toFixed(0)
+  );
+
+  const activeY = useDerivedValue(
+    () => y.value - 20
+  );
+
+  const activeX = useDerivedValue(
+    () => x.value - 10,
+  );
+
+  return (
+    <Group>
+      <Circle cx={x} cy={y} r={8} color="white" />
+      <SkiaText
+        x={activeX}
+        y={activeY}
+        text={activeValueDisplay} // Ensure value is a string
+        font={font}
+        color="white"
+      />
+    </Group>
+  );
 }
 
 let totalWeight = 0;
@@ -103,7 +151,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
           <View
             style={{
               backgroundColor: COLOURS.darkGreen,
-              height: 490,
+              height: 480,
               // flex: 1,
               borderRadius: 20,
               paddingVertical: 10,
@@ -184,6 +232,9 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                     <ToolTip
                       x={state.x.position}
                       y={state.y.averageWeight.position}
+                      value={state.y.averageWeight.value}
+                      font={font}
+                      top={chartBounds.top}
                     />
                   ) : null}
                 </>
@@ -197,7 +248,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
 
             {false && <WeightInput />}
             {true && (
-              <View style={{marginTop: 65}}>
+              <View style={{ marginTop: 65 }}>
                 <HealthSlider value={value} setValue={setValue} />
               </View>
             )}

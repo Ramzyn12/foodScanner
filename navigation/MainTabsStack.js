@@ -19,6 +19,10 @@ import GroceriesStack from "./GroceriesStack";
 import HealthStack from "./HealthStack";
 import MeStack from "./MeStack";
 import MeProfile from "../svgs/MeProfile";
+import DiaryTab from "../svgs/DiaryTab";
+import MeProfileFill from "../svgs/MeProfileFill";
+import GroceryIconNoFill from "../svgs/GroceryIconNoFill";
+import HeartTabNoFill from "../svgs/HeartTabNoFill";
 const Tab = createBottomTabNavigator();
 
 function MainTabsStack() {
@@ -26,8 +30,8 @@ function MainTabsStack() {
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: COLOURS.nearBlack,
-        tabBarInactiveTintColor: COLOURS.tabUnselected,
+        tabBarActiveTintColor: COLOURS.darkGreen,
+        tabBarInactiveTintColor: COLOURS.nearBlack,
         tabBarLabelStyle: { fontFamily: "Mulish_700Bold", fontSize: 12 },
         tabBarStyle: { borderTopWidth: 0 },
         headerShown: false,
@@ -36,9 +40,8 @@ function MainTabsStack() {
       <Tab.Screen
         name="DiaryStack"
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <DiaryIcon color={color} size={size} />
-          ),
+          tabBarIcon: ({ color, size, focused }) =>
+            focused ? <DiaryIcon color={color} size={size} /> : <DiaryTab />,
           tabBarLabel: "Diary",
         }}
         component={DiaryStack}
@@ -48,9 +51,12 @@ function MainTabsStack() {
         options={{
           headerShown: false,
           tabBarLabel: "Health",
-          tabBarIcon: ({ color, size }) => (
-            <HeartIcon color={color} size={size} />
-          ),
+          tabBarIcon: ({ color, size, focused }) =>
+            focused ? (
+              <HeartIcon color={color} size={size} />
+            ) : (
+              <HeartTabNoFill />
+            ),
         }}
         component={HealthStack}
       />
@@ -68,9 +74,12 @@ function MainTabsStack() {
       <Tab.Screen
         name="GroceriesStack"
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <ListIcon color={color} size={size} />
-          ),
+          tabBarIcon: ({ color, size, focused }) =>
+            focused ? (
+              <ListIcon color={color} size={size} />
+            ) : (
+              <GroceryIconNoFill />
+            ),
           tabBarLabel: "Groceries",
         }}
         component={GroceriesStack}
@@ -79,11 +88,13 @@ function MainTabsStack() {
         name="MeStack"
         options={{
           headerShown: false,
-          tabBarIcon: ({ color, size }) => (
-            <MeProfile color={color} size={size} />
-          ),
+          tabBarIcon: ({ color, size, focused }) =>
+            focused ? (
+              <MeProfileFill color={color} size={size} />
+            ) : (
+              <MeProfile />
+            ),
           tabBarLabel: "Me",
-
         }}
         component={MeStack}
       />
