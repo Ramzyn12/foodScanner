@@ -7,34 +7,23 @@ import TimelineEventCard from "./TimelineEventCard";
 const TimelineEvent = ({ unlocked, data }) => {
   return (
     <View style={styles.container}>
-      {/* Tick */}
-      {unlocked && (
-        <Svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <Path
-            fillRule="evenodd"
-            clipRule="evenodd"
-            d="M10 19.1667C15.0627 19.1667 19.1667 15.0626 19.1667 10C19.1667 4.9374 15.0627 0.833344 10 0.833344C4.93743 0.833344 0.833374 4.9374 0.833374 10C0.833374 15.0626 4.93743 19.1667 10 19.1667ZM15.0956 7.70859C15.3489 7.42571 15.3248 6.99107 15.042 6.7378C14.7591 6.48453 14.3244 6.50854 14.0712 6.79143L10.9828 10.241C10.3569 10.94 9.9355 11.4083 9.57518 11.7111C9.23193 11.9996 9.03033 12.0625 8.85421 12.0625C8.67809 12.0625 8.47648 11.9996 8.13323 11.7111C7.77291 11.4083 7.35146 10.94 6.72566 10.241L5.92892 9.35109C5.67565 9.06821 5.24101 9.0442 4.95813 9.29746C4.67524 9.55073 4.65123 9.98537 4.9045 10.2683L5.73528 11.1962C6.31814 11.8473 6.8043 12.3903 7.24853 12.7637C7.71845 13.1587 8.22531 13.4375 8.85421 13.4375C9.48311 13.4375 9.98997 13.1587 10.4599 12.7637C10.9041 12.3903 11.3903 11.8473 11.9731 11.1962L15.0956 7.70859Z"
-            fill="#126668"
-          />
-        </Svg>
-      )}
-      {/* No Tick */}
-      {!unlocked && (
-        // If Day > 100, MarginRight: -9
-        <View style={{ alignItems: "center", marginRight: -1 }}>
-          <Text style={{ fontSize: 11, fontFamily: "Mulish_700Bold" }}>
-            Day
-          </Text>
-          <Text style={{ fontSize: 16, fontFamily: "Mulish_600SemiBold" }}>
-            {data.week}
-          </Text>
-        </View>
-      )}
+      
+      <View style={{ alignItems: "center", marginRight: -1 }}>
+        <Text style={{ fontSize: 11, fontFamily: "Mulish_800ExtraBold", color: COLOURS.nearBlack }}>week</Text>
+        <Text style={{ fontSize: 16, fontFamily: "Mulish_700Bold", color: COLOURS.nearBlack }}>
+          {data.week}
+        </Text>
+      </View>
 
       {/* Green Dot */}
       <View style={styles.circle}></View>
 
-      <TimelineEventCard destination={'UnlockedDetails'} data={data} unlocked={unlocked} />
+      <TimelineEventCard
+        destination={"WeeklyOverview"}
+        data={data}
+        unlocked={unlocked}
+      />
+
     </View>
   );
 };

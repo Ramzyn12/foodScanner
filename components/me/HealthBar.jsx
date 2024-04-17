@@ -2,8 +2,8 @@ import { View, Text } from "react-native";
 import React from "react";
 import COLOURS from "../../constants/colours";
 
-const HealthBar = ({ barType, progress }) => {
-  
+const HealthBar = ({ barType, progress, isLastLoggedToday }) => {
+  const barColour = isLastLoggedToday ? COLOURS.darkGreen : COLOURS.lightGray
   return (
     <View
       style={{
@@ -19,7 +19,7 @@ const HealthBar = ({ barType, progress }) => {
     >
       <View
         style={{
-          backgroundColor: COLOURS.darkGreen,
+          backgroundColor: barColour,
           width: `${progress}%`,
           height: "100%",
           borderTopLeftRadius: barType === 'left' ? 12 : 6,

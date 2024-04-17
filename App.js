@@ -13,6 +13,7 @@ import {
   Mulish_500Medium,
   Mulish_600SemiBold,
   Mulish_700Bold,
+  Mulish_800ExtraBold,
 } from "@expo-google-fonts/mulish";
 import { toastConfig } from "./toastConfig";
 import { Lato_400Regular, Lato_700Bold } from "@expo-google-fonts/lato";
@@ -42,6 +43,7 @@ const AppInitializer = () => {
     Mulish_500Medium,
     Mulish_600SemiBold,
     Mulish_700Bold,
+    Mulish_800ExtraBold,
     Lato_400Regular,
     Lato_700Bold,
   });

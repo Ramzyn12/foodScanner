@@ -25,7 +25,9 @@ async function addFoodToDiary({ userId, foodDetails }) {
 
     diaryDay = await DiaryDay.findOneAndUpdate(
       { userId: userId, date: normalizedDay },
-      { $addToSet: { consumedFoods: foodItem._id } }, // Use $addToSet to only add if the foodItem isn't already in the array
+      {
+        $addToSet: { consumedFoods: foodItem._id },
+      }, // Use $addToSet to only add if the foodItem isn't already in the array
       { new: true, upsert: true } // Create the document if it doesn't exist and return the updated document
     );
   } else if (singleFoodId) {
@@ -33,7 +35,9 @@ async function addFoodToDiary({ userId, foodDetails }) {
 
     diaryDay = await DiaryDay.findOneAndUpdate(
       { userId: userId, date: normalizedDay },
-      { $addToSet: { consumedSingleFoods: foodItem._id } }, // Use $addToSet to only add if the foodItem isn't already in the array
+      {
+        $addToSet: { consumedSingleFoods: foodItem._id },
+      }, // Use $addToSet to only add if the foodItem isn't already in the array
       { new: true, upsert: true } // Create the document if it doesn't exist and return the updated document
     );
   }
@@ -111,7 +115,7 @@ async function getAllDiaryDays({ userId }) {
 
   let diaryDays = await DiaryDay.find({ userId: userId })
     .sort("date")
-    .select("_id score date diaryDayState")
+    .select("_id score date diaryDayState fastedState")
     .lean();
 
   if (!diaryDays.length) {
@@ -123,9 +127,31 @@ async function getAllDiaryDays({ userId }) {
   return diaryDays;
 }
 
+async function updateFastedState({ userId, date, fastedState }) {
+  const normalizedDate = getNormalizedDate(date);
+
+  try {
+    const options = { new: true, upsert: true, setDefaultsOnInsert: true };
+    const update = { fastedState: fastedState };
+
+    // findOneAndUpdate will find and update, or insert if not found
+    const diaryDay = await DiaryDay.findOneAndUpdate(
+      { userId: userId, date: normalizedDate },
+      { $set: update },
+      options
+    );
+
+    return diaryDay;
+  } catch (error) {
+    console.error("Error updating or creating DiaryDay:", error);
+    throw error; // Rethrow or handle as needed
+  }
+}
+
 module.exports = {
   addFoodToDiary,
   removeFoodFromDiaryDay,
   getDiaryDay,
   getAllDiaryDays,
+  updateFastedState,
 };

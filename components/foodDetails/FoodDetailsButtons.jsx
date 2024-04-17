@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, ActivityIndicator } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Path, Svg } from "react-native-svg";
 import COLOURS from "../../constants/colours";
@@ -27,7 +27,12 @@ const FoodDetailsButtons = () => {
     handleRemoveFromDiary,
     handleAddToGroceryList,
     handleRemoveFromGroceryList,
+    buttonsLoaded
   } = useFoodDetailsActions();
+
+  console.log(buttonsLoaded);
+
+  if (!buttonsLoaded) return <ActivityIndicator />
 
   return (
     <View style={{ flexDirection: "row", gap: 8, marginTop: 15}}>

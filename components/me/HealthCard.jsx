@@ -1,11 +1,21 @@
 import { View, Text, Pressable } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import ArrowRight from "../../svgs/ArrowRight";
 import { CartesianChart, useAreaPath, useLinePath } from "victory-native";
 import COLOURS from "../../constants/colours";
 import { Group, LinearGradient, Path, vec } from "@shopify/react-native-skia";
 import HealthBar from "./HealthBar";
 import { useNavigation } from "@react-navigation/native";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { getRecentMetric } from "../../axiosAPI/healthMetricAPI";
+import {
+  format,
+  formatDistance,
+  formatDistanceToNow,
+  formatRelative,
+  parseISO,
+  subDays,
+} from "date-fns";
 
 const DATA = Array.from({ length: 31 }, (_, i) => ({
   day: i,
@@ -13,12 +23,10 @@ const DATA = Array.from({ length: 31 }, (_, i) => ({
   highTmp: 40 + 30 - i,
 }));
 
-const HealthCard = ({ isGraph, onLog }) => {
-  let progress = 85;
+const calculateBarProgress = (progress) => {
   let barOneRange = 33; // each bar represents 33 percent range
   let barTwoRange = 66;
   let barThreeRange = 100;
-  const navigation = useNavigation();
 
   let barOneProgress = Math.min(100, (progress / barOneRange) * 100);
   let barTwoProgress =
@@ -36,11 +44,47 @@ const HealthCard = ({ isGraph, onLog }) => {
         )
       : 0;
 
+  return { barOneProgress, barTwoProgress, barThreeProgress };
+};
+
+const getLastLoggedText = (isoDateString) => {
+  if (!isoDateString) return "N/A";
+
+  const date = parseISO(isoDateString);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  if (date >= today) {
+    return "Today";
+  } else if (date >= yesterday && date < today) {
+    return "Yesterday";
+  } else {
+    return `${formatDistanceToNow(date)} ago`;
+  }
+};
+
+const HealthCard = ({ onLog, metricType, leftLable, rightLable }) => {
+  const navigation = useNavigation();
+  const isWeight = metricType === "Weight";
+  const { data } = useQuery({
+    queryFn: () => getRecentMetric({ metric: metricType }),
+    queryKey: ["RecentMetric", metricType], //Second param is the metric
+  });
+
+  const { barOneProgress, barTwoProgress, barThreeProgress } =
+    calculateBarProgress(data?.metricValue * 10);
+  const lastLoggedText = getLastLoggedText(data?.date);
+  const isLastLoggedToday = lastLoggedText === "Today";
+
+  useEffect(() => {
+  }, [data]);
+
   return (
     <Pressable
-      onPress={() =>
-        navigation.navigate("HealthStatInfo", { statFor: "Weight" })
-      }
+      onPress={() => navigation.navigate("HealthStatInfo", { metricType })}
       style={{
         borderWidth: 1,
         borderColor: COLOURS.lightGray,
@@ -64,7 +108,7 @@ const HealthCard = ({ isGraph, onLog }) => {
               fontSize: 16,
             }}
           >
-            Weight
+            {metricType}
           </Text>
           <ArrowRight />
         </View>
@@ -85,39 +129,40 @@ const HealthCard = ({ isGraph, onLog }) => {
               fontSize: 14,
             }}
           >
-            Today
+            {lastLoggedText}
           </Text>
         </View>
       </View>
-      {isGraph && (
+      {isWeight && (
         <View style={{ flexDirection: "row", gap: 20 }}>
-          <CartesianChart
-            data={DATA} // 👈 specify your data
-            xKey="day" // 👈 specify data key for x-axis
-            yKeys={["lowTmp", "highTmp"]} // 👈 specify data keys used for y-axis
-            // domainPadding={{ bottom: 10 }}
-            // axisOptions={{ font, lineColor: "transparent" }} // 👈 we'll generate axis labels using given font.
-          >
-            {({ points, chartBounds }) => {
-              return <StockChart colourOne={'#CFDACC'} colourTwo={'white'} points={points.highTmp} chartBounds={chartBounds} />;
-            }}
-          </CartesianChart>
           <View style={{ flexDirection: "row", alignItems: "baseline" }}>
             <Text style={{ fontSize: 50, fontFamily: "700Mulish_Bold" }}>
-              68
+              {data?.metricValue}
             </Text>
             <Text style={{ fontSize: 11, fontFamily: "700Mulish_Bold" }}>
-              KG
+              {data?.unitOfMeasure}
             </Text>
           </View>
         </View>
       )}
-      {!isGraph && (
+      {!isWeight && (
         <View style={{ gap: 6 }}>
           <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
-            <HealthBar progress={barOneProgress} barType={"left"} />
-            <HealthBar progress={barTwoProgress} barType={"middle"} />
-            <HealthBar progress={barThreeProgress} barType={"right"} />
+            <HealthBar
+              isLastLoggedToday={isLastLoggedToday}
+              progress={barOneProgress}
+              barType={"left"}
+            />
+            <HealthBar
+              isLastLoggedToday={isLastLoggedToday}
+              progress={barTwoProgress}
+              barType={"middle"}
+            />
+            <HealthBar
+              isLastLoggedToday={isLastLoggedToday}
+              progress={barThreeProgress}
+              barType={"right"}
+            />
           </View>
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
@@ -129,7 +174,7 @@ const HealthCard = ({ isGraph, onLog }) => {
                 color: "#636566",
               }}
             >
-              None
+              {leftLable}
             </Text>
             <Text
               style={{
@@ -138,31 +183,46 @@ const HealthCard = ({ isGraph, onLog }) => {
                 color: "#636566",
               }}
             >
-              Extreme
+              {rightLable}
             </Text>
           </View>
         </View>
       )}
       <Pressable
-        onPress={onLog}
+        onPress={() => onLog(metricType)}
         style={{
           borderWidth: 1,
-          borderColor: COLOURS.lightGray,
+          borderColor: isLastLoggedToday ? COLOURS.lightGray : "transparent",
+          backgroundColor: isLastLoggedToday
+            ? "transparent"
+            : COLOURS.darkGreen,
           height: 44,
           alignItems: "center",
           justifyContent: "center",
           borderRadius: 12,
         }}
       >
-        <Text style={{ fontSize: 14, fontFamily: "Mulish_700Bold", color: COLOURS.nearBlack }}>
-          Update
+        <Text
+          style={{
+            fontSize: 14,
+            fontFamily: "Mulish_700Bold",
+            color: isLastLoggedToday ? COLOURS.nearBlack : "white",
+          }}
+        >
+          {isLastLoggedToday ? "Update" : "Log"}
         </Text>
       </Pressable>
     </Pressable>
   );
 };
 
-export const StockChart = ({ points, chartBounds, lineColour, colourOne, colourTwo }) => {
+export const StockChart = ({
+  points,
+  chartBounds,
+  lineColour,
+  colourOne,
+  colourTwo,
+}) => {
   const { path: areaPath } = useAreaPath(points, chartBounds.bottom, {
     curveType: "natural",
   });

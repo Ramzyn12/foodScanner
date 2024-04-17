@@ -12,15 +12,16 @@ import TodayScore from "./TodayScore";
 import FoodList from "./FoodList";
 import { getDiaryDay } from "../../axiosAPI/diaryDayAPI";
 import { useQuery } from "@tanstack/react-query";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { storage } from "../../utils/MMKVStorage";
+import { setCurrentDiaryDay } from "../../redux/diarySlice";
 
 const FoodDiary = () => {
   // const token = useSelector(state => state.auth.token)
   const token = storage.getString("firebaseToken");
   const userCreated = useSelector((state) => state.auth.userCreated);
   const chosenDate = useSelector((state) => state.diary.chosenDate);
-
+  const dispatch = useDispatch();
   useEffect(() => {
     if (userCreated) {
       refetch();
@@ -41,6 +42,10 @@ const FoodDiary = () => {
     retry: false,
   });
 
+  useEffect(() => {
+    dispatch(setCurrentDiaryDay(diaryFoodItems));
+  }, [diaryFoodItems]);
+
   const emptyFoodList =
     1 * diaryFoodItems?.consumedFoods.length +
       1 * diaryFoodItems?.consumedSingleFoods.length ===
@@ -50,11 +55,15 @@ const FoodDiary = () => {
   if (isError) return <Text>{error.response.data.message}</Text>;
 
   return (
-    <View style={{ width: "100%", marginTop: 25, marginBottom: 150 }}>
+    <View style={{ width: "100%", marginTop: 25, paddingBottom: 200 }}>
       {/* {!emptyFoodList && (
         <TodayScore score={diaryFoodItems?.score} />
       )} */}
-      <FoodList loadingFoodDiary={isLoading} emptyFoodList={emptyFoodList} diaryFoodItems={diaryFoodItems} />
+      <FoodList
+        loadingFoodDiary={isLoading}
+        emptyFoodList={emptyFoodList}
+        diaryFoodItems={diaryFoodItems}
+      />
     </View>
   );
 };

@@ -4,6 +4,7 @@ const {
   getDiaryDay,
   removeFoodFromDiaryDay,
   getAllDiaryDays,
+  updateFastedState,
 } = require("../controllers/diaryController");
 const authMiddleware = require("../middleware/authMiddleware");
 const { auth } = require("firebase-admin");
@@ -28,5 +29,6 @@ router
 router.route("/all").get(authMiddleware, getAllDiaryDays);
 router.route("/remove").post(authMiddleware, removeFoodFromDiaryDay);
 router.route("/:date").get(authMiddleware, getDiaryDay);
+router.route("/toggle-fasting").post(authMiddleware, updateFastedState);
 
 module.exports = router;

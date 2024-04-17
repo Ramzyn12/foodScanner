@@ -55,10 +55,20 @@ const getAllDiaryDays = async (req, res) => {
   res.status(200).json(diaryDays);
 };
 
+const updateFastedState = async (req, res) => {
+  const userId = req.user._id;
+  const { fastedState, date } = req.body;
+
+  const diaryDays = await diaryService.updateFastedState({userId, date, fastedState})
+
+  res.status(200).json(diaryDays);
+};
+
 
 module.exports = {
   addFoodToDiaryDay,
   getDiaryDay,
   removeFoodFromDiaryDay,
   getAllDiaryDays,
+  updateFastedState
 };

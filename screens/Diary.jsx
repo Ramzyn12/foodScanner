@@ -116,7 +116,7 @@ const Diary = ({ navigation }) => {
       <WeekHeader diaryData={data} />
 
       {/* Main page */}
-      <ScrollView style={styles.mainSectionContainer}>
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.mainSectionContainer}>
         <StreakCard diaryData={data} />
         {/* <BenefitFactCard /> */}
         <Pressable style={{ marginTop: 25 }}>
@@ -148,7 +148,6 @@ const styles = StyleSheet.create({
   mainSectionContainer: {
     padding: 18,
     flex: 1,
-    paddingTop: 90,
-    paddingBottom: 300,
+    paddingTop: 150,
   },
 });

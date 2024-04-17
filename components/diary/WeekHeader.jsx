@@ -1,25 +1,66 @@
 import { View, Text, Pressable, Alert } from "react-native";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BlurView } from "expo-blur";
 import Carousel from "react-native-reanimated-carousel";
 import WeekDayProgress from "./WeekDayProgress";
 import { Dimensions } from "react-native";
 import moment from "moment";
 import { StyleSheet } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setChosenDate } from "../../redux/diarySlice";
 import { AccessibilityInfo } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import COLOURS from '../../constants/colours'
+import COLOURS from "../../constants/colours";
 import TickIcon from "../../svgs/TickIcon";
+import { Svg, Path } from "react-native-svg";
+import GreenTickCircle from "../../svgs/GreenTickCircle";
+import GreyFail from "../../svgs/GreyFail";
 
 const windowWidth = Dimensions.get("window").width;
+
+const transformCurrentDate = (date) => {
+  const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const Months = [
+    "Jan",
+    "Feb",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  const day = daysOfWeek[date.getDay() - 1];
+  const dayNumber = date.getDate();
+  const month = Months[date.getMonth()];
+  return `${day} ${dayNumber} ${month}`;
+};
 
 const WeekHeader = ({ diaryData }) => {
   const [weeksData, setWeeksData] = useState([]);
   const carouselRef = useRef(null);
   const dispatch = useDispatch();
-  const insets = useSafeAreaInsets()
+  const insets = useSafeAreaInsets();
+
+  const chosenDateString = useSelector((state) => state.diary.chosenDate);
+  const chosenDiaryDay = useSelector((state) => state.diary.currentDiaryDay);
+  const diaryDayStateGood =
+    chosenDiaryDay?.diaryDayState === "unprocessed" ||
+    chosenDiaryDay?.fastedState;
+
+  
+  const subHeaderMessage = useMemo(() => {
+    if (chosenDiaryDay === undefined) {
+      return "..."
+    }
+    return diaryDayStateGood ? "All good so far" : "Failed";
+  }, [chosenDiaryDay]);
+  const chosenDate = chosenDateString ? new Date(chosenDateString) : new Date();
+  const date = transformCurrentDate(chosenDate);
 
   const [isReduceTransparencyEnabled, setIsReduceTransparencyEnabled] =
     useState(false);
@@ -36,6 +77,11 @@ const WeekHeader = ({ diaryData }) => {
       setWeeksData(processedWeeks);
     }
   }, [diaryData]);
+
+  const handleGoToRecentDayPress = () => {
+    dispatch(setChosenDate(moment().startOf("day").toISOString()));
+    carouselRef.current.scrollTo({ index: weeksData.length - 1 });
+  };
 
   //Maybe place this outside component so not rerendered
   const processDiaryDaysToWeeks = (diaryDays) => {
@@ -56,6 +102,7 @@ const WeekHeader = ({ diaryData }) => {
             .format("YYYY-MM-DD"),
           diaryDayState: "empty", // Default score
           _id: null, // Default ID
+          fastedState: false,
         }));
 
       // Map actual diary data onto the week structure
@@ -70,6 +117,7 @@ const WeekHeader = ({ diaryData }) => {
             diaryDayState: day.diaryDayState,
             _id: day._id,
             date: day.date,
+            fastedState: day.fastedState,
           };
         }
       });
@@ -114,7 +162,6 @@ const WeekHeader = ({ diaryData }) => {
       // item is a week object from your weeksData array (cant change name)
       return (
         <View style={styles.weekHeaderContainer}>
-
           {item.days.map((day, index) => (
             <Pressable
               key={index}
@@ -125,6 +172,7 @@ const WeekHeader = ({ diaryData }) => {
                 date={moment(item.weekStart).add(index, "days")}
                 score={day.score}
                 diaryDayState={day.diaryDayState}
+                fastedState={day.fastedState}
               />
             </Pressable>
           ))}
@@ -137,20 +185,54 @@ const WeekHeader = ({ diaryData }) => {
   return (
     <BlurView
       intensity={isReduceTransparencyEnabled ? 10 : 70}
-      tint={isReduceTransparencyEnabled ? 'systemThickMaterialLight' : 'default'}
+      tint={
+        isReduceTransparencyEnabled ? "systemThickMaterialLight" : "default"
+      }
       style={{ position: "absolute", zIndex: 3000, paddingTop: insets.top + 5 }}
     >
-      <View style={{flexDirection: 'row', paddingHorizontal: 18, justifyContent: 'space-between', alignItems: 'center'}}>
-        <View style={{gap: 6}}>
-          <Text>Current Date</Text>
-          <View style={{flexDirection: 'row', gap: 4}}>
-            <View style={{width: 12, height: 12, borderRadius: 12, backgroundColor: COLOURS.darkGreen, alignItems: 'center', justifyContent: 'center'}}>
-              <TickIcon width />
-            </View>
-            <Text>All good so far</Text>
+      <View
+        style={{
+          flexDirection: "row",
+          paddingHorizontal: 18,
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 5,
+        }}
+      >
+        <View style={{ gap: 6 }}>
+          <Text
+            style={{
+              color: COLOURS.nearBlack,
+              fontSize: 19,
+              fontFamily: "Mulish_700Bold",
+            }}
+          >
+            {date}
+          </Text>
+          <View style={{ flexDirection: "row", gap: 4, alignItems: "center" }}>
+            {diaryDayStateGood ? <GreenTickCircle /> : <GreyFail />}
+            <Text
+              style={{
+                color: "#636566",
+                fontSize: 11,
+                fontFamily: "Mulish_700Bold",
+              }}
+            >
+              {subHeaderMessage}
+            </Text>
           </View>
         </View>
-        <Text>Today</Text>
+        <Pressable hitSlop={30} onPress={handleGoToRecentDayPress}>
+          <Text
+            style={{
+              fontFamily: "Mulish_700Bold",
+              fontSize: 14,
+              color: COLOURS.darkGreen,
+            }}
+          >
+            Today
+          </Text>
+        </Pressable>
       </View>
       <Carousel
         data={weeksData}

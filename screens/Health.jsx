@@ -79,8 +79,8 @@ const styles = StyleSheet.create({
     flex: 1,
     position: "absolute",
     backgroundColor: "#EEEEEE",
-    left: 60,
-    top: "-50%",
+    left: 67,
+    top: "10%",
     height: "200%",
   },
 });

@@ -15,13 +15,16 @@ const StreakCard = ({ diaryData }) => {
 
   const calculateCurrentStreak = (diaryDays) => {
     let currentStreak = 0;
-    let i = 0;
+    let i = 1;
     const sorted = [...diaryDays].reverse();
 
-    while (i < sorted.length && sorted[i].diaryDayState !== "processed") {
-      if (sorted[i].diaryDayState === "empty") {
+    while (
+      (i < sorted.length && sorted[i].diaryDayState === "unprocessed") ||
+      sorted[i]?.fastedState
+    ) {
+      if (sorted[i].diaryDayState === "empty" && !sorted[i]?.fastedState) {
         i++;
-      } else if (sorted[i].diaryDayState === "unprocessed") {
+      } else {
         currentStreak++;
         i++;
       }
@@ -53,7 +56,7 @@ const StreakCard = ({ diaryData }) => {
     return numbers;
   };
 
-  if (streak < 3) return null
+  if (streak < 3) return null;
 
   return (
     <View style={styles.streakCardContainer}>

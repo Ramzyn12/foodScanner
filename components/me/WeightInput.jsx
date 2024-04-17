@@ -1,47 +1,62 @@
 import { View, Text, Pressable, TextInput } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import COLOURS from "../../constants/colours";
+import BottomSheet, { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 
-const WeightInput = () => {
+const WeightInput = ({
+  bottomSheetBehaviour,
+  value,
+  setValue,
+  setWeightUnit,
+  weightUnit,
+}) => {
+  const isImperial = weightUnit === 'imperial'
+  const isMetric = weightUnit === 'metric'
+
   return (
     <View style={{ gap: 14 }}>
       <View style={{ flexDirection: "row", gap: 8 }}>
         <Pressable
+          onPress={() => setWeightUnit("imperial")}
           style={{
             height: 36,
             paddingHorizontal: 14,
             alignItems: "center",
             justifyContent: "center",
             borderRadius: 30,
-            backgroundColor: COLOURS.darkGreen,
+            backgroundColor: isImperial ? COLOURS.darkGreen : 'white',
+            borderWidth: 1,
+            borderColor: isImperial ? 'transparent' : COLOURS.lightGray,
           }}
         >
           <Text
             style={{
               fontSize: 14,
               fontFamily: "Mulish_700Bold",
-              color: "white",
+              color: isImperial ? "white" : COLOURS.nearBlack,
             }}
           >
             Imperial
           </Text>
         </Pressable>
         <Pressable
+          onPress={() => setWeightUnit("metric")}
           style={{
             height: 36,
             paddingHorizontal: 14,
             alignItems: "center",
             justifyContent: "center",
             borderRadius: 30,
+            backgroundColor: isMetric ? COLOURS.darkGreen : 'white',
             borderWidth: 1,
-            borderColor: COLOURS.lightGray,
+            borderColor: isMetric ? 'transparent' : COLOURS.lightGray,
           }}
         >
           <Text
             style={{
               fontSize: 14,
               fontFamily: "Mulish_700Bold",
-              color: COLOURS.nearBlack,
+              color: isMetric ? "white" : COLOURS.nearBlack,
             }}
           >
             Metric
@@ -49,20 +64,43 @@ const WeightInput = () => {
         </Pressable>
       </View>
 
-      <TextInput
-        placeholder="Weight (KG)"
-        placeholderTextColor={"#A4A4A4"}
-        style={{
-          padding: 20,
-          height: 58,
-          borderRadius: 12,
-          borderWidth: 1,
-          borderColor: COLOURS.lightGray,
-          fontSize: 14,
-          fontFamily: "Mulish_700Bold",
-          color: COLOURS.nearBlack,
-        }}
-      />
+      {bottomSheetBehaviour ? (
+        <BottomSheetTextInput
+          placeholder="Weight (KG)"
+          value={value.toString()}
+          inputMode="numeric"
+          onChangeText={setValue}
+          placeholderTextColor={"#A4A4A4"}
+          style={{
+            padding: 20,
+            height: 58,
+            borderRadius: 12,
+            borderWidth: 1,
+            borderColor: COLOURS.lightGray,
+            fontSize: 14,
+            fontFamily: "Mulish_700Bold",
+            color: COLOURS.nearBlack,
+          }}
+        />
+      ) : (
+        <TextInput
+          placeholder={`Weight (${isImperial ? 'KG' : 'lbs'})`}
+          placeholderTextColor={"#A4A4A4"}
+          value={value.toString()}
+          inputMode="numeric"
+          onChangeText={setValue}
+          style={{
+            padding: 20,
+            height: 58,
+            borderRadius: 12,
+            borderWidth: 1,
+            borderColor: COLOURS.lightGray,
+            fontSize: 14,
+            fontFamily: "Mulish_700Bold",
+            color: COLOURS.nearBlack,
+          }}
+        />
+      )}
     </View>
   );
 };

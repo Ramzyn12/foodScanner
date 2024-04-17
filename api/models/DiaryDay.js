@@ -15,6 +15,10 @@ const DiaryDaySchema = new mongoose.Schema(
       enum: ["processed", "unprocessed", "empty"],
       default: "empty",
     },
+    fastedState: {
+      type: Boolean,
+      default: false
+    }
   },
   {
     timestamps: true,

@@ -42,8 +42,10 @@ const Me = ({ navigation }) => {
   const scrollY = useRef(new Animated.Value(0)).current; // Use Animated.Value to track scroll position
   const insets = useSafeAreaInsets();
 
-  const handlePresentModalPress = useCallback((e) => {
-    e.stopPropagation();
+  const [currentMetric, setCurrentMetric] = useState(null);
+
+  const handlePresentModalPress = useCallback((metricType) => {
+    setCurrentMetric(metricType);
     bottomSheetModalRef.current?.present();
   }, []);
 
@@ -110,12 +112,14 @@ const Me = ({ navigation }) => {
             Me
           </Text>
           <ProBanner />
-          <HealthCard onLog={handlePresentModalPress} />
-          <HealthCard isGraph={true} />
+          <HealthCard leftLable={'None'} rightLable={'Extreme'} onLog={handlePresentModalPress} metricType='Anxiety' />
+          <HealthCard leftLable={'Terrible'} rightLable={'Great'} onLog={handlePresentModalPress} metricType='Sleep Quality' />
+          <HealthCard leftLable={'Very Low'} rightLable={'Very High'} onLog={handlePresentModalPress} metricType='Energy' />
+          <HealthCard metricType="Weight" onLog={handlePresentModalPress} />
           <InviteFriendsCard />
         </View>
       </ScrollView>
-      <LogModal onClose={handleHideModal} ref={bottomSheetModalRef} />
+      <LogModal onClose={handleHideModal} metricType={currentMetric} ref={bottomSheetModalRef} />
     </View>
   );
 };

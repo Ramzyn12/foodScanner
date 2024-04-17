@@ -7,24 +7,30 @@ const windowWidth = Dimensions.get("window").width;
 const sliderWidth = windowWidth - 2 * padding;
 import COLOURS from "../../constants/colours";
 
-
-const HealthSlider = ({value, setValue}) => {
+const HealthSlider = ({ value, setValue, metricType }) => {
   const [thumbSize, setThumbSize] = useState(24); //34
   const [valueBoxSize, setValueBoxSize] = useState(37); //54
   const [valueTextSize, setValueTextSize] = useState(14); //24
-  const [extraLeft, setExtraLeft] = useState(0)
+  const [extraLeft, setExtraLeft] = useState(0);
+
+  const labels =
+    metricType === "Energy"
+      ? ["Very Low", "Very High"]
+      : metricType === "Anxiety"
+      ? ["None", "Extreme"]
+      : ["Terrible", "Great"];
 
   const handleSlidingStart = () => {
     setThumbSize(34);
     setValueBoxSize(54);
     setValueTextSize(24);
-    setExtraLeft(0)
+    setExtraLeft(0);
   };
   const handleSlidingEnd = () => {
     setThumbSize(24);
     setValueBoxSize(37);
     setValueTextSize(14);
-    setExtraLeft(value)
+    setExtraLeft(value);
   };
 
   return (
@@ -53,7 +59,7 @@ const HealthSlider = ({value, setValue}) => {
             color: "#636566",
           }}
         >
-          None
+          {labels[0]}
         </Text>
         <Text
           style={{
@@ -62,7 +68,7 @@ const HealthSlider = ({value, setValue}) => {
             color: "#636566",
           }}
         >
-          Extreme
+           {labels[1]}
         </Text>
       </View>
       <View

@@ -6,10 +6,10 @@ import ArrowRight from "../../svgs/ArrowRight";
 import TimerCircle from "../../svgs/TimerCircle";
 import { useNavigation } from "@react-navigation/native";
 import { SvgXml } from "react-native-svg";
+import WeekOverviewLines from "../WeeklyOverview/WeekOverviewLines";
 
 const TimelineEventCard = ({ unlocked, data, destination }) => {
   const navigation = useNavigation();
-
 
   return (
     <Pressable
@@ -20,39 +20,57 @@ const TimelineEventCard = ({ unlocked, data, destination }) => {
         { borderWidth: unlocked ? 0 : 1, borderColor: COLOURS.lightGray },
       ]}
     >
-      {/* Icon */}
+      {/* Top Section when locked */}
       <View style={styles.cardTopContainer}>
-        <View
-          style={[
-            styles.iconContainer,
-            { backgroundColor: unlocked ? COLOURS.darkGreen : "white" },
-            { borderWidth: unlocked ? 0 : 1, borderColor: COLOURS.lightGray },
-          ]}
-        >
-          <SvgXml width={'100%'} height={'100%'} xml={data?.svg.replaceAll('white', unlocked ? 'white' : COLOURS.darkGreen)} />
-          {/* <Shuttle colour={unlocked ? "white" : COLOURS.darkGreen} /> */}
-        </View>
+        
+        {/* Icon (Shown if locked) */}
+        {!unlocked && (
+          <View
+            style={[
+              styles.iconContainer,
+              { backgroundColor: unlocked ? COLOURS.darkGreen : "white" },
+              { borderWidth: unlocked ? 0 : 1, borderColor: COLOURS.lightGray },
+            ]}
+          >
+            <SvgXml
+              width={"100%"}
+              height={"100%"}
+              xml={data?.svg.replaceAll(
+                "white",
+                unlocked ? "white" : COLOURS.darkGreen
+              )}
+            />
+          </View>
+        )}
+
+        {/* Show when both locked and unlocked */}
         <View style={{ flex: 1 }}>
-          <Text style={{ marginBottom: 8, fontFamily: "Mulish_600SemiBold" }}>
+          <Text style={{ marginBottom: 8, fontFamily: "Mulish_700Bold" , fontSize: 16}}>
             {data.title}
           </Text>
-          <Text style={{ marginBottom: 14, fontFamily: "Mulish_400Regular" }}>
+          <Text style={{ marginBottom: 14, fontFamily: "Mulish_400Regular", fontSize: 14 }}>
             {data.description}
           </Text>
           {unlocked && (
+            <View style={{ paddingBottom: 16 }}>
+              <WeekOverviewLines />
+            </View>
+          )}
+          {unlocked && (
             <View style={styles.tipsTextContainer}>
-              <Text style={{ fontSize: 11, fontFamily: "Mulish_700Bold" }}>
-                {data.tips.length} tips available
+              <Text style={{ fontSize: 11, fontFamily: "Mulish_800ExtraBold" }}>
+                5 days remaining
               </Text>
             </View>
           )}
         </View>
+
         <ArrowRight />
+
       </View>
+
       {!unlocked && (
-        <View
-          style={styles.cardLockedMessage}
-        >
+        <View style={styles.cardLockedMessage}>
           <TimerCircle />
           <Text style={{ fontSize: 14, fontFamily: "Mulish_600SemiBold" }}>
             Unlock In 10 Days
@@ -98,8 +116,8 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.08)",
     alignSelf: "flex-start",
     paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 12,
+    paddingVertical: 6,
+    borderRadius: 40,
   },
   cardLockedMessage: {
     backgroundColor: COLOURS.lightGreen,
@@ -109,5 +127,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 12,
     paddingVertical: 8,
-  }
+  },
 });

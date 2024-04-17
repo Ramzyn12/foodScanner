@@ -5,8 +5,9 @@ import {
   Pressable,
   TouchableOpacity,
   Animated,
+  Switch,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import AddFoodButton from "./AddFoodButton";
 import FoodListItem from "./FoodListItem";
 import COLOURS from "../../constants/colours";
@@ -14,6 +15,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   getDiaryDay,
   removeFoodFromDiaryDay,
+  toggleFastedState,
 } from "../../axiosAPI/diaryDayAPI";
 import FruitBowlIcon from "../../svgs/FruitBowlIcon";
 import { useNavigation } from "@react-navigation/native";
@@ -25,6 +27,13 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary }) => {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const chosenDate = useSelector((state) => state.diary.chosenDate);
+  const [isFasting, setIsFasting] = useState(false)
+
+  useEffect(() => {
+    if (diaryFoodItems) {
+      setIsFasting(diaryFoodItems.fastedState);
+    }
+  }, [diaryFoodItems]); 
 
   const removeFoodFromDiaryMutation = useMutation({
     mutationFn: removeFoodFromDiaryDay,
@@ -35,6 +44,21 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary }) => {
       console.log(err, "HERE");
     },
   });
+
+  const toggleFastedMutation = useMutation({
+    mutationFn: toggleFastedState,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["DiaryDay"]);
+    },
+    onError: (err) => {
+      console.log(err, "HERE");
+    },
+  })
+
+  const handleValueChange = (val) => {
+    setIsFasting(val)
+    toggleFastedMutation.mutate({fastedState: val, date: chosenDate || new Date()})
+  }
 
   const handleRemoveFromDiary = ({ barcode, singleFoodId }) => {
     removeFoodFromDiaryMutation.mutate({
@@ -147,14 +171,18 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary }) => {
         </Swipeable>
       ))}
 
-      {emptyFoodList && (
+      {emptyFoodList && !isFasting &&  (
         <View style={styles.emptyListContainer}>
           <FruitBowlIcon />
           <Text style={styles.emptyListText}>Add food to get started</Text>
         </View>
       )}
       {/* More food button */}
-      <AddFoodButton />
+      {!isFasting && <AddFoodButton />}
+      {emptyFoodList && <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 14}}>
+        <Text style={{fontSize: 14, color: COLOURS.nearBlack, fontFamily: 'Mulish_700Bold'}}>I'm fasting today</Text>
+        <Switch value={isFasting} onValueChange={handleValueChange} />
+      </View>}
     </View>
   );
 };

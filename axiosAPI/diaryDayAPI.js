@@ -56,3 +56,12 @@ export const getAllDiaryDays = async () => {
     throw error;
   }
 };
+export const toggleFastedState = async ({fastedState, date}) => {
+  try {
+    const res = await diaryDayAPI.post(`/toggle-fasting`, {fastedState, date});
+    return res.data
+  } catch (error) {
+    console.error("Error getting diary DAysss:", error);
+    throw error;
+  }
+};

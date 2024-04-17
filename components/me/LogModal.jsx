@@ -8,10 +8,24 @@ import {
 import ClearIcon from "../../svgs/ClearIcon";
 import HealthSlider from "./HealthSlider";
 import COLOURS from "../../constants/colours";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateHealthMetric } from "../../axiosAPI/healthMetricAPI";
+import WeightInput from "./WeightInput";
 
-const LogModal = forwardRef(({ onClose }, ref) => {
+const LogModal = forwardRef(({ onClose, metricType }, ref) => {
+  const isWeight = metricType === "Weight";
   const [value, setValue] = useState(0);
-
+  const [weightValue, setWeightValue] = useState('');
+  const [weightUnit, setWeightUnit] = useState("imperial");
+  const question =
+    metricType === "Weight"
+      ? `What's your weight today?`
+      : metricType === "Energy"
+      ? "How are your energy levels today?"
+      : metricType === "Anxiety"
+      ? "How is your anxiety today?"
+      : "How well did you sleep last night?";
+  const queryClient = useQueryClient();
   const renderBackdrop = useCallback((props) => {
     return (
       <BottomSheetBackdrop
@@ -22,10 +36,26 @@ const LogModal = forwardRef(({ onClose }, ref) => {
     );
   }, []);
 
+  const updateHealthMetricMutation = useMutation({
+    mutationFn: updateHealthMetric,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["RecentMetric"]);
+    },
+    onError: (err) => {
+      console.log(err);
+    },
+  });
+
   const handleSave = () => {
-    // console.log(value);
+    console.log(metricType, value, weightUnit);
+    updateHealthMetricMutation.mutate({
+      metric: metricType,
+      date: new Date(),
+      metricValue: isWeight ? weightValue : value,
+      unitOfMeasure: weightUnit === 'imperial' ? 'kg' : 'lbs'
+    });
     ref.current.close();
-    ("Maybe add toast?");
+    // ("Maybe add toast?");
   };
 
   return (
@@ -34,6 +64,7 @@ const LogModal = forwardRef(({ onClose }, ref) => {
       backdropComponent={renderBackdrop}
       enablePanDownToClose={true}
       snapPoints={[390]}
+      keyboardBlurBehavior="restore"
       // enableDynamicSizing={true}
       handleStyle={{ display: "none" }}
     >
@@ -52,7 +83,7 @@ const LogModal = forwardRef(({ onClose }, ref) => {
               color: COLOURS.nearBlack,
             }}
           >
-            Anxiety
+            {metricType}
           </Text>
           <Text
             style={{
@@ -61,12 +92,22 @@ const LogModal = forwardRef(({ onClose }, ref) => {
               color: "#636566",
             }}
           >
-            How is your anxiety today?
+            {question}
           </Text>
         </BottomSheetView>
-        <View style={{padding: 20, paddingBottom: 40, marginTop: 65}}>
-          <HealthSlider value={value} setValue={setValue} />
-        </View>
+        <BottomSheetView
+          style={{
+            padding: 20,
+            paddingBottom: 40,
+            marginTop: isWeight ? 20 : 65,
+          }}
+        >
+          {isWeight ? (
+            <WeightInput weightUnit={weightUnit} setWeightUnit={setWeightUnit} value={weightValue} setValue={setWeightValue} bottomSheetBehaviour={true} />
+          ) : (
+            <HealthSlider metricType={metricType} value={value} setValue={setValue} />
+          )}
+        </BottomSheetView>
         <View style={{ paddingHorizontal: 20, paddingVertical: 10 }}>
           <Pressable
             onPress={handleSave}

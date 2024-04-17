@@ -20,6 +20,7 @@ import ClearIcon from "../../svgs/ClearIcon";
 const FoodDetailsSimpleInfo = ({ foodItem }) => {
   const navigation = useNavigation();
 
+
   const currentFood = useSelector(state => state.food.currentFood)
   const [modalVisible, setModalVisible] = useState(false)
 
