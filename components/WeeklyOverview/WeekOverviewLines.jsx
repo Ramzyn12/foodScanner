@@ -2,8 +2,8 @@ import { View, Text } from "react-native";
 import React from "react";
 import COLOURS from '../../constants/colours'
 
-const WeekOverviewLines = () => {
-  const currentDayIndex = 3;
+const WeekOverviewLines = ({daysFinished}) => {
+  const currentDayIndex = daysFinished;
   const generateLines = () => {
     const elements = [];
     for (let i = 0; i < 7; i++) {

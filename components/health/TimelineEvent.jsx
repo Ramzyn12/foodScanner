@@ -4,7 +4,7 @@ import COLOURS from "../../constants/colours";
 import { Path, Svg } from "react-native-svg";
 import TimelineEventCard from "./TimelineEventCard";
 
-const TimelineEvent = ({ unlocked, data }) => {
+const TimelineEvent = ({ unlocked, data, daysFinished, remainingDaysToUnlock }) => {
   return (
     <View style={styles.container}>
       
@@ -22,6 +22,8 @@ const TimelineEvent = ({ unlocked, data }) => {
         destination={"WeeklyOverview"}
         data={data}
         unlocked={unlocked}
+        daysFinished={daysFinished}
+        remainingDaysToUnlock={remainingDaysToUnlock}
       />
 
     </View>

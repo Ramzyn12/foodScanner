@@ -3,7 +3,13 @@ import React from "react";
 import { Path, Svg } from "react-native-svg";
 import COLOURS from '../../constants/colours'
 
-const AccordianMetricLog = () => {
+const AccordianMetricLog = ({metric}) => {
+
+  const { metricValue, unitOfMeasure } = Object.values(metric)[0]; // Assuming metric is an object like { "Weight": { "metricValue": 3, "unitOfMeasure": "kg" } }
+  
+  const metricName = Object.keys(metric)[0];
+  const displayValue = metricValue !== null ? `${metricValue} ${unitOfMeasure || ''}`.trim() : "No Data";
+
   return (
     <View
       style={{
@@ -36,7 +42,16 @@ const AccordianMetricLog = () => {
           color: COLOURS.nearBlack,
         }}
       >
-        Weight
+        {metricName}
+      </Text>
+      <Text
+        style={{
+          fontSize: 14,
+          fontFamily: "Mulish_700Bold",
+          color: COLOURS.darkGreen,
+        }}
+      >
+        {displayValue}
       </Text>
       <Text
         style={{

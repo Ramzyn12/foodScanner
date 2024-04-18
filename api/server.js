@@ -14,6 +14,7 @@ const groceryRoutes = require('./routes/groceryRoutes');
 const searchSingleRoutes = require('./routes/searchSingleRoutes');
 const userRoutes = require('./routes/userRoutes');
 const metricRoutes = require('./routes/metricRoutes');
+const timelineRoutes = require('./routes/timelineRoutes');
 const errorHandler = require("./middleware/errorHandler");
 // const authMiddleware = require("./middleware/authMiddleware");
 
@@ -29,6 +30,7 @@ app.use('/api/v1/ivy', searchSingleRoutes);
 app.use('/api/v1/groceries', groceryRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/health-metrics', metricRoutes);
+app.use('/api/v1/timeline-weeks', timelineRoutes);
 
 // Error Handlers
 app.use("*", (req, res) => {

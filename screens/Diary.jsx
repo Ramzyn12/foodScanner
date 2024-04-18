@@ -23,6 +23,7 @@ import { useSelector } from "react-redux";
 import WeekHeader from "../components/diary/WeekHeader";
 import TimelineEventCard from "../components/health/TimelineEventCard";
 import { storage } from "../utils/MMKVStorage";
+import { getRecentTimelineWeek } from "../axiosAPI/timelineAPI";
 
 const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
 <g clip-path="url(#clip0_1126_4878)">
@@ -55,7 +56,7 @@ const tipSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="120" height="103"
 const HealthData = {
   week: 2,
   title: "Fresh Start",
-  description:
+  subtitle:
     "Embark on a journey toward health, feeling empowered and motivated.",
   svg: svgString,
   tips: [
@@ -90,6 +91,12 @@ const Diary = ({ navigation }) => {
     enabled: !!token,
   });
 
+  const {data: recentTimelineWeekData} = useQuery({
+    queryKey: ['RecentTimelineWeek'],
+    queryFn: getRecentTimelineWeek,
+    enabled: !!token,
+  })
+
   useEffect(() => {
     if (userCreated) {
       refetch();
@@ -123,7 +130,8 @@ const Diary = ({ navigation }) => {
           <TimelineEventCard
             destination={"HealthStack"}
             unlocked={true}
-            data={HealthData}
+            data={recentTimelineWeekData}
+            daysFinished={recentTimelineWeekData?.currentDay}
           />
         </Pressable>
         <FoodDiary />

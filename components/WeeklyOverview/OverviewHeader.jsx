@@ -4,7 +4,7 @@ import ArrowLeft from "../../svgs/ArrowLeft";
 import COLOURS from "../../constants/colours";
 import { useNavigation } from "@react-navigation/native";
 
-const OverviewHeader = () => {
+const OverviewHeader = ({week, title}) => {
   const navigation = useNavigation();
 
   return (
@@ -25,7 +25,7 @@ const OverviewHeader = () => {
             color: COLOURS.darkGreen,
           }}
         >
-          WEEK 1
+          WEEK {week}
         </Text>
         <Text
           style={{
@@ -35,7 +35,7 @@ const OverviewHeader = () => {
             color: COLOURS.nearBlack,
           }}
         >
-          Strong Cravings
+          {title}
         </Text>
       </View>
     </View>

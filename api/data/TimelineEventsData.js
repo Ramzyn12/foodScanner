@@ -1,10 +1,3 @@
-import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
-import React from "react";
-import TimelineEvent from "../components/health/TimelineEvent";
-import { ScrollView } from "react-native";
-import { useQuery } from "@tanstack/react-query";
-import { getAllTimelineWeeks } from "../axiosAPI/timelineAPI";
-
 const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
 <g clip-path="url(#clip0_1126_4878)">
 <path d="M6.10492 6.48126L4.02565 6.6419C3.44708 6.68662 2.93179 6.98985 2.61182 7.47383L0.213854 11.1006C-0.0288162 11.4676 -0.067394 11.927 0.110589 12.3293C0.288619 12.7317 0.654475 13.0121 1.08924 13.0795L2.99305 13.3743C3.43841 11.0109 4.50452 8.65329 6.10492 6.48126Z" fill="white"/>
@@ -23,7 +16,8 @@ const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24
 </defs>
 </svg>`;
 
-const data = [
+
+const timelineData = [
   {
     week: 1,
     title: "Strong Cravings",
@@ -59,68 +53,17 @@ const data = [
       "Welcome to your first week of eliminating processed foods. It goes without saying that this will be the most difficult week of your journey as your body and mind scream out for refined sugars and processed fats. Dont forget to make good use of our scanner to ensure that what you are eating is not processed. ",
     svg: svgString,
   },
-];
-
-// Data we get is the
-// When get data do this
-// If more than 7, week is full and take away 7
-// if its like 3 then just send it 3 days to the TimelineEvent and take away 3
-// If its 0 (which it will be after last step) then its locked
-
-const calculateWeekStatus = (daysSinceStart, weekIndex) => {
-  const daysPassed = daysSinceStart - weekIndex * 7;
-  const remainingDaysToUnlock = Math.max(
-    0,
-    (weekIndex) * 7 - daysSinceStart
-  );
-
-  if (daysPassed >= 7) {
-    return { daysFinished: 7, unlocked: true, remainingDaysToUnlock };
-  } else if (daysPassed > 0) {
-    return { daysFinished: daysPassed, unlocked: true, remainingDaysToUnlock };
-  } else {
-    return { daysFinished: 0, unlocked: false, remainingDaysToUnlock };
-  }
-};
-
-const Health = () => {
-  const { data: timelineWeeks, isLoading } = useQuery({
-    queryFn: getAllTimelineWeeks,
-    queryKey: ["AllTimelineWeeks"],
-  });
-
-
-  if (isLoading) return <ActivityIndicator />;
-
-  return (
-    <ScrollView style={{ flex: 1, backgroundColor: "white" }}>
-      <View style={styles.line}></View>
-      {timelineWeeks?.timelineWeeks?.map((week, index) => {
-        const { daysFinished, unlocked, remainingDaysToUnlock } = calculateWeekStatus(timelineWeeks.daysSinceStart, index, timelineWeeks.timelineWeeks.length);
-        return (
-          <TimelineEvent
-            key={week._id}
-            data={week}
-            daysFinished={daysFinished}
-            unlocked={unlocked}
-            remainingDaysToUnlock={remainingDaysToUnlock}
-          />
-        );
-      })}
-    </ScrollView>
-  );
-};
-
-export default Health;
-
-const styles = StyleSheet.create({
-  line: {
-    width: 4,
-    flex: 1,
-    position: "absolute",
-    backgroundColor: "#EEEEEE",
-    left: 67,
-    top: "-50%",
-    height: "200%",
+  {
+    week: 5,
+    title: "Random Title",
+    subtitle:
+      " Lorem ipsum dolor random sit amet consectetur adipisicing elit. Porro, provident!",
+    description:
+      "Welcome to your first RANDOM week of eliminating processed foods. It goes without saying that this will be the most difficult week of your journey as your body and mind scream out for refined sugars and processed fats. Dont forget to make good use of our scanner to ensure that what you are eating is not processed. ",
+    svg: svgString,
   },
-});
+]
+
+module.exports = { timelineData };
+
+

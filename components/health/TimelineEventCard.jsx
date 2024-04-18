@@ -8,12 +8,12 @@ import { useNavigation } from "@react-navigation/native";
 import { SvgXml } from "react-native-svg";
 import WeekOverviewLines from "../WeeklyOverview/WeekOverviewLines";
 
-const TimelineEventCard = ({ unlocked, data, destination }) => {
+const TimelineEventCard = ({ unlocked, data, destination, daysFinished, remainingDaysToUnlock }) => {
   const navigation = useNavigation();
 
   return (
     <Pressable
-      onPress={() => navigation.navigate(destination)}
+      onPress={() => navigation.navigate(destination, {week: data?.week})}
       style={[
         styles.cardContainer,
         { backgroundColor: unlocked ? COLOURS.lightGreen : "white" },
@@ -46,20 +46,20 @@ const TimelineEventCard = ({ unlocked, data, destination }) => {
         {/* Show when both locked and unlocked */}
         <View style={{ flex: 1 }}>
           <Text style={{ marginBottom: 8, fontFamily: "Mulish_700Bold" , fontSize: 16}}>
-            {data.title}
+            {data?.title}
           </Text>
           <Text style={{ marginBottom: 14, fontFamily: "Mulish_400Regular", fontSize: 14 }}>
-            {data.description}
+            {data?.subtitle}
           </Text>
           {unlocked && (
             <View style={{ paddingBottom: 16 }}>
-              <WeekOverviewLines />
+              <WeekOverviewLines daysFinished={daysFinished || data?.currentDay} />
             </View>
           )}
           {unlocked && (
             <View style={styles.tipsTextContainer}>
               <Text style={{ fontSize: 11, fontFamily: "Mulish_800ExtraBold" }}>
-                5 days remaining
+                {7 - daysFinished} days remaining
               </Text>
             </View>
           )}
@@ -73,7 +73,7 @@ const TimelineEventCard = ({ unlocked, data, destination }) => {
         <View style={styles.cardLockedMessage}>
           <TimerCircle />
           <Text style={{ fontSize: 14, fontFamily: "Mulish_600SemiBold" }}>
-            Unlock In 10 Days
+            Unlock In {remainingDaysToUnlock} Days
           </Text>
         </View>
       )}
