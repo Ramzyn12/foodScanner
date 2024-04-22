@@ -1,5 +1,5 @@
 import { View, Text, Pressable } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ArrowDownShort from "../../svgs/ArrowDownShort";
 import COLOURS from "../../constants/colours";
 import GreenTickCircle from "../../svgs/GreenTickCircle";
@@ -10,10 +10,13 @@ import ArrowRight from "../../svgs/ArrowRight";
 import { startOfDay } from "date-fns";
 import GreyFail from "../../svgs/GreyFail";
 import PendingClock from "../../svgs/PendingClock";
+import LogModal from "../me/LogModal";
+import { useNavigation } from "@react-navigation/native";
 
 const DayAccordian = ({ dayData, day }) => {
   const [accordianOpen, setAccordianOpen] = useState(false);
 
+  const navigation = useNavigation();
   const dateOfEntry = startOfDay(new Date(dayData?.date));
   const today = startOfDay(new Date());
 
@@ -99,14 +102,20 @@ const DayAccordian = ({ dayData, day }) => {
       {accordianOpen && (
         <View>
           {dayData.metrics.map((metric, index) => (
-            <AccordianMetricLog metric={metric} key={index} />
+            <AccordianMetricLog
+              date={dateOfEntry}
+              metric={metric}
+              key={index}
+            />
           ))}
           {/* <AccordianMetricLog />
           <AccordianMetricLog />
           <AccordianMetricLog />
           <AccordianMetricLog /> */}
           <Pressable
-            onPress={() => console.log("write notes")}
+            onPress={() =>
+              navigation.navigate("AddNotes", { date: dateOfEntry.toISOString(), day })
+            }
             style={{
               flexDirection: "row",
               justifyContent: "space-between",

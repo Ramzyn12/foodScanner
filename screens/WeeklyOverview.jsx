@@ -56,7 +56,6 @@ const WeeklyOverview = ({ route }) => {
   if (isLoading) return <ActivityIndicator />;
 
 
-
   return (
     <View style={{ paddingTop: insets.top, flex: 1, backgroundColor: "white" }}>
       <OverviewHeader week={week} title={weekData?.timelineWeek?.title} />

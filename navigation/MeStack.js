@@ -12,6 +12,8 @@ import SettingsIcon from "../svgs/SettingsIcon";
 import SettingsIconNoFill from "../svgs/SettingsIconNoFill";
 import { Pressable } from "react-native";
 import HealthStatInfo from "../screens/HealthStatInfo";
+import UpdatePassword from "../screens/UpdatePassword";
+import DeleteAccount from "../screens/DeleteAccount";
 
 const Stack = createNativeStackNavigator();
 
@@ -60,6 +62,22 @@ const MeStack = () => {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="UpdatePassword"
+        component={UpdatePassword}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="DeleteAccount"
+        component={DeleteAccount}
+        options={{
+          headerShown: false,
+        }}
+      />
+    
+
     </Stack.Navigator>
   );
 };

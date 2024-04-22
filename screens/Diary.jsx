@@ -120,7 +120,7 @@ const Diary = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <WeekHeader diaryData={data} />
+      <WeekHeader daysFinished={recentTimelineWeekData?.currentDay} diaryData={data} />
 
       {/* Main page */}
       <ScrollView showsVerticalScrollIndicator={false} style={styles.mainSectionContainer}>

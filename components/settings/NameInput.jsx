@@ -13,7 +13,7 @@ const NameInput = ({name, setName, text}) => {
     <View
       style={[
         styles.input,
-        FocusedOrNonEmptyText && {
+        isNameFocused && {
           borderColor: "black",
         },
       ]}
@@ -50,7 +50,7 @@ const NameInput = ({name, setName, text}) => {
           }}
         />
       </View>
-      {FocusedOrNonEmptyText && (
+      {isNameFocused && name && (
         <Pressable onPress={() => setName("")} style={{ alignSelf: "center" }}>
           <ClearIcon />
         </Pressable>

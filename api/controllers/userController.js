@@ -29,6 +29,7 @@ const removeUser = async (req, res) => {
   const userId = req.user._id;
   const { firebaseId } = req.params;
 
+  //Why dont we just use UserId? Maybe do that 
 
   const message = await userService.removeUser(
     firebaseId
@@ -37,7 +38,18 @@ const removeUser = async (req, res) => {
   res.json({ message, userId });
 };
 
+const getUserNames = async (req, res) => {
+  const userId = req.user._id;
+
+  const namesObject = await userService.getUserNames(
+    userId
+  );
+
+  res.json(namesObject);
+};
+
 module.exports = {
   addUserNames,
-  removeUser
+  removeUser,
+  getUserNames
 };

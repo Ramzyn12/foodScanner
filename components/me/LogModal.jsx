@@ -12,7 +12,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateHealthMetric } from "../../axiosAPI/healthMetricAPI";
 import WeightInput from "./WeightInput";
 
-const LogModal = forwardRef(({ onClose, metricType }, ref) => {
+const LogModal = forwardRef(({ onClose, metricType, date }, ref) => {
   const isWeight = metricType === "Weight";
   const [value, setValue] = useState(0);
   const [weightValue, setWeightValue] = useState('');
@@ -47,10 +47,9 @@ const LogModal = forwardRef(({ onClose, metricType }, ref) => {
   });
 
   const handleSave = () => {
-    console.log(metricType, value, weightUnit);
     updateHealthMetricMutation.mutate({
       metric: metricType,
-      date: new Date(),
+      date: date ? new Date(date) : new Date(),
       metricValue: isWeight ? weightValue : value,
       unitOfMeasure: weightUnit === 'imperial' ? 'kg' : 'lbs'
     });

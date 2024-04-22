@@ -4,14 +4,28 @@ import ArrowLeft from "../../svgs/ArrowLeft";
 import COLOURS from "../../constants/colours";
 import { useNavigation } from "@react-navigation/native";
 
-const OverviewHeader = ({week, title}) => {
+const OverviewHeader = ({ week, title, day, onSave }) => {
   const navigation = useNavigation();
 
+  const handleGoback = () => {
+    navigation.goBack()
+    if (onSave) {
+      onSave()
+    }
+  }
+
   return (
-    <View style={{ alignItems: "center", flexDirection: "row", marginTop: 10, paddingBottom: 10 }}>
+    <View
+      style={{
+        alignItems: "center",
+        flexDirection: "row",
+        marginTop: 10,
+        paddingBottom: 10,
+      }}
+    >
       <Pressable
         hitSlop={40}
-        onPress={() => navigation.goBack()}
+        onPress={handleGoback}
         style={{ position: "absolute", left: 25, zIndex: 40000, top: 10 }}
       >
         <ArrowLeft width={5.5} height={11.5} />
@@ -25,7 +39,7 @@ const OverviewHeader = ({week, title}) => {
             color: COLOURS.darkGreen,
           }}
         >
-          WEEK {week}
+          {week ? "WEEK" : "DAY"} {week ? week : day}
         </Text>
         <Text
           style={{
@@ -38,6 +52,22 @@ const OverviewHeader = ({week, title}) => {
           {title}
         </Text>
       </View>
+      {day && (
+        <Pressable onPress={onSave}>
+          <Text
+            style={{
+              paddingRight: 20,
+              marginLeft: -45,
+              fontSize: 16,
+              textAlign: "center",
+              fontFamily: "Mulish_700Bold",
+              color: COLOURS.darkGreen,
+            }}
+          >
+            Save
+          </Text>
+        </Pressable>
+      )}
     </View>
   );
 };

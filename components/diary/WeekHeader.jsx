@@ -1,5 +1,11 @@
 import { View, Text, Pressable, Alert } from "react-native";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { BlurView } from "expo-blur";
 import Carousel from "react-native-reanimated-carousel";
 import WeekDayProgress from "./WeekDayProgress";
@@ -40,7 +46,7 @@ const transformCurrentDate = (date) => {
   return `${day} ${dayNumber} ${month}`;
 };
 
-const WeekHeader = ({ diaryData }) => {
+const WeekHeader = ({ diaryData, daysFinished }) => {
   const [weeksData, setWeeksData] = useState([]);
   const carouselRef = useRef(null);
   const dispatch = useDispatch();
@@ -48,18 +54,37 @@ const WeekHeader = ({ diaryData }) => {
 
   const chosenDateString = useSelector((state) => state.diary.chosenDate);
   const chosenDiaryDay = useSelector((state) => state.diary.currentDiaryDay);
+  const chosenDate = chosenDateString ? new Date(chosenDateString) : new Date();
+
+  // THIS MAY BE WRONG? LOG IT WHEN NO DATA
   const diaryDayStateGood =
     chosenDiaryDay?.diaryDayState === "unprocessed" ||
     chosenDiaryDay?.fastedState;
 
-  
   const subHeaderMessage = useMemo(() => {
-    if (chosenDiaryDay === undefined) {
-      return "..."
+    if (!chosenDiaryDay) {
+      return "..."; // No diary day chosen yet
     }
-    return diaryDayStateGood ? "All good so far" : "Failed";
-  }, [chosenDiaryDay]);
-  const chosenDate = chosenDateString ? new Date(chosenDateString) : new Date();
+
+    // Convert chosenDate string to a moment object
+    const chosenMoment = moment(chosenDate);
+    const today = moment().startOf("day");
+
+    // Determine the state of the chosen diary day
+    const isToday = chosenMoment.isSame(today, "day");
+    const isPast = chosenMoment.isBefore(today, "day");
+
+    if (isToday) {
+      if (diaryDayStateGood) return "All good so far";
+      if (!diaryDayStateGood) return "Failed";
+    } else if (isPast) {
+      if (diaryDayStateGood) return "Success";
+      if (!diaryDayStateGood) return "Failed";
+    }
+
+    return "Failed"; // Covers all failed states or future dates
+  }, [chosenDiaryDay, chosenDate]);
+
   const date = transformCurrentDate(chosenDate);
 
   const [isReduceTransparencyEnabled, setIsReduceTransparencyEnabled] =
@@ -87,6 +112,7 @@ const WeekHeader = ({ diaryData }) => {
   const processDiaryDaysToWeeks = (diaryDays) => {
     // Use the first item in the array as the earliest date, assuming array is in ascending order
     const earliestDate = moment(diaryDays[0].date);
+    const earliestDateUseable = diaryDays[0].date;
     const latestDate = moment(); // Use the current date as the latest date
 
     const weeks = [];
@@ -125,6 +151,7 @@ const WeekHeader = ({ diaryData }) => {
       weeks.push({
         weekStart: currentWeekStart.format("YYYY-MM-DD"),
         days: week,
+        earliestDate: earliestDateUseable,
       });
 
       // Proceed to the next week
@@ -148,6 +175,12 @@ const WeekHeader = ({ diaryData }) => {
   const handleDayPressChange = (item, index) => {
     const pressedDate = moment(item.weekStart).add(index, "days");
     const currentDate = moment().startOf("day");
+    const earliestMoment = moment(item.earliestDate);
+    const pressedMoment = moment(pressedDate);
+
+    if (earliestMoment.isAfter(pressedMoment)) {
+      return;
+    }
 
     // If pressedDate is after the current date, dispatch the current date instead
     if (pressedDate.isAfter(currentDate)) {
@@ -173,6 +206,7 @@ const WeekHeader = ({ diaryData }) => {
                 score={day.score}
                 diaryDayState={day.diaryDayState}
                 fastedState={day.fastedState}
+                earliestDate={item.earliestDate}
               />
             </Pressable>
           ))}
@@ -181,6 +215,8 @@ const WeekHeader = ({ diaryData }) => {
     },
     [weeksData]
   );
+
+  console.log(weeksData);
 
   return (
     <BlurView

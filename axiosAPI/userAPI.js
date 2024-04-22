@@ -27,6 +27,16 @@ export const addUserNames = async ({ firstName, lastName }) => {
   }
 };
 
+export const getUserNames = async () => {
+  try {
+    const res = await userAPI.get("/names");
+    return res.data;
+  } catch (error) {
+    console.error("Error adding user info:", error);
+    throw error;
+  }
+};
+
 export const removeUserAccount = async ({ firebaseId }) => {
   try {
     const res = await userAPI.delete(`/removeUser/${firebaseId}`);

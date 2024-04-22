@@ -12,6 +12,7 @@ import WeeklyOverview from "../screens/WeeklyOverview";
 import ArrowLeft from "../svgs/ArrowLeft";
 import { Pressable } from "react-native";
 import COLOURS from "../constants/colours";
+import AddNotes from "../screens/AddNotes";
 
 const Stack = createNativeStackNavigator();
 
@@ -41,6 +42,13 @@ const HealthStack = () => {
       <Stack.Screen
         name="WeeklyOverview"
         component={WeeklyOverview}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="AddNotes"
+        component={AddNotes}
         options={{
           headerShown: false,
         }}

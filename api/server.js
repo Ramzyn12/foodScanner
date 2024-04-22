@@ -15,6 +15,7 @@ const searchSingleRoutes = require('./routes/searchSingleRoutes');
 const userRoutes = require('./routes/userRoutes');
 const metricRoutes = require('./routes/metricRoutes');
 const timelineRoutes = require('./routes/timelineRoutes');
+const noteRoutes = require('./routes/noteRoutes');
 const errorHandler = require("./middleware/errorHandler");
 // const authMiddleware = require("./middleware/authMiddleware");
 
@@ -31,6 +32,7 @@ app.use('/api/v1/groceries', groceryRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/health-metrics', metricRoutes);
 app.use('/api/v1/timeline-weeks', timelineRoutes);
+app.use('/api/v1/notes', noteRoutes);
 
 // Error Handlers
 app.use("*", (req, res) => {

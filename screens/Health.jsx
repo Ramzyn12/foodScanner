@@ -68,18 +68,20 @@ const data = [
 // If its 0 (which it will be after last step) then its locked
 
 const calculateWeekStatus = (daysSinceStart, weekIndex) => {
+  
   const daysPassed = daysSinceStart - weekIndex * 7;
-  const remainingDaysToUnlock = Math.max(
-    0,
-    (weekIndex) * 7 - daysSinceStart
-  );
+  const remainingDaysToUnlock = weekIndex * 7 - daysSinceStart;
 
   if (daysPassed >= 7) {
     return { daysFinished: 7, unlocked: true, remainingDaysToUnlock };
-  } else if (daysPassed > 0) {
+  } else if (daysPassed >= 0) {
     return { daysFinished: daysPassed, unlocked: true, remainingDaysToUnlock };
   } else {
-    return { daysFinished: 0, unlocked: false, remainingDaysToUnlock };
+    return {
+      daysFinished: 0,
+      unlocked: false,
+      remainingDaysToUnlock: Math.max(remainingDaysToUnlock, 0),
+    };
   }
 };
 
@@ -89,14 +91,18 @@ const Health = () => {
     queryKey: ["AllTimelineWeeks"],
   });
 
-
   if (isLoading) return <ActivityIndicator />;
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: "white" }}>
       <View style={styles.line}></View>
       {timelineWeeks?.timelineWeeks?.map((week, index) => {
-        const { daysFinished, unlocked, remainingDaysToUnlock } = calculateWeekStatus(timelineWeeks.daysSinceStart, index, timelineWeeks.timelineWeeks.length);
+        const { daysFinished, unlocked, remainingDaysToUnlock } =
+          calculateWeekStatus(
+            timelineWeeks.daysSinceStart,
+            index,
+            timelineWeeks.timelineWeeks.length
+          );
         return (
           <TimelineEvent
             key={week._id}

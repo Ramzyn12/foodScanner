@@ -1,14 +1,27 @@
-import { View, Text } from "react-native";
-import React from "react";
+import { View, Text, Pressable } from "react-native";
+import React, { useCallback, useRef } from "react";
 import { Path, Svg } from "react-native-svg";
-import COLOURS from '../../constants/colours'
+import COLOURS from "../../constants/colours";
+import LogModal from "../me/LogModal";
 
-const AccordianMetricLog = ({metric}) => {
+const AccordianMetricLog = ({ metric, date }) => {
+  const bottomSheetRef = useRef(null);
 
   const { metricValue, unitOfMeasure } = Object.values(metric)[0]; // Assuming metric is an object like { "Weight": { "metricValue": 3, "unitOfMeasure": "kg" } }
-  
+
   const metricName = Object.keys(metric)[0];
-  const displayValue = metricValue !== null ? `${metricValue} ${unitOfMeasure || ''}`.trim() : "No Data";
+  const isWeight = metricName === 'Weight'
+
+  const displayValue = metricValue !== null
+    ? isWeight
+      ? `${metricValue} ${unitOfMeasure || ""}`.trim()
+      : `${metricValue} / 10` // Assuming ratings are out of 10
+    : "";
+
+  const handleHideModal = useCallback(() => {
+    // console.log('close');
+    bottomSheetRef.current?.close();
+  }, []);
 
   return (
     <View
@@ -31,7 +44,7 @@ const AccordianMetricLog = ({metric}) => {
       >
         <Path
           d="M11.25 25.525L3.48755 17.7625L7.02505 14.225L11.25 18.4625L23.6 6.10001L27.1375 9.63751L11.25 25.525Z"
-          fill="#DEDEDE"
+          fill={metricValue === null ? COLOURS.lightGray :  COLOURS.darkGreen}
         />
       </Svg>
       <Text
@@ -46,22 +59,25 @@ const AccordianMetricLog = ({metric}) => {
       </Text>
       <Text
         style={{
-          fontSize: 14,
+          fontSize: 17,
           fontFamily: "Mulish_700Bold",
-          color: COLOURS.darkGreen,
+          color: COLOURS.nearBlack,
         }}
       >
         {displayValue}
       </Text>
-      <Text
-        style={{
-          fontSize: 14,
-          fontFamily: "Mulish_700Bold",
-          color: COLOURS.darkGreen,
-        }}
-      >
-        Log
-      </Text>
+      <Pressable onPress={() => bottomSheetRef.current.present()}>
+        <Text
+          style={{
+            fontSize: 14,
+            fontFamily: "Mulish_700Bold",
+            color: COLOURS.darkGreen,
+          }}
+        >
+          {metricValue === null ? 'Log' : 'update'}
+        </Text>
+      </Pressable>
+      <LogModal date={date} onClose={handleHideModal} metricType={metricName} ref={bottomSheetRef} />
     </View>
   );
 };

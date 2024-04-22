@@ -11,6 +11,8 @@ import WeekOverviewLines from "../WeeklyOverview/WeekOverviewLines";
 const TimelineEventCard = ({ unlocked, data, destination, daysFinished, remainingDaysToUnlock }) => {
   const navigation = useNavigation();
 
+  console.log(daysFinished);
+
   return (
     <Pressable
       onPress={() => navigation.navigate(destination, {week: data?.week})}
@@ -53,13 +55,14 @@ const TimelineEventCard = ({ unlocked, data, destination, daysFinished, remainin
           </Text>
           {unlocked && (
             <View style={{ paddingBottom: 16 }}>
-              <WeekOverviewLines daysFinished={daysFinished || data?.currentDay} />
+              <WeekOverviewLines daysFinished={daysFinished + 1 || data?.currentDay} />
             </View>
           )}
           {unlocked && (
             <View style={styles.tipsTextContainer}>
               <Text style={{ fontSize: 11, fontFamily: "Mulish_800ExtraBold" }}>
-                {7 - daysFinished} days remaining
+                {7 - daysFinished > 0 ? `${7 - daysFinished} days remaining` : 'Completed'}
+                {/* {7 - daysFinished} days remaining */}
               </Text>
             </View>
           )}

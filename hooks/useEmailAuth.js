@@ -46,7 +46,7 @@ export const useEmailAuth = (password) => {
     } catch (err) {
       Toast.show({
         text1: "An error occurred",
-        text2: "Please try again or contact support if the problem persists.",
+        text2: "Try different password",
         type: "error",
       });
       console.log(err, 'Error deleting email account');

@@ -12,7 +12,7 @@ export const useAuthentication = () => {
   // const storage = useMMKV()
 
   useEffect(() => {
-    const unsubscribe = auth().onAuthStateChanged(async (user) => {
+    const unsubscribeAuthChange = auth().onAuthStateChanged(async (user) => {
       if (user) {
         const token = await user.getIdToken();
         dispatch(setToken(token));
@@ -27,7 +27,25 @@ export const useAuthentication = () => {
       setIsLoading(false);
     });
 
-    return unsubscribe;
+    const tokenChanged = auth().onIdTokenChanged((user) => {
+      if (user) {
+        user
+          .getIdToken(true)
+          .then((token) => {
+            dispatch(setToken(token));
+            storage.set("firebaseToken", token);
+          })
+          .catch((error) => {
+            console.error("Error refreshing token, will sign out now", error);
+            auth().signOut()
+          });
+      }
+    });
+
+    return () => {
+      unsubscribeAuthChange();
+      tokenChanged();
+    };
   }, []);
 
   return { isLoggedIn, isLoading };

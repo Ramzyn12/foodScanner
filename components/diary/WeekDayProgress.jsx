@@ -13,6 +13,7 @@ const WeekDayProgress = ({
   diaryDayState,
   fastedState,
   hasProcessed,
+  earliestDate
 }) => {
   const chosenDate =
     useSelector((state) => state.diary.chosenDate) ||
@@ -21,6 +22,8 @@ const WeekDayProgress = ({
   const thisDateObj = new Date(date);
   const [showUnderline, setShowUnderline] = useState(false);
   const isFasting = fastedState;
+
+  const beforeEarliest = new Date(date) < new Date(earliestDate)
 
   useEffect(() => {
     if (chosenDateObj.getTime() === thisDateObj.getTime()) {
@@ -72,7 +75,10 @@ const WeekDayProgress = ({
         // <CircularProgress progress={score} />
         <GreyFail crossSize={13} circleSize={30} />
       )}
-      {dayType === "past" && diaryDayState === "empty" && !isFasting && (
+      {dayType === "past" && diaryDayState === "empty" && !isFasting && beforeEarliest && (
+          <View style={styles.progressCircleFuture}></View>
+      )}
+      {dayType === "past" && diaryDayState === "empty" && !isFasting && !beforeEarliest && (
         <GreyFail crossSize={13} circleSize={30} />
       )}
       {dayType === "past" && diaryDayState === "empty" && isFasting && (

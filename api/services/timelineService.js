@@ -43,7 +43,7 @@ async function getAllTimelineWeeks({userId}) {
   const lastDiaryDate = new Date(recentDiaryDay.date);
   const differenceInDays = differenceInCalendarDays(today, lastDiaryDate);
 
-  const timelineWeeks = await TimelineWeek.find().select('title subtitle svg week')
+  const timelineWeeks = await TimelineWeek.find().select('title subtitle svg week').sort({week: 1})
 
   return {timelineWeeks, daysSinceStart: differenceInDays};
 }

@@ -9,7 +9,7 @@ const {
   ConflictError,
 } = require("../utils/error");
 const verifyAppleToken = require("../utils/verifyAppleToken");
-const { startSession } = require('mongoose');
+const { startSession } = require("mongoose");
 
 function handleFirebaseError(err) {
   console.error(err); // Log the original error for debugging purposes
@@ -68,7 +68,7 @@ async function createUser(email, password, userInfo) {
     date: today,
   });
 
-  const customToken = await admin.auth().createCustomToken(newFirebaseUser.uid)
+  const customToken = await admin.auth().createCustomToken(newFirebaseUser.uid);
 
   return {
     token: customToken,
@@ -110,12 +110,22 @@ async function updateFirstLastName(firstName, lastName, userId) {
   return user;
 }
 
+async function getUserNames(userId) {
+  const user = await User.findById(userId).lean();
+
+  if (!user) throw new NotFoundError("User Id is most likely invalid");
+  const firstName = user?.firstName || '';
+  const lastName = user?.lastName || '';
+
+  return { firstName, lastName };
+}
+
 async function removeUser(firebaseId, userId) {
   const session = await startSession();
-  
+
   try {
     session.startTransaction();
-    // Maybe just need userId not firebaseId? 
+    // Maybe just need userId not firebaseId?
     const user = await User.findOneAndDelete({ firebaseId }, { session });
 
     if (!user) throw new NotFoundError("Firebase Id invalid");
@@ -133,4 +143,10 @@ async function removeUser(firebaseId, userId) {
   }
 }
 
-module.exports = { createUser, createAppleUser, updateFirstLastName, removeUser };
+module.exports = {
+  createUser,
+  createAppleUser,
+  updateFirstLastName,
+  removeUser,
+  getUserNames,
+};

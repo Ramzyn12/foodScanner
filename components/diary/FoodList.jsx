@@ -27,13 +27,17 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary }) => {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const chosenDate = useSelector((state) => state.diary.chosenDate);
-  const [isFasting, setIsFasting] = useState(false)
+  const [isFasting, setIsFasting] = useState(false);
+
+  const numberOfItems =
+    diaryFoodItems?.consumedFoods?.length +
+    diaryFoodItems?.consumedSingleFoods?.length;
 
   useEffect(() => {
     if (diaryFoodItems) {
       setIsFasting(diaryFoodItems.fastedState);
     }
-  }, [diaryFoodItems]); 
+  }, [diaryFoodItems]);
 
   const removeFoodFromDiaryMutation = useMutation({
     mutationFn: removeFoodFromDiaryDay,
@@ -53,12 +57,15 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary }) => {
     onError: (err) => {
       console.log(err, "HERE");
     },
-  })
+  });
 
   const handleValueChange = (val) => {
-    setIsFasting(val)
-    toggleFastedMutation.mutate({fastedState: val, date: chosenDate || new Date()})
-  }
+    setIsFasting(val);
+    toggleFastedMutation.mutate({
+      fastedState: val,
+      date: chosenDate || new Date(),
+    });
+  };
 
   const handleRemoveFromDiary = ({ barcode, singleFoodId }) => {
     removeFoodFromDiaryMutation.mutate({
@@ -117,6 +124,21 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary }) => {
         { borderTopLeftRadius: 20, borderTopRightRadius: 20 },
       ]}
     >
+      {numberOfItems > 0 && (
+        <Text
+          style={{
+            paddingHorizontal: 10,
+            paddingBottom: 20,
+            paddingTop: 5,
+            fontFamily: "Mulish_700Bold",
+            fontSize: 14,
+            color: COLOURS.nearBlack,
+          }}
+        >
+          {numberOfItems} items
+        </Text>
+      )}
+
       {/* Food List Item */}
       {diaryFoodItems?.consumedFoods?.map((item) => (
         <Swipeable
@@ -171,7 +193,7 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary }) => {
         </Swipeable>
       ))}
 
-      {emptyFoodList && !isFasting &&  (
+      {emptyFoodList && !isFasting && (
         <View style={styles.emptyListContainer}>
           <FruitBowlIcon />
           <Text style={styles.emptyListText}>Add food to get started</Text>
@@ -179,10 +201,27 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary }) => {
       )}
       {/* More food button */}
       {!isFasting && <AddFoodButton />}
-      {emptyFoodList && <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 14}}>
-        <Text style={{fontSize: 14, color: COLOURS.nearBlack, fontFamily: 'Mulish_700Bold'}}>I'm fasting today</Text>
-        <Switch value={isFasting} onValueChange={handleValueChange} />
-      </View>}
+      {emptyFoodList && (
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            paddingBottom: 14,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 14,
+              color: COLOURS.nearBlack,
+              fontFamily: "Mulish_700Bold",
+            }}
+          >
+            I'm fasting today
+          </Text>
+          <Switch value={isFasting} onValueChange={handleValueChange} />
+        </View>
+      )}
     </View>
   );
 };
@@ -196,7 +235,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 20,
     borderBottomLeftRadius: 20,
     paddingTop: 14,
-    paddingHorizontal: 15,
+    paddingHorizontal: 14,
   },
   emptyListContainer: {
     height: 200,
