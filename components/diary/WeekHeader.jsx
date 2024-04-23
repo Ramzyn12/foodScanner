@@ -25,7 +25,7 @@ import GreyFail from "../../svgs/GreyFail";
 const windowWidth = Dimensions.get("window").width;
 
 const transformCurrentDate = (date) => {
-  const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const daysOfWeek = [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const Months = [
     "Jan",
     "Feb",
@@ -40,7 +40,7 @@ const transformCurrentDate = (date) => {
     "Nov",
     "Dec",
   ];
-  const day = daysOfWeek[date.getDay() - 1];
+  const day = daysOfWeek[date.getDay()];
   const dayNumber = date.getDate();
   const month = Months[date.getMonth()];
   return `${day} ${dayNumber} ${month}`;
@@ -75,8 +75,8 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
     const isPast = chosenMoment.isBefore(today, "day");
 
     if (isToday) {
-      if (diaryDayStateGood) return "All good so far";
-      if (!diaryDayStateGood) return "Failed";
+      if (diaryDayStateGood || chosenDiaryDay?.diaryDayState === 'empty') return "All good so far";
+      if (!diaryDayStateGood && chosenDiaryDay?.diaryDayState !== 'empty') return "Failed";
     } else if (isPast) {
       if (diaryDayStateGood) return "Success";
       if (!diaryDayStateGood) return "Failed";
@@ -215,8 +215,6 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
     },
     [weeksData]
   );
-
-  console.log(weeksData);
 
   return (
     <BlurView

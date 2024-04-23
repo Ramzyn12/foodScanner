@@ -103,7 +103,8 @@ async function getDiaryDay({ userId, date }) {
       consumedFoods: [],
       consumedSingleFoods: [],
       score: 0,
-      hasProcessed: false,
+      diaryDayState: 'empty',
+      fastedState: 'false'
     };
   }
 

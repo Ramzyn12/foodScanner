@@ -30,8 +30,6 @@ const FoodDetailsButtons = () => {
     buttonsLoaded
   } = useFoodDetailsActions();
 
-  console.log(buttonsLoaded);
-
   if (!buttonsLoaded) return <ActivityIndicator />
 
   return (

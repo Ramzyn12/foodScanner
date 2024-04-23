@@ -95,9 +95,7 @@ const WeekDayProgress = ({
         <View style={styles.progressCircleFuture}></View>
       )}
       {dayType === "current" && diaryDayState === "processed" && (
-        <View
-          style={[styles.progressCirclePast, { backgroundColor: "red" }]}
-        ></View>
+         <GreyFail crossSize={13} circleSize={30} />
       )}
       {dayType === "current" &&
         (diaryDayState === "empty" || diaryDayState === "unprocessed") && (

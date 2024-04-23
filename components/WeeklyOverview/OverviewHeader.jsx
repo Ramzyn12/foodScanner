@@ -53,7 +53,7 @@ const OverviewHeader = ({ week, title, day, onSave }) => {
         </Text>
       </View>
       {day && (
-        <Pressable onPress={onSave}>
+        <Pressable hitSlop={40} onPress={onSave}>
           <Text
             style={{
               paddingRight: 20,

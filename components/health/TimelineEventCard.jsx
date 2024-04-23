@@ -11,8 +11,6 @@ import WeekOverviewLines from "../WeeklyOverview/WeekOverviewLines";
 const TimelineEventCard = ({ unlocked, data, destination, daysFinished, remainingDaysToUnlock }) => {
   const navigation = useNavigation();
 
-  console.log(daysFinished);
-
   return (
     <Pressable
       onPress={() => navigation.navigate(destination, {week: data?.week})}

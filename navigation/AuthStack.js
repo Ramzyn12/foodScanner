@@ -19,6 +19,7 @@ import ProgressBar from "../components/onboarding/ProgressBar";
 import { View } from "react-native";
 
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import ForgotPassword from "../components/onboarding/ForgotPassword";
 // import { createSharedElementStackNavigator } from "react-navigation-shared-element";
 
 const Stack = createNativeStackNavigator();
@@ -95,6 +96,11 @@ const AuthStack = () => {
         name="AuthScreen"
         component={AuthScreen}
         options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ForgotPassword"
+        component={ForgotPassword}
+        options={{ headerShown: false, presentation: 'modal' }}
       />
       {/* <Stack.Screen
         name="CreateAccount"

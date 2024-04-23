@@ -9,7 +9,6 @@ const SettingOption = ({ optionText, optionSvg, showArrow, onPress }) => {
 
   const toggleSwitch = (val) => {
     setIsEnabled(val);
-    console.log(val);
   };
 
   return (

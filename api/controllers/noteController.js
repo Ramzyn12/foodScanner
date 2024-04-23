@@ -12,13 +12,9 @@ const updateNote = async (req, res) => {
     { upsert: true, new: true }
   );
 
-  console.log(updatedNote);
-
   if (!updatedNote) {
     throw new Error("No note");
   }
-
-  console.log(updatedNote);
 
   res.status(200).json(updatedNote);
 };
@@ -32,8 +28,6 @@ const getNote = async (req, res) => {
   if (!note) {
     throw new NotFoundError("No note created yet");
   }
-
-  console.log(note);
 
   res.status(200).json(note);
 };

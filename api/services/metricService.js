@@ -72,7 +72,6 @@ async function getAllDataForMetric({ metric, userId, timeFrame }) {
     }
   }
 
-  console.log(results);
 
   return results;
 }

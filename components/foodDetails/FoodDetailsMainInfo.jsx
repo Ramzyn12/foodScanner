@@ -16,6 +16,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
 import FakeBlurComponent from "./FakeBlurComponent";
 import { Image } from "react-native";
+import FoodDetailReasonCard from "./FoodDetailReasonCard";
 // import { BlurView } from "@react-native-community/blur";
 
 const FoodDetailsMainInfo = () => {
@@ -45,48 +46,18 @@ const FoodDetailsMainInfo = () => {
   };
 
   return (
-    <View
-      style={{
-        marginTop: 20,
-        padding: 20,
-        borderWidth: 1,
-        borderColor: COLOURS.lightGray,
-        borderRadius: 20,
-        gap: 14,
-      }}
-    >
+    <View style={styles.container}>
       {!hasProSub && (
         <LinearGradient
           colors={["#5135C1", "#EE0A93"]}
           start={start}
           end={end}
-          style={{
-            paddingHorizontal: 14,
-            borderRadius: 6,
-            paddingVertical: 8,
-            alignSelf: "flex-start",
-          }}
+          style={styles.proFeatureTextContainer}
         >
-          <Text
-            style={{
-              color: "white",
-              fontSize: 14,
-              fontFamily: "Mulish_700Bold",
-            }}
-          >
-            Pro feature
-          </Text>
+          <Text style={styles.proFeatureText}>Pro feature</Text>
         </LinearGradient>
       )}
-      <Text
-        style={{
-          fontSize: 19,
-          color: COLOURS.nearBlack,
-          fontFamily: "Mulish_700Bold",
-        }}
-      >
-        {title}
-      </Text>
+      <Text style={styles.titleText}>{title}</Text>
       {hasProSub && (
         <View style={{ gap: 14 }}>
           <Text
@@ -98,141 +69,84 @@ const FoodDetailsMainInfo = () => {
           >
             {message}
           </Text>
-          <View
-            style={{
-              flexDirection: "row",
-              gap: 8,
-              justifyContent: "space-between",
-            }}
-          >
-            <View style={{ gap: 8 }}>
-              <View
-                style={{
-                  width: 44,
-                  alignSelf: "center",
-                  height: 44,
-                  backgroundColor:
-                    currentFood.additives.length > 0 ? "#FAD8D5" : "#CAE2C3",
-                  borderRadius: 44,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Flask />
-              </View>
-              <Text
-                style={{
-                  fontFamily: "Mulish_400Regular",
-                  fontSize: 14,
-                  color: COLOURS.nearBlack,
-                }}
-              >
-                {currentFood.additives.length > 0
-                  ? currentFood.additives.length
-                  : "No"}{" "}
-                additives
-              </Text>
-            </View>
-            <View style={{ gap: 8 }}>
-              <View
-                style={{
-                  width: 44,
-                  alignSelf: "center",
-                  height: 44,
-                  backgroundColor: currentFood.hasVegetableOil
-                    ? "#FAD8D5"
-                    : "#CAE2C3",
-                  borderRadius: 44,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <RainDrops />
-              </View>
-              <Text
-                style={{
-                  fontFamily: "Mulish_400Regular",
-                  fontSize: 14,
-                  color: COLOURS.nearBlack,
-                }}
-              >
-                {currentFood.hasVegetableOil
-                  ? "Vegetable oil"
-                  : "No vegetable oil"}
-              </Text>
-            </View>
-            <View style={{ gap: 8 }}>
-              <View
-                style={{
-                  width: 44,
-                  alignSelf: "center",
-                  height: 44,
-                  backgroundColor: currentFood.hasPalmOil
-                    ? "#FAD8D5"
-                    : "#CAE2C3",
-                  borderRadius: 44,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <PalmTree />
-              </View>
-              <Text
-                style={{
-                  fontFamily: "Mulish_400Regular",
-                  fontSize: 14,
-                  color: COLOURS.nearBlack,
-                }}
-              >
-                {currentFood.hasPalmOil ? "Palm oil" : "No palm oil"}
-              </Text>
-            </View>
+          <View style={styles.foodDetailReasonContainer}>
+            <FoodDetailReasonCard type={"Additive"} currentFood={currentFood} />
+            <FoodDetailReasonCard
+              type={"Vegetable"}
+              currentFood={currentFood}
+            />
+            <FoodDetailReasonCard type={"Palm"} currentFood={currentFood} />
           </View>
           {currentFood?.additives.map((el) => (
             <FoodDetailsLesson key={el} additive={el} />
           ))}
         </View>
       )}
-      {/* {!hasProSub && (
-        <FakeBlurComponent processedState={currentFood.processedState} />
-      )} */}
       {!hasProSub && (
-        <Image style={{resizeMode: 'contain', width: '100%', height: 280}} source={require("../../assets/BlurImage.png")} />
+        <Image
+          style={{ resizeMode: "contain", width: "100%", height: 280 }}
+          source={require("../../assets/BlurImage.png")}
+        />
       )}
-
       {!hasProSub && (
         <Pressable onPress={() => setHasProSub(true)}>
           <LinearGradient
             colors={["#5135C1", "#EE0A93"]}
             start={start}
             end={end}
-            style={{
-              paddingHorizontal: 14,
-              borderRadius: 12,
-              paddingVertical: 8,
-              height: 44,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
+            style={styles.tryProButtonContainer}
           >
-            <Text
-              style={{
-                color: "white",
-                fontSize: 14,
-                fontFamily: "Mulish_700Bold",
-              }}
-            >
-              Try Pro
-            </Text>
+            <Text style={styles.tryProText}>Try Pro</Text>
           </LinearGradient>
         </Pressable>
       )}
-
-      {/* <Text>{currentFood?.additives.length} Additives</Text>
-      <Text>{currentFood?.hasVegetableOil ? 'Has' : 'No'} Veg oil</Text>
-      <Text>{currentFood?.hasPalmOil} palm oil</Text> */}
     </View>
   );
 };
 
 export default FoodDetailsMainInfo;
+
+const styles = StyleSheet.create({
+  container: {
+    marginTop: 20,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: COLOURS.lightGray,
+    borderRadius: 20,
+    gap: 14,
+  },
+  proFeatureTextContainer: {
+    paddingHorizontal: 14,
+    borderRadius: 6,
+    paddingVertical: 8,
+    alignSelf: "flex-start",
+  },
+  proFeatureText: {
+    color: "white",
+    fontSize: 14,
+    fontFamily: "Mulish_700Bold",
+  },
+  titleText: {
+    fontSize: 19,
+    color: COLOURS.nearBlack,
+    fontFamily: "Mulish_700Bold",
+  },
+  foodDetailReasonContainer: {
+    flexDirection: "row",
+    gap: 8,
+    justifyContent: "space-between",
+  },
+  tryProButtonContainer: {
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    paddingVertical: 8,
+    height: 44,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  tryProText: {
+    color: "white",
+    fontSize: 14,
+    fontFamily: "Mulish_700Bold",
+  },
+});

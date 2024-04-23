@@ -14,14 +14,16 @@ import FormSubmissionButton from "./FormSubmissionButton";
 import { signInWithEmailAndPassword } from "firebase/auth";
 // import { auth } from "../../firebaseConfig";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import auth from '@react-native-firebase/auth'
+import auth from "@react-native-firebase/auth";
 import { storage } from "../../utils/MMKVStorage";
+import { useNavigation } from "@react-navigation/native";
 
 const SignInForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [signInLoading, setSignInLoading] = useState(false)
+  const [signInLoading, setSignInLoading] = useState(false);
+  const navigation = useNavigation()
 
   const handleFirebaseError = (code) => {
     let message;
@@ -48,20 +50,28 @@ const SignInForm = () => {
   };
 
   const handleSignIn = () => {
-    setSignInLoading(true)
-    auth().signInWithEmailAndPassword(email, password)
+    setSignInLoading(true);
+    auth()
+      .signInWithEmailAndPassword(email, password)
       .then(async (userCredential) => {
         const token = await userCredential.user.getIdToken();
         // await AsyncStorage.setItem("firebaseToken", token);
-        storage.set('firebaseToken', token) 
-        setSignInLoading(false)
+        storage.set("firebaseToken", token);
+        setSignInLoading(false);
       })
       .catch((error) => {
         const errorCode = error.code;
         handleFirebaseError(errorCode);
-        setSignInLoading(false)
+        setSignInLoading(false);
       });
   };
+
+  const handleForgotPassword = () => {
+    navigation.navigate('ForgotPassword')
+    // console.log('First go to another screen with email');
+    // console.log('Get the email through an input similar to change password');
+    // console.log('If successful send the email and show toast saying sent');
+  }
 
   return (
     <View style={styles.container}>
@@ -76,6 +86,9 @@ const SignInForm = () => {
           text={"Sign In"}
           onPress={handleSignIn}
         />
+        <Pressable onPress={handleForgotPassword}>
+          <Text style={{textAlign: 'center', marginTop: 14, fontSize: 14, fontFamily: 'Mulish_700Bold', color: COLOURS.nearBlack}}>Forgot Password</Text>
+        </Pressable>
       </View>
     </View>
   );

@@ -15,7 +15,7 @@ const DaysLeftCard = ({ week, daysPassed }) => {
     }
   };
 
-  const day = getdaysPassedForWeek(week, daysPassed);
+  const day = getdaysPassedForWeek(week, daysPassed) 
 
   return (
     <View
@@ -35,7 +35,7 @@ const DaysLeftCard = ({ week, daysPassed }) => {
             color: "#636566",
           }}
         >
-          DAY {day}
+          DAY {daysPassed + 1}
         </Text>
         <Text
           style={{
@@ -47,7 +47,7 @@ const DaysLeftCard = ({ week, daysPassed }) => {
           {7 - day} days remaining
         </Text>
       </View>
-      <WeekOverviewLines daysFinished={day} />
+      <WeekOverviewLines daysFinished={day + 1} />
     </View>
   );
 };

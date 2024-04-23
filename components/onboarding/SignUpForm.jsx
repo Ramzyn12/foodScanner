@@ -70,6 +70,7 @@ const SignUpForm = () => {
           text={"Create an account"}
           onPress={handleCreateAccount}
         />
+        
       </View>
     </View>
   );
