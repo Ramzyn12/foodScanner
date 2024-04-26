@@ -63,7 +63,7 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary }) => {
     setIsFasting(val);
     toggleFastedMutation.mutate({
       fastedState: val,
-      date: chosenDate || new Date(),
+      date: chosenDate || new Date().toISOString().split('T')[0],
     });
   };
 
@@ -71,7 +71,7 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary }) => {
     removeFoodFromDiaryMutation.mutate({
       barcode: barcode,
       singleFoodId: singleFoodId,
-      date: chosenDate || new Date(),
+      date: chosenDate || new Date().toISOString().split('T')[0],
     });
   };
 

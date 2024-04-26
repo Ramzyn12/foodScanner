@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch } from "react-redux";
 import { setToken } from "../redux/authSlice";
 import { storage } from "../utils/MMKVStorage";
+import { Log } from "victory-native";
 
 export const useAuthentication = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -27,7 +28,14 @@ export const useAuthentication = () => {
       setIsLoading(false);
     });
 
-    const tokenChanged = auth().onIdTokenChanged((user) => {
+    const tokenChanged = auth().onIdTokenChanged(async (user) => {
+      // const result = await user.getIdTokenResult();
+      // const expiresIn = result.expirationTime;
+      // const timeNow = new Date();
+      // const timeLeft = new Date(expiresIn) - timeNow;
+      // console.log(
+      //   `Time left until token expires: ${timeLeft / 1000 / 60} minutes`
+      // );
       if (user) {
         user
           .getIdToken(true)
@@ -37,7 +45,7 @@ export const useAuthentication = () => {
           })
           .catch((error) => {
             console.error("Error refreshing token, will sign out now", error);
-            auth().signOut()
+            auth().signOut();
           });
       }
     });

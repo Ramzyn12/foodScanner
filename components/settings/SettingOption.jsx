@@ -1,14 +1,38 @@
 import { View, Text, Switch, Pressable } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import COLOURS from "../../constants/colours";
 import { Path, Svg } from "react-native-svg";
 import ArrowRight from "../../svgs/ArrowRight";
 import { validate } from "../../api/models/User";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { getUserHaptics, toggleUserHaptics } from "../../axiosAPI/userAPI";
 const SettingOption = ({ optionText, optionSvg, showArrow, onPress }) => {
   const [isEnabled, setIsEnabled] = useState(false);
 
+  const toggleHaptics = useMutation({
+    mutationFn: toggleUserHaptics,
+    onSuccess: () => {
+      console.log(isEnabled);
+    },
+    onError: (err) => {
+      console.log(err);
+    },
+  });
+
+  const { data: hapticsEnabledData } = useQuery({
+    queryFn: getUserHaptics,
+    queryKey: ["HapticsEnabled"],
+  });
+
+  useEffect(() => {
+    if (hapticsEnabledData) {
+      setIsEnabled(hapticsEnabledData);
+    }
+  }, [hapticsEnabledData]);
+
   const toggleSwitch = (val) => {
     setIsEnabled(val);
+    toggleHaptics.mutate();
   };
 
   return (

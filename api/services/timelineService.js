@@ -7,6 +7,7 @@ const {
   addWeeks,
   addDays,
 } = require("date-fns");
+const { getCurrentDateLocal } = require("../utils/dateHelper");
 
 async function getRecentTimelineWeek({ userId }) {
   const recentDiaryDay = await DiaryDay.findOne({ userId: userId }).sort({
@@ -18,7 +19,7 @@ async function getRecentTimelineWeek({ userId }) {
       .status(404)
       .json({ message: "No diary days found for this user." });
   }
-  const today = new Date();
+  const today = new Date(getCurrentDateLocal());
   const lastDiaryDate = new Date(recentDiaryDay.date);
   const differenceInDays = differenceInCalendarDays(today, lastDiaryDate);
 
@@ -43,7 +44,7 @@ async function getAllTimelineWeeks({ userId }) {
       .json({ message: "No diary days found for this user." });
   }
 
-  const today = new Date();
+  const today = new Date(getCurrentDateLocal())
   const lastDiaryDate = new Date(recentDiaryDay.date);
   const differenceInDays = differenceInCalendarDays(today, lastDiaryDate);
 
@@ -66,8 +67,9 @@ async function getTimelineWeek({ userId, week }) {
   }
 
   const lastDiaryDate = new Date(recentDiaryDay.date);
-  const differenceInDays = differenceInCalendarDays(new Date(), lastDiaryDate);
-  const firstDayOfWeek = startOfDay(addWeeks(lastDiaryDate, week - 1)); //
+  const today = new Date(getCurrentDateLocal())
+  const differenceInDays = differenceInCalendarDays(today, lastDiaryDate);
+  const firstDayOfWeek = addWeeks(lastDiaryDate, week - 1); //
   const arrayOfDates = Array.from({ length: 7 }, (_, i) =>
     addDays(firstDayOfWeek, i)
   );
@@ -110,7 +112,6 @@ async function getTimelineWeek({ userId, week }) {
     const foundDiaryDay = diaryDays.find(
       (d) => d.date.toISOString() === date.toISOString()
     );
-
     // Ensure all metrics are present, even if they have null values
     let metrics = metricTypes.map((metricType) => {
       const metricData = foundMetrics.metrics.find(
@@ -123,6 +124,7 @@ async function getTimelineWeek({ userId, week }) {
         },
       };
     });
+
 
     return {
       date: date,

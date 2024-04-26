@@ -21,11 +21,24 @@ import TickIcon from "../../svgs/TickIcon";
 import { Svg, Path } from "react-native-svg";
 import GreenTickCircle from "../../svgs/GreenTickCircle";
 import GreyFail from "../../svgs/GreyFail";
+import {
+  addDays,
+  format,
+  isAfter,
+  isBefore,
+  isSameDay,
+  isSameWeek,
+  startOfDay,
+  startOfWeek,
+  toDate,
+} from "date-fns";
+import { formatInTimeZone, fromZonedTime, toZonedTime } from "date-fns-tz";
+import { getAnyDateLocal, getCurrentDateLocal } from "../../utils/dateHelpers";
 
 const windowWidth = Dimensions.get("window").width;
 
 const transformCurrentDate = (date) => {
-  const daysOfWeek = [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const Months = [
     "Jan",
     "Feb",
@@ -51,10 +64,14 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
   const carouselRef = useRef(null);
   const dispatch = useDispatch();
   const insets = useSafeAreaInsets();
-
+  const nowDateString = getCurrentDateLocal();
   const chosenDateString = useSelector((state) => state.diary.chosenDate);
   const chosenDiaryDay = useSelector((state) => state.diary.currentDiaryDay);
-  const chosenDate = chosenDateString ? new Date(chosenDateString) : new Date();
+
+  // Has to be date for date-fns to work below
+  const chosenDate = chosenDateString
+    ? new Date(chosenDateString)
+    : new Date(nowDateString);
 
   // THIS MAY BE WRONG? LOG IT WHEN NO DATA
   const diaryDayStateGood =
@@ -66,17 +83,15 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
       return "..."; // No diary day chosen yet
     }
 
-    // Convert chosenDate string to a moment object
-    const chosenMoment = moment(chosenDate);
-    const today = moment().startOf("day");
-
-    // Determine the state of the chosen diary day
-    const isToday = chosenMoment.isSame(today, "day");
-    const isPast = chosenMoment.isBefore(today, "day");
+    const today = new Date(getCurrentDateLocal());
+    const isToday = isSameDay(chosenDate, today);
+    const isPast = isBefore(chosenDate, today);
 
     if (isToday) {
-      if (diaryDayStateGood || chosenDiaryDay?.diaryDayState === 'empty') return "All good so far";
-      if (!diaryDayStateGood && chosenDiaryDay?.diaryDayState !== 'empty') return "Failed";
+      if (diaryDayStateGood || chosenDiaryDay?.diaryDayState === "empty")
+        return "All good so far";
+      if (!diaryDayStateGood && chosenDiaryDay?.diaryDayState !== "empty")
+        return "Failed";
     } else if (isPast) {
       if (diaryDayStateGood) return "Success";
       if (!diaryDayStateGood) return "Failed";
@@ -104,68 +119,76 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
   }, [diaryData]);
 
   const handleGoToRecentDayPress = () => {
-    dispatch(setChosenDate(moment().startOf("day").toISOString()));
+    dispatch(setChosenDate(nowDateString));
     carouselRef.current.scrollTo({ index: weeksData.length - 1 });
   };
 
   //Maybe place this outside component so not rerendered
   const processDiaryDaysToWeeks = (diaryDays) => {
     // Use the first item in the array as the earliest date, assuming array is in ascending order
-    const earliestDate = moment(diaryDays[0].date);
-    const earliestDateUseable = diaryDays[0].date;
-    const latestDate = moment(); // Use the current date as the latest date
+    // const earliestDateUseable = diaryDays[0].date;
+    const earliestDate = new Date(diaryDays[0].date);
+    const latestDate = new Date(nowDateString); // Current date as the latest date
 
     const weeks = [];
-    let currentWeekStart = earliestDate.clone().startOf("isoWeek");
-
-    while (currentWeekStart.isSameOrBefore(latestDate, "week")) {
+    let currentWeekStart = startOfWeek(earliestDate, { weekStartsOn: 1 }); // ISO week starts on Monday
+    let currentWeekStartLocal = getAnyDateLocal(currentWeekStart);
+    while (
+      isSameWeek(currentWeekStartLocal, latestDate, { weekStartsOn: 1 }) ||
+      isBefore(currentWeekStartLocal, latestDate)
+    ) {
       let week = Array(7)
         .fill(null)
-        .map((_, index) => ({
-          date: currentWeekStart
-            .clone()
-            .add(index, "days")
-            .format("YYYY-MM-DD"),
-          diaryDayState: "empty", // Default score
-          _id: null, // Default ID
-          fastedState: false,
-        }));
+        .map((_, index) => {
+          return {
+            date: format(addDays(currentWeekStartLocal, index), "yyyy-MM-dd"),
+            diaryDayState: "empty", // Default state
+            _id: null, // Default ID
+            fastedState: false,
+          };
+        });
 
       // Map actual diary data onto the week structure
       diaryDays.forEach((day) => {
-        const dateMoment = moment(day.date);
+        const dayDate = new Date(day.date);
+        // THIS SHOULD WORK SINCE DAY DATE WILL BE like 00:000Z
+        const formattedDate = day.date.split("T")[0];
+        // const formattedDate = formatInTimeZone(dayDate, 'Europe/London', 'yyyy-MM-dd HH:mm:ssXXX').split(' ')[0] // 2014-10-25 06:46:20-04:00
+
         if (
-          dateMoment.isSameOrAfter(currentWeekStart) &&
-          dateMoment.isBefore(currentWeekStart.clone().add(1, "week"))
+          isSameWeek(dayDate, currentWeekStartLocal, { weekStartsOn: 1 }) ||
+          isBefore(dayDate, addDays(currentWeekStartLocal, 7))
         ) {
-          const dayOfWeek = dateMoment.isoWeekday() - 1; // Adjust for 0-indexed array
+          const dayOfWeek = (dayDate.getDay() + 6) % 7;
           week[dayOfWeek] = {
             diaryDayState: day.diaryDayState,
             _id: day._id,
-            date: day.date,
+            date: formattedDate,
             fastedState: day.fastedState,
           };
         }
       });
 
       weeks.push({
-        weekStart: currentWeekStart.format("YYYY-MM-DD"),
+        weekStart: format(currentWeekStartLocal, "yyyy-MM-dd"),
         days: week,
-        earliestDate: earliestDateUseable,
+        earliestDate: diaryDays[0].date.split("T")[0],
       });
 
       // Proceed to the next week
-      currentWeekStart.add(1, "week");
+      currentWeekStartLocal = addDays(currentWeekStartLocal, 7);
     }
 
     return weeks;
   };
 
   const determineDayType = (weekStart, dayIndex) => {
-    const day = moment(weekStart).add(dayIndex, "days");
-    if (day.isSame(moment(), "day")) {
+    const day = addDays(new Date(weekStart), dayIndex);
+    const today = new Date(nowDateString); // Consider using startOfDay if the time matters
+
+    if (isSameDay(day, today)) {
       return "current";
-    } else if (day.isBefore(moment(), "day")) {
+    } else if (isBefore(day, today)) {
       return "past";
     } else {
       return "future";
@@ -173,26 +196,26 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
   };
 
   const handleDayPressChange = (item, index) => {
-    const pressedDate = moment(item.weekStart).add(index, "days");
-    const currentDate = moment().startOf("day");
-    const earliestMoment = moment(item.earliestDate);
-    const pressedMoment = moment(pressedDate);
+    const pressedDate = addDays(new Date(item.weekStart), index);
+    const currentDate = new Date(nowDateString); // Get the start of today, trimming time part
+    const earliestDate = new Date(item.earliestDate);
 
-    if (earliestMoment.isAfter(pressedMoment)) {
-      return;
+    if (isAfter(earliestDate, pressedDate)) {
+      return; // If the earliest date is after the pressed date, do nothing
     }
 
     // If pressedDate is after the current date, dispatch the current date instead
-    if (pressedDate.isAfter(currentDate)) {
-      dispatch(setChosenDate(currentDate.toISOString()));
+    if (isAfter(pressedDate, currentDate)) {
+      dispatch(setChosenDate(currentDate.toISOString().split("T")[0]));
     } else {
-      dispatch(setChosenDate(pressedDate.toISOString()));
+      dispatch(setChosenDate(pressedDate.toISOString().split("T")[0]));
     }
   };
 
   const renderWeek = useCallback(
     ({ item, index }) => {
       // item is a week object from your weeksData array (cant change name)
+
       return (
         <View style={styles.weekHeaderContainer}>
           {item.days.map((day, index) => (
@@ -202,7 +225,13 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
             >
               <WeekDayProgress
                 dayType={determineDayType(item.weekStart, index)}
-                date={moment(item.weekStart).add(index, "days")}
+                // date={moment(item.weekStart).add(index, "days")}
+                date={
+                  addDays(new Date(item.weekStart), index)
+                    .toISOString()
+                    .split("T")[0]
+                } // or day.date?
+                // date={day.date} // or day.date?
                 score={day.score}
                 diaryDayState={day.diaryDayState}
                 fastedState={day.fastedState}

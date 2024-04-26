@@ -10,6 +10,7 @@ import {
   removeFoodFromGroceryList,
 } from "../axiosAPI/groceryAPI";
 import Toast from "react-native-toast-message";
+import { getCurrentDateLocal } from "../utils/dateHelpers";
 
 export const useFoodDetailsActions = () => {
   const currentFood = useSelector((state) => state.food.currentFood);
@@ -17,7 +18,7 @@ export const useFoodDetailsActions = () => {
   const [buttonsLoaded, setButtonsLoaded] = useState(false);
   const [addedToDiary, setAddedToDiary] = useState(currentFood?.isConsumedToday);
   const [addedToGroceries, SetAddedToGroceries] = useState(currentFood?.isInGroceryList);
-  const chosenDate = useSelector((state) => state.diary.chosenDate);
+  const chosenDate = useSelector((state) => state.diary.chosenDate) || getCurrentDateLocal()
 
   // This is the schema the backend expects to add to database
   const foodItemSchema = {
@@ -93,7 +94,7 @@ export const useFoodDetailsActions = () => {
 
     addFoodToDiaryMutation.mutate({
       ...foodItemSchema,
-      date: chosenDate || new Date(),
+      date: chosenDate,
     });
     setAddedToDiary(true);
   };
@@ -106,7 +107,7 @@ export const useFoodDetailsActions = () => {
     removeFoodFromDiaryMutation.mutate({
       barcode: currentFood?.barcode,
       singleFoodId: currentFood?.singleFoodId,
-      date: chosenDate || new Date(),
+      date: chosenDate,
     });
     setAddedToDiary(false);
   };

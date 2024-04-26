@@ -26,21 +26,9 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true
     },
-    // password: {
-    //   type: String,
-    //   required: true,
-    // },
-    avatar: {
-      type: String,
-      default: null,
-    },
-    avatarPublicId: {
-      type: String,
-      default: null,
-    },
-    bio: {
-      type: String,
-      default: "I like skiing",
+    hapticsEnabled: {
+      type: Boolean,
+      default: true
     },
     userInformation: {
       age: {

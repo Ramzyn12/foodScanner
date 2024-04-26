@@ -46,9 +46,9 @@ const RecentSearchList = () => {
         style={styles.container}
       >
         <Text style={styles.recentText}>Recent</Text>
-        <Pressable onPress={handleClearRecent}>
-          <Text>Clear recents</Text>
-        </Pressable>
+        {/* <Pressable onPress={handleClearRecent}>
+          <Text style={{fontFamily: 'Mulish_500Medium'}}>Clear</Text>
+        </Pressable> */}
       </View>
       <BottomSheetScrollView
         showsVerticalScrollIndicator={false}

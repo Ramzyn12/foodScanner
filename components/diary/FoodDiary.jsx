@@ -21,6 +21,7 @@ const FoodDiary = () => {
   const token = storage.getString("firebaseToken");
   const userCreated = useSelector((state) => state.auth.userCreated);
   const chosenDate = useSelector((state) => state.diary.chosenDate);
+
   const dispatch = useDispatch();
   useEffect(() => {
     if (userCreated) {
@@ -35,8 +36,9 @@ const FoodDiary = () => {
     refetch,
     error,
   } = useQuery({
-    queryFn: () => getDiaryDay({ date: chosenDate || new Date() }),
+    queryFn: () => getDiaryDay({ date: chosenDate || new Date().toISOString().split('T')[0] }),
     // NEED TO ADD SECOND PARAM when fetching for different days
+    // Maybe use chosenDate start of day for the queryKey
     queryKey: ["DiaryDay", chosenDate],
     enabled: !!token,
     retry: false,

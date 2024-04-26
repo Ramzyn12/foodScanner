@@ -46,3 +46,22 @@ export const removeUserAccount = async ({ firebaseId }) => {
     throw error;
   }
 };
+
+export const toggleUserHaptics = async () => {
+  try {
+    const res = await userAPI.post(`haptics/toggle`);
+    return res.data;
+  } catch (error) {
+    console.error("Error adding user info:", error);
+    throw error;
+  }
+};
+export const getUserHaptics = async () => {
+  try {
+    const res = await userAPI.get(`haptics`);
+    return res.data;
+  } catch (error) {
+    console.error("Error adding user info:", error);
+    throw error;
+  }
+};

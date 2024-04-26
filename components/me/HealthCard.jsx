@@ -16,6 +16,7 @@ import {
   parseISO,
   subDays,
 } from "date-fns";
+import { getCurrentDateLocal } from "../../utils/dateHelpers";
 
 const DATA = Array.from({ length: 31 }, (_, i) => ({
   day: i,
@@ -51,8 +52,7 @@ const getLastLoggedText = (isoDateString) => {
   if (!isoDateString) return "N/A";
 
   const date = parseISO(isoDateString);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = new Date(getCurrentDateLocal());
 
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
@@ -78,9 +78,6 @@ const HealthCard = ({ onLog, metricType, leftLable, rightLable }) => {
     calculateBarProgress(data?.metricValue * 10);
   const lastLoggedText = getLastLoggedText(data?.date);
   const isLastLoggedToday = lastLoggedText === "Today";
-
-  useEffect(() => {
-  }, [data]);
 
   return (
     <Pressable

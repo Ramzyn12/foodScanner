@@ -29,11 +29,9 @@ const removeUser = async (req, res) => {
   const userId = req.user._id;
   const { firebaseId } = req.params;
 
-  //Why dont we just use UserId? Maybe do that 
+  //Why dont we just use UserId? Maybe do that
 
-  const message = await userService.removeUser(
-    firebaseId
-  );
+  const message = await userService.removeUser(firebaseId);
 
   res.json({ message, userId });
 };
@@ -41,15 +39,34 @@ const removeUser = async (req, res) => {
 const getUserNames = async (req, res) => {
   const userId = req.user._id;
 
-  const namesObject = await userService.getUserNames(
-    userId
-  );
+  const namesObject = await userService.getUserNames(userId);
 
   res.json(namesObject);
+};
+
+const toggleUserHaptics = async (req, res) => {
+  const userId = req.user._id;
+
+  const user = await User.findById(userId);
+
+  user.hapticsEnabled = !user.hapticsEnabled;
+  await user.save();
+
+  res.json(user)
+};
+
+const getUserHaptics = async (req, res) => {
+  const userId = req.user._id;
+
+  const user = await User.findById(userId).lean()
+
+  res.json(user.hapticsEnabled)
 };
 
 module.exports = {
   addUserNames,
   removeUser,
-  getUserNames
+  getUserNames,
+  toggleUserHaptics,
+  getUserHaptics
 };

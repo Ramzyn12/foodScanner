@@ -35,7 +35,7 @@ const FoodDetails = ({ navigation, route }) => {
   const barcode = route?.params?.barcodeId;
   const singleFoodId = route?.params?.singleFoodId;
   const currentFood = useSelector((state) => state.food.currentFood);
-  const chosenDate = useSelector(state => state.diary.chosenDate)
+  const chosenDate = useSelector(state => state.diary.chosenDate) || new Date().toISOString().split('T')[0]
 
   const {
     data: foodDetails,
@@ -47,7 +47,7 @@ const FoodDetails = ({ navigation, route }) => {
     queryKey: ["FoodDetails", barcode],
     retry: false,
     enabled: !!barcode,
-    queryFn: () => fetchFoodWithBarcode(barcode, chosenDate || new Date()),
+    queryFn: () => fetchFoodWithBarcode(barcode, chosenDate),
   });
 
   // Need to add loading states here ASWELL!!
@@ -55,7 +55,7 @@ const FoodDetails = ({ navigation, route }) => {
     queryKey: ["FoodDetailsIvy", singleFoodId],
     retry: false,
     enabled: !!singleFoodId,
-    queryFn: () => fetchFoodWithIvyId(singleFoodId, chosenDate || new Date()),
+    queryFn: () => fetchFoodWithIvyId(singleFoodId, chosenDate),
   });
 
 
@@ -89,7 +89,7 @@ const FoodDetails = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-      <FoodDetailsSimpleInfo foodItem={foodDetails} />
+      <FoodDetailsSimpleInfo foodItem={currentFood} />
       <ScrollView showsVerticalScrollIndicator={false}>
         {currentFood?.processedScore && <FoodDetailsScoreStrip />}
         {/* {currentFood?.additives?.length > 0 && <FoodDetailsLessonCarousel />} */}

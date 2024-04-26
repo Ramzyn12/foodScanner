@@ -4,12 +4,12 @@ import ArrowLeft from "../../svgs/ArrowLeft";
 import COLOURS from "../../constants/colours";
 import { useNavigation } from "@react-navigation/native";
 
-const OverviewHeader = ({ week, title, day, onSave }) => {
+const OverviewHeader = ({ week, title, day, onSave, notes }) => {
   const navigation = useNavigation();
 
   const handleGoback = () => {
     navigation.goBack()
-    if (onSave) {
+    if (onSave && notes) {
       onSave()
     }
   }

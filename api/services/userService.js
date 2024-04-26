@@ -1,3 +1,4 @@
+const { fromZonedTime } = require("date-fns-tz");
 const admin = require("../firebase-server");
 const DiaryDay = require("../models/DiaryDay");
 const User = require("../models/User");
@@ -10,6 +11,8 @@ const {
 } = require("../utils/error");
 const verifyAppleToken = require("../utils/verifyAppleToken");
 const { startSession } = require("mongoose");
+const { startOfDay } = require("date-fns");
+const { getCurrentDateLocal } = require("../utils/dateHelper");
 
 function handleFirebaseError(err) {
   console.error(err); // Log the original error for debugging purposes
@@ -45,8 +48,19 @@ function handleFirebaseError(err) {
 }
 
 async function createUser(email, password, userInfo) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  // const today = new Date();
+  // today.setHours(0, 0, 0, 0);
+
+  // const timeZoneTwo = "Europe/London";
+  // const dateInUTC = fromZonedTime(date, timeZoneTwo);
+
+  // MAY NEED TO CHANGE THIS BASED ON TIMEZONE, since node doesnt use timezone of user but 
+  // Rather timezone of node env, COULD GET TIMEZONE OFFset from frontend!
+  const localDate = getCurrentDateLocal()
+
+
+  // const startOfDayUTC = fromZonedTime(startOfDay(date), timeZoneTwo);
+  // const endOfDayUTC = fromZonedTime(endOfDay(date), timeZoneTwo);
 
   const newFirebaseUser = await admin
     .auth()
@@ -65,7 +79,7 @@ async function createUser(email, password, userInfo) {
 
   await DiaryDay.create({
     userId: user._id,
-    date: today,
+    date: localDate,
   });
 
   const customToken = await admin.auth().createCustomToken(newFirebaseUser.uid);
@@ -78,8 +92,8 @@ async function createUser(email, password, userInfo) {
 }
 
 async function createAppleUser(email, uid, idToken, userInformation) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  // const today = new Date();
+  // today.setHours(0, 0, 0, 0);
 
   try {
     // Is this still correct?

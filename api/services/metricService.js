@@ -1,5 +1,6 @@
 const HealthMetric = require("../models/HealthMetric");
-const { startOfDay, endOfDay, addDays, format } = require('date-fns')
+const { startOfDay, endOfDay, addDays, format } = require('date-fns');
+const { getCurrentDateLocal } = require("../utils/dateHelper");
 
 function getNormalizedDate(date = new Date()) {
   const normalizedDate = new Date(date);
@@ -8,7 +9,8 @@ function getNormalizedDate(date = new Date()) {
 }
 
 async function updateHealthMetric({ date, metric, userId, metricValue, unitOfMeasure }) {
-  const normalizedDate = getNormalizedDate(date);
+  // const normalizedDate = getNormalizedDate(date);
+  const localDate = new Date(date + "T00:00:00.000Z");
   const updateOptions = { upsert: true, new: true, runValidators: true };
   const updateData = { metricValue };
 
@@ -19,10 +21,11 @@ async function updateHealthMetric({ date, metric, userId, metricValue, unitOfMea
 
   // Use await to handle the asynchronous operation directly if you need the result immediately
   const updatedMetric = await HealthMetric.findOneAndUpdate(
-    { date: normalizedDate, metric, userId },
+    { date: localDate, metric, userId },
     updateData,
     updateOptions
   );
+
 
   return updatedMetric;
 }
@@ -36,18 +39,20 @@ async function getRecentMetric({ metric, userId }) {
 
   return recentMetric;
 }
+
 async function getAllDataForMetric({ metric, userId, timeFrame }) {
   const days = timeFrame === 'Month' ? 28 : timeFrame === 'Year' ? 364 : 7
-  const today = new Date();
-  const endDate = endOfDay(today); // Set end of today
-  const startDate = startOfDay(addDays(today, -days + 1)); // 7 days ago, including today
+  const today = new Date(getCurrentDateLocal());
+  const endDate = today; // Set end of today
+  const startDate = addDays(today, -days + 1); // 7 days ago, including today
 
+  
   const metricData = await HealthMetric.find({
     userId,
     metric,
     date: { $gte: startDate, $lte: endDate },
   }).sort({ date: 1 });
-
+  
   // Map existing data by local date strings
   const dataByDate = new Map(
     metricData.map((entry) => [format(entry.date, "yyyy-MM-dd"), entry])

@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
 import Svg, { G, Path, ClipPath, Rect, Defs } from "react-native-svg";
 import COLOURS from "../../constants/colours";
+import { addDays, isSameDay } from "date-fns";
 
 const StreakCard = ({ diaryData }) => {
   const [streak, setStreak] = useState(0);
@@ -18,9 +19,11 @@ const StreakCard = ({ diaryData }) => {
     let i = 1;
     const sorted = [...diaryDays].reverse();
 
+
+    // While its unprocessed or fasting and also consecutive days within length 
     while (
-      (i < sorted.length && sorted[i].diaryDayState === "unprocessed") ||
-      sorted[i]?.fastedState
+      ((i < sorted.length && sorted[i].diaryDayState === "unprocessed") ||
+      sorted[i]?.fastedState) && isSameDay(new Date(sorted[i].date), addDays(new Date(sorted[i-1].date), -1))
     ) {
       if (sorted[i].diaryDayState === "empty" && !sorted[i]?.fastedState) {
         i++;

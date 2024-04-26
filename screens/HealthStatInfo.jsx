@@ -56,6 +56,7 @@ import {
 } from "../axiosAPI/healthMetricAPI";
 import ContextMenu from "react-native-context-menu-view";
 import ChangeDateDropdown from "../components/me/ChangeDateDropdown";
+import { getCurrentDateLocal } from "../utils/dateHelpers";
 
 const screenWidth = Dimensions.get("screen").width;
 
@@ -227,7 +228,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
     Keyboard.dismiss(); // Dismiss the keyboard upon submission
     updateHealthMetricMutation.mutate({
       metric: route.params.metricType,
-      date: new Date(),
+      date: getCurrentDateLocal(),
       metricValue: isWeight ? weightValue : value,
       unitOfMeasure: weightUnit === "imperial" ? "kg" : "lbs",
     });

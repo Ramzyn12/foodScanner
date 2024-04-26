@@ -11,6 +11,7 @@ import COLOURS from "../../constants/colours";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateHealthMetric } from "../../axiosAPI/healthMetricAPI";
 import WeightInput from "./WeightInput";
+import { getAnyDateLocal, getCurrentDateLocal } from "../../utils/dateHelpers";
 
 const LogModal = forwardRef(({ onClose, metricType, date }, ref) => {
   const isWeight = metricType === "Weight";
@@ -36,6 +37,7 @@ const LogModal = forwardRef(({ onClose, metricType, date }, ref) => {
     );
   }, []);
 
+
   const updateHealthMetricMutation = useMutation({
     mutationFn: updateHealthMetric,
     onSuccess: () => {
@@ -49,7 +51,7 @@ const LogModal = forwardRef(({ onClose, metricType, date }, ref) => {
   const handleSave = () => {
     updateHealthMetricMutation.mutate({
       metric: metricType,
-      date: date ? new Date(date) : new Date(),
+      date: date ? getAnyDateLocal(date) : getCurrentDateLocal(),
       metricValue: isWeight ? weightValue : value,
       unitOfMeasure: weightUnit === 'imperial' ? 'kg' : 'lbs'
     });

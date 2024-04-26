@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const FoodItemSchema = new mongoose.Schema(
   {
     barcode: { type: String, required: true, unique: true },
-    name: { type: String, required: true },
+    name: { type: String },
     brand: { type: String }, //Maybe add required
     ingredients: [String],
     additives: [String],

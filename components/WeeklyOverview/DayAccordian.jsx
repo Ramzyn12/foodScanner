@@ -12,25 +12,29 @@ import GreyFail from "../../svgs/GreyFail";
 import PendingClock from "../../svgs/PendingClock";
 import LogModal from "../me/LogModal";
 import { useNavigation } from "@react-navigation/native";
+import { getCurrentDateLocal } from "../../utils/dateHelpers";
 
 const DayAccordian = ({ dayData, day }) => {
   const [accordianOpen, setAccordianOpen] = useState(false);
 
-  const navigation = useNavigation();
-  const dateOfEntry = startOfDay(new Date(dayData?.date));
-  const today = startOfDay(new Date());
 
+  const navigation = useNavigation();
+  const dateOfEntry = new Date(dayData?.date);
+  const today = new Date(getCurrentDateLocal())
+
+  
   const isPresent = today.toISOString() === dateOfEntry.toISOString();
   const isFuture = dateOfEntry > today;
 
+  
   const svgWithoutTime = isSuccess ? <GreenTickCircle /> : <GreyFail />;
 
   const svg = isPresent ? <PendingClock /> : isFuture ? "" : svgWithoutTime;
-
+  
   const isSuccess =
-    dayData.diaryDetails.fastedState === true ||
-    dayData.diaryDetails.diaryState === "unprocessed";
-
+  dayData.diaryDetails.fastedState === true ||
+  dayData.diaryDetails.diaryDayState === "unprocessed";
+  
   const messageWithoutTime = isSuccess
     ? "Success - no processed food"
     : "Failed - you consumed processed food";
@@ -55,7 +59,8 @@ const DayAccordian = ({ dayData, day }) => {
         borderWidth: 1,
         borderColor: COLOURS.lightGray,
         borderRadius: 20,
-        paddingVertical: 20,
+        paddingTop: 20,
+        paddingBottom: accordianOpen ? 0 : 20,
         gap: 14,
       }}
     >
@@ -117,11 +122,12 @@ const DayAccordian = ({ dayData, day }) => {
               navigation.navigate("AddNotes", { date: dateOfEntry.toISOString(), day })
             }
             style={{
+              // backgroundColor: 'red',
               flexDirection: "row",
               justifyContent: "space-between",
               alignItems: "center",
               paddingHorizontal: 20,
-              paddingTop: 20,
+              paddingVertical: 20,
             }}
           >
             <Text

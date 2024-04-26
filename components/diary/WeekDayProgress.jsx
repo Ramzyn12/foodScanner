@@ -5,6 +5,8 @@ import COLOURS from "../../constants/colours";
 import CircularProgress from "./CircularProgress";
 import { useSelector } from "react-redux";
 import GreyFail from "../../svgs/GreyFail";
+import { format } from "date-fns";
+import { getCurrentDateLocal } from "../../utils/dateHelpers";
 
 const WeekDayProgress = ({
   dayType,
@@ -13,19 +15,22 @@ const WeekDayProgress = ({
   diaryDayState,
   fastedState,
   hasProcessed,
-  earliestDate
+  earliestDate,
 }) => {
+  // This needs to be the local time, not setHours...
+  const nowDateString = getCurrentDateLocal() // "YYYY-MM-DD"
   const chosenDate =
-    useSelector((state) => state.diary.chosenDate) ||
-    new Date().setHours(0, 0, 0, 0);
-  const chosenDateObj = chosenDate ? new Date(chosenDate) : new Date();
+    useSelector((state) => state.diary.chosenDate) || nowDateString;
+  const chosenDateObj = chosenDate ? new Date(chosenDate) : new Date(nowDateString);
   const thisDateObj = new Date(date);
   const [showUnderline, setShowUnderline] = useState(false);
   const isFasting = fastedState;
 
-  const beforeEarliest = new Date(date) < new Date(earliestDate)
+  // Change to date-fns is Before
+  const beforeEarliest = new Date(date) < new Date(earliestDate);
 
   useEffect(() => {
+    // Milliseconds of each, equal since start of day local time both cases
     if (chosenDateObj.getTime() === thisDateObj.getTime()) {
       setShowUnderline(true);
     } else {
@@ -50,7 +55,8 @@ const WeekDayProgress = ({
             dayType === "current" && { color: COLOURS.darkGreen },
           ]}
         >
-          {date.format("ddd").toUpperCase()}
+          {format(new Date(date), "eee").toUpperCase()}{" "}
+          {/* Format day of the week */}
         </Text>
         <Text
           style={[
@@ -58,7 +64,7 @@ const WeekDayProgress = ({
             dayType === "current" && { color: COLOURS.darkGreen },
           ]}
         >
-          {date.date()}
+          {new Date(date).getDate()} {/* Get day of the month */}
         </Text>
       </View>
       {dayType === "past" && diaryDayState === "unprocessed" && (
@@ -75,12 +81,14 @@ const WeekDayProgress = ({
         // <CircularProgress progress={score} />
         <GreyFail crossSize={13} circleSize={30} />
       )}
-      {dayType === "past" && diaryDayState === "empty" && !isFasting && beforeEarliest && (
-          <View style={styles.progressCircleFuture}></View>
-      )}
-      {dayType === "past" && diaryDayState === "empty" && !isFasting && !beforeEarliest && (
-        <GreyFail crossSize={13} circleSize={30} />
-      )}
+      {dayType === "past" &&
+        diaryDayState === "empty" &&
+        !isFasting &&
+        beforeEarliest && <View style={styles.progressCircleFuture}></View>}
+      {dayType === "past" &&
+        diaryDayState === "empty" &&
+        !isFasting &&
+        !beforeEarliest && <GreyFail crossSize={13} circleSize={30} />}
       {dayType === "past" && diaryDayState === "empty" && isFasting && (
         <View style={styles.progressCirclePast}>
           <Svg width="15" height="11" viewBox="0 0 15 11" fill="none">
@@ -95,7 +103,7 @@ const WeekDayProgress = ({
         <View style={styles.progressCircleFuture}></View>
       )}
       {dayType === "current" && diaryDayState === "processed" && (
-         <GreyFail crossSize={13} circleSize={30} />
+        <GreyFail crossSize={13} circleSize={30} />
       )}
       {dayType === "current" &&
         (diaryDayState === "empty" || diaryDayState === "unprocessed") && (

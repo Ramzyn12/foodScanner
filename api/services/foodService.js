@@ -3,6 +3,8 @@ const DiaryDay = require("../models/DiaryDay");
 const Grocery = require("../models/Grocery");
 const SingleFood = require("../models/SingleFood");
 const { NotFoundError } = require("../utils/error");
+const { startOfDay, endOfDay, parseISO } = require("date-fns");
+const { zonedTimeToUtc } = require("date-fns-tz");
 
 const openFoodFactsAPI = axios.create({
   baseURL: "https://world.openfoodfacts.org",
@@ -25,12 +27,17 @@ async function checkIsInGroceryList(userId, identifier, isBarcode = true) {
 async function checkIsConsumedToday(userId, identifier, isBarcode = true, date) {
 
   const decodedDate = decodeURIComponent(date)
-  const decodedDateObj = new Date(decodedDate)
-  decodedDateObj.setHours(0,0,0,0)
+  const localDate = new Date(decodedDate + 'T00:00:00.000Z')
+
+
+  // const timeZoneTwo = "Europe/London";
+  // const dateInUTC = zonedTimeToUtc(decodedDate, timeZoneTwo);
+  // const startOfDayUTC = zonedTimeToUtc(startOfDay(decodedDate), timeZoneTwo);
+  // const endOfDayUTC = zonedTimeToUtc(endOfDay(decodedDate), timeZoneTwo);
 
   const diaryDay = await DiaryDay.findOne({
     userId: userId,
-    date: decodedDateObj,
+    date: localDate,
   }).populate(isBarcode ? "consumedFoods" : "consumedSingleFoods");
   if (!diaryDay) return false;
 
