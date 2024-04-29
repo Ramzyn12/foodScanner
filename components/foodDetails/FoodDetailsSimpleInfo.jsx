@@ -17,7 +17,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import ClearIcon from "../../svgs/ClearIcon";
 
-const FoodDetailsSimpleInfo = ({ foodItem }) => {
+const FoodDetailsSimpleInfo = ({ foodItem, expectedId }) => {
   const navigation = useNavigation();
 
 
@@ -44,7 +44,7 @@ const FoodDetailsSimpleInfo = ({ foodItem }) => {
           <ClearIcon size={28} />
         </Pressable>
       </View>
-      <FoodDetailsButtons foodItem={foodItem} />
+      <FoodDetailsButtons expectedId={expectedId} />
       <FoodImageModal
         setModalVisible={setModalVisible}
         modalVisible={modalVisible}

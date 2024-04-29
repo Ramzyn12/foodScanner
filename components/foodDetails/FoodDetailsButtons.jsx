@@ -19,7 +19,7 @@ import { useFoodDetailsActions } from "../../hooks/useFoodDetailsActions";
 import PlusIcon from "../../svgs/PlusIcon";
 import XIcon from "../../svgs/XIcon";
 
-const FoodDetailsButtons = () => {
+const FoodDetailsButtons = ({ expectedId }) => {
   const {
     addedToDiary,
     addedToGroceries,
@@ -27,13 +27,14 @@ const FoodDetailsButtons = () => {
     handleRemoveFromDiary,
     handleAddToGroceryList,
     handleRemoveFromGroceryList,
-    buttonsLoaded
-  } = useFoodDetailsActions();
+    buttonsLoaded,
+  } = useFoodDetailsActions(expectedId);
 
-  if (!buttonsLoaded) return <ActivityIndicator />
+  if (!buttonsLoaded) return;
+  <ActivityIndicator />;
 
   return (
-    <View style={{ flexDirection: "row", gap: 8, marginTop: 15}}>
+    <View style={{ flexDirection: "row", gap: 8, marginTop: 15 }}>
       {/* Could reduce down to single button to be neater if needed */}
       {!addedToDiary && (
         <Pressable onPress={handleAddToDiary} style={styles.addButton}>
@@ -105,7 +106,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     justifyContent: "center",
     flex: 1,
-    
+
     borderRadius: 20,
     gap: 8,
     height: 36,

@@ -1,5 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   addFoodToDiaryDay,
   removeFoodFromDiaryDay,
@@ -11,14 +17,28 @@ import {
 } from "../axiosAPI/groceryAPI";
 import Toast from "react-native-toast-message";
 import { getCurrentDateLocal } from "../utils/dateHelpers";
+import { setCurrentFood } from "../redux/foodSlice";
+import debounce from "lodash.debounce";
+import throttle from "lodash.throttle";
+import { useFocusEffect } from "@react-navigation/native";
+import { isPending } from "@reduxjs/toolkit";
 
-export const useFoodDetailsActions = () => {
+// I've decided to just use a small debounce to prevent abuse
+// Any larger debounce causes flickering.
+// If experience server overload use either useFocusEffect or throttle methods instead
+
+export const useFoodDetailsActions = (expectedId) => {
   const currentFood = useSelector((state) => state.food.currentFood);
   const queryClient = useQueryClient();
   const [buttonsLoaded, setButtonsLoaded] = useState(false);
-  const [addedToDiary, setAddedToDiary] = useState(currentFood?.isConsumedToday);
-  const [addedToGroceries, SetAddedToGroceries] = useState(currentFood?.isInGroceryList);
-  const chosenDate = useSelector((state) => state.diary.chosenDate) || getCurrentDateLocal()
+  const [addedToDiary, setAddedToDiary] = useState(false);
+  const mutationCounterDiary = useRef(0);
+  const mutationCounterGrocery = useRef(0);
+
+  const [addedToGroceries, SetAddedToGroceries] = useState(false);
+  const chosenDate =
+    useSelector((state) => state.diary.chosenDate) || getCurrentDateLocal();
+  const dispatch = useDispatch();
 
   // This is the schema the backend expects to add to database
   const foodItemSchema = {
@@ -42,100 +62,210 @@ export const useFoodDetailsActions = () => {
     }
   }, [currentFood]);
 
+  useEffect(() => {
+    return () => {
+      dispatch(setCurrentFood({}));
+    };
+  }, []);
+
   const addFoodToDiaryMutation = useMutation({
     mutationFn: addFoodToDiaryDay,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["DiaryDay"]);
-    },
-    onError: (err) => {
-      console.log(err, "HERE");
-    },
-  });
+    onMutate: async (variables) => {
+      mutationCounterDiary.current += 1;
+      const queryKey = variables.singleFoodId
+        ? ["FoodDetailsIvy", variables.singleFoodId]
+        : ["FoodDetails", variables.barcode];
 
-  const addToGroceryListMutation = useMutation({
-    mutationFn: addFoodToGroceryList,
-    onSuccess: () => {
-      Toast.show({
-        type: "foodDetailToast",
-        text1: "Item added to grocery list",
-        text2: "View",
-      });
-      queryClient.invalidateQueries(["Groceries"]);
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries(queryKey);
+
+      // Snapshot the previous value
+      const previousFoodDetails = queryClient.getQueryData(queryKey);
+
+      // Optimistically update to the new value
+      queryClient.setQueryData(queryKey, (old) => ({
+        ...old,
+        isConsumedToday: true,
+      }));
+
+      return { previousFoodDetails };
     },
-    onError: (err) => {
-      console.log(err, "HERE");
+    onSettled: (data, error, variables) => {
+      mutationCounterDiary.current -= 1;
+      if (mutationCounterDiary.current !== 0) return;
+      queryClient.invalidateQueries(["DiaryDay", { date: variables.date }]);
+      if (variables.barcode) {
+        queryClient.invalidateQueries(["FoodDetails", variables.barcode]);
+      } else if (variables.singleFoodId) {
+        queryClient.invalidateQueries([
+          "FoodDetailsIvy",
+          variables.singleFoodId,
+        ]);
+      }
+    },
+    // onSuccess: (data, variables) => {},
+    onError: (err, variables, context) => {
+      console.log(err);
+      mutationCounterDiary.current = 0;
+      const queryKey = variables.singleFoodId
+        ? ["FoodDetailsIvy", variables.singleFoodId]
+        : ["FoodDetails", variables.barcode];
+      queryClient.setQueryData(queryKey, context.previousFoodDetails);
     },
   });
 
   const removeFoodFromDiaryMutation = useMutation({
     mutationFn: removeFoodFromDiaryDay,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["DiaryDay"]);
+    onMutate: async (variables) => {
+      mutationCounterDiary.current += 1;
+      const queryKey = variables.singleFoodId
+        ? ["FoodDetailsIvy", variables.singleFoodId]
+        : ["FoodDetails", variables.barcode];
+
+      await queryClient.cancelQueries(queryKey);
+      const previousFoodDetails = queryClient.getQueryData(queryKey);
+
+      queryClient.setQueryData(queryKey, (old) => ({
+        ...old,
+        isConsumedToday: false,
+      }));
+
+      return { previousFoodDetails };
+    },
+    onSettled: (data, error, variables) => {
+      mutationCounterDiary.current -= 1;
+      if (mutationCounterDiary.current !== 0) return;
+      queryClient.invalidateQueries(["DiaryDay", { date: variables.date }]);
+      if (variables.barcode) {
+        queryClient.invalidateQueries(["FoodDetails", variables.barcode]);
+      } else if (variables.singleFoodId) {
+        queryClient.invalidateQueries([
+          "FoodDetailsIvy",
+          variables.singleFoodId,
+        ]);
+      }
+    },
+    onError: (err, variables, context) => {
+      console.log(err);
+      mutationCounterDiary.current = 0;
+      const queryKey = variables.singleFoodId
+        ? ["FoodDetailsIvy", variables.singleFoodId]
+        : ["FoodDetails", variables.barcode];
+      queryClient.setQueryData(queryKey, context.previousFoodDetails);
+    },
+  });
+
+  const addToGroceryListMutation = useMutation({
+    mutationFn: addFoodToGroceryList,
+    onMutate: () => {
+      mutationCounterGrocery.current += 1;
+    },
+    onSettled: (data, error, variables) => {
+      mutationCounterGrocery.current -= 1;
+      if (mutationCounterGrocery.current !== 0) return;
+      queryClient.invalidateQueries(["Groceries"]);
+      if (variables.barcode) {
+        queryClient.invalidateQueries(["FoodDetails", variables.barcode]);
+      } else if (variables.singleFoodId) {
+        queryClient.invalidateQueries([
+          "FoodDetailsIvy",
+          variables.singleFoodId,
+        ]);
+      }
     },
     onError: (err) => {
       console.log(err, "HERE");
+      mutationCounterGrocery.current = 0;
     },
   });
 
   const removeFromGroceryListMutation = useMutation({
     mutationFn: removeFoodFromGroceryList,
-    onSuccess: () => {
+    onMutate: () => {
+      mutationCounterGrocery.current += 1;
+    },
+    onSettled: (data, error, variables) => {
+      mutationCounterGrocery.current -= 1;
+      if (mutationCounterGrocery.current !== 0) return;
       queryClient.invalidateQueries(["Groceries"]);
+      if (variables.barcode) {
+        queryClient.invalidateQueries(["FoodDetails", variables.barcode]);
+      } else if (variables.singleFoodId) {
+        queryClient.invalidateQueries([
+          "FoodDetailsIvy",
+          variables.singleFoodId,
+        ]);
+      }
     },
     onError: (err) => {
+      mutationCounterGrocery.current = 0;
       console.log(err, "HERE");
     },
   });
 
-  const handleAddToDiary = () => {
-    if (removeFoodFromDiaryMutation.isPending) {
-      return;
+  const diaryHandler = (type) => {
+    if (type === "add") {
+      addFoodToDiaryMutation.mutate({
+        ...foodItemSchema,
+        date: chosenDate,
+      });
+    } else if (type === "remove") {
+      removeFoodFromDiaryMutation.mutate({
+        barcode: currentFood?.barcode,
+        singleFoodId: currentFood?.singleFoodId,
+        date: chosenDate,
+      });
     }
+  };
 
-    addFoodToDiaryMutation.mutate({
-      ...foodItemSchema,
-      date: chosenDate,
-    });
+  const groceryHandler = (type) => {
+    if (type === "add") {
+      addToGroceryListMutation.mutate(foodItemSchema);
+    } else if (type === "remove") {
+      removeFromGroceryListMutation.mutate({
+        barcode: currentFood?.barcode,
+        singleFoodId: currentFood?.singleFoodId,
+      });
+    }
+  };
+
+  // Either we debounce like 500 to save some calls or not? Ask farid
+  const debouncedDiaryHandler = useCallback(debounce(diaryHandler, 0), []);
+  const debouncedGroceryHandler = useCallback(debounce(groceryHandler, 0), []);
+
+  const handleAddToDiaryFinal = () => {
     setAddedToDiary(true);
+    debouncedDiaryHandler("add");
   };
 
-  const handleRemoveFromDiary = () => {
-    if (addFoodToDiaryMutation.isPending) {
-      return;
-    }
-
-    removeFoodFromDiaryMutation.mutate({
-      barcode: currentFood?.barcode,
-      singleFoodId: currentFood?.singleFoodId,
-      date: chosenDate,
-    });
+  const handleRemoveFromDiaryFinal = () => {
     setAddedToDiary(false);
+    debouncedDiaryHandler("remove");
   };
 
-  const handleAddToGroceryList = () => {
-    if (removeFromGroceryListMutation.isPending) return null;
-
-    addToGroceryListMutation.mutate(foodItemSchema);
+  const handleAddToGroceryFinal = () => {
+    debouncedGroceryHandler("add");
     SetAddedToGroceries(true);
+    Toast.show({
+      type: "foodDetailToast",
+      text1: "Item added to grocery list",
+      text2: "View",
+    });
   };
 
-  const handleRemoveFromGroceryList = () => {
-    if (addToGroceryListMutation.isPending) return null;
-
-    removeFromGroceryListMutation.mutate({
-      barcode: currentFood?.barcode,
-      singleFoodId: currentFood?.singleFoodId,
-    });
+  const handleRemoveFromGroceryFinal = () => {
+    debouncedGroceryHandler("remove");
     SetAddedToGroceries(false);
+    // Toast.hide();
   };
 
   return {
     addedToDiary,
     addedToGroceries,
     buttonsLoaded,
-    handleAddToDiary,
-    handleRemoveFromDiary,
-    handleAddToGroceryList,
-    handleRemoveFromGroceryList,
+    handleAddToDiary: handleAddToDiaryFinal,
+    handleRemoveFromDiary: handleRemoveFromDiaryFinal,
+    handleAddToGroceryList: handleAddToGroceryFinal,
+    handleRemoveFromGroceryList: handleRemoveFromGroceryFinal,
   };
 };

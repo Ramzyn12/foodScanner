@@ -76,12 +76,10 @@ const GroceryList = () => {
     }, [newOrder, updateOrderMutation, dispatch])
   );
 
-
   const handleDragEnd = ({ data }) => {
     setNewOrder(data.map((item) => item.item._id));
     dispatch(updateGroceryOrder(data));
   };
-
 
   return (
     <View style={{ paddingBottom: 120, flex: 1 }}>

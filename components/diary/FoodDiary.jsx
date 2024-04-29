@@ -15,6 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useDispatch, useSelector } from "react-redux";
 import { storage } from "../../utils/MMKVStorage";
 import { setCurrentDiaryDay } from "../../redux/diarySlice";
+import { getCurrentDateLocal } from "../../utils/dateHelpers";
 
 const FoodDiary = () => {
   // const token = useSelector(state => state.auth.token)
@@ -36,7 +37,7 @@ const FoodDiary = () => {
     refetch,
     error,
   } = useQuery({
-    queryFn: () => getDiaryDay({ date: chosenDate || new Date().toISOString().split('T')[0] }),
+    queryFn: () => getDiaryDay({ date: chosenDate || getCurrentDateLocal() }),
     // NEED TO ADD SECOND PARAM when fetching for different days
     // Maybe use chosenDate start of day for the queryKey
     queryKey: ["DiaryDay", chosenDate],

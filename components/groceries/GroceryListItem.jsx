@@ -36,12 +36,24 @@ const GroceryListItem = ({ foodItem, id, onLongPress, isActive }) => {
   const dispatch = useDispatch();
   const deletionTimerRef = useRef(null);
   const singleFoodId = foodItem?.barcode ? '' : foodItem?._id
+  const brand = singleFoodId ? 'Fresh' : foodItem?.brand
 
   const removeFoodMutation = useMutation({
     mutationFn: removeFoodFromGroceryList,
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       dispatch(confirmDeletion(id))
       queryClient.invalidateQueries(["Groceries"]);
+      if (variables.barcode) {
+        queryClient.invalidateQueries({
+          queryKey: ["FoodDetails"],
+          refetchType: "inactive",
+        });
+      } else if (variables.singleFoodId) {
+        queryClient.invalidateQueries({
+          queryKey: ["FoodDetailsIvy"],
+          refetchType: "inactive",
+        });
+      }
     },
     onError: (err) => {
       console.log(err);
@@ -132,7 +144,6 @@ const GroceryListItem = ({ foodItem, id, onLongPress, isActive }) => {
     );
   };
 
-
   return (
     <Swipeable
       rightThreshold={100}
@@ -163,13 +174,14 @@ const GroceryListItem = ({ foodItem, id, onLongPress, isActive }) => {
           onPress={handleGoToFood}
           delayLongPress={200}
         >
-          <FoodListItem foodSelected={grocery?.checked} foodItem={foodItem} />
+          <FoodListItem foodSelected={grocery?.checked} foodItem={{...foodItem, brand: brand}} />
         </Pressable>
 
       </View>
     </Swipeable>
   );
 };
+
 
 export default GroceryListItem;
 

@@ -39,6 +39,7 @@ async function checkIsConsumedToday(userId, identifier, isBarcode = true, date) 
     userId: userId,
     date: localDate,
   }).populate(isBarcode ? "consumedFoods" : "consumedSingleFoods");
+
   if (!diaryDay) return false;
 
   return diaryDay[isBarcode ? "consumedFoods" : "consumedSingleFoods"].some(

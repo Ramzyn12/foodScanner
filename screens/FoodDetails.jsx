@@ -30,34 +30,36 @@ import {
 import { useFoodDetails } from "../hooks/useFoodDetails";
 import FoodDetailsMainInfo from "../components/foodDetails/FoodDetailsMainInfo";
 import FoodDetailsEnvironment from "../components/foodDetails/FoodDetailsEnvironment";
+import { getCurrentDateLocal } from "../utils/dateHelpers";
 
 const FoodDetails = ({ navigation, route }) => {
   const barcode = route?.params?.barcodeId;
   const singleFoodId = route?.params?.singleFoodId;
   const currentFood = useSelector((state) => state.food.currentFood);
-  const chosenDate = useSelector(state => state.diary.chosenDate) || new Date().toISOString().split('T')[0]
+  const chosenDate = useSelector(state => state.diary.chosenDate) || getCurrentDateLocal()
 
   const {
     data: foodDetails,
     isLoading,
     isError,
     isFetching,
-    error,
+    error
   } = useQuery({
-    queryKey: ["FoodDetails", barcode],
+    queryKey: ["FoodDetails", barcode, chosenDate],
     retry: false,
+    // gcTime: 0,
     enabled: !!barcode,
     queryFn: () => fetchFoodWithBarcode(barcode, chosenDate),
   });
 
+
   // Need to add loading states here ASWELL!!
-  const { data: singleFoodDetails } = useQuery({
-    queryKey: ["FoodDetailsIvy", singleFoodId],
+  const { data: singleFoodDetails, error: IvyError } = useQuery({
+    queryKey: ["FoodDetailsIvy", singleFoodId, chosenDate],
     retry: false,
     enabled: !!singleFoodId,
     queryFn: () => fetchFoodWithIvyId(singleFoodId, chosenDate),
   });
-
 
   // handle the normalisation
   const readyToShow = useFoodDetails(foodDetails, singleFoodDetails);
@@ -70,8 +72,9 @@ const FoodDetails = ({ navigation, route }) => {
     );
   }
 
+
   if (isError) {
-    console.log(error);
+    console.log(IvyError, error);
     return <Text>Product doesnt exist...</Text>;
   }
 
@@ -89,7 +92,7 @@ const FoodDetails = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-      <FoodDetailsSimpleInfo foodItem={currentFood} />
+      <FoodDetailsSimpleInfo expectedId={singleFoodId || barcode} />
       <ScrollView showsVerticalScrollIndicator={false}>
         {currentFood?.processedScore && <FoodDetailsScoreStrip />}
         {/* {currentFood?.additives?.length > 0 && <FoodDetailsLessonCarousel />} */}

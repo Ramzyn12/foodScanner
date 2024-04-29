@@ -22,6 +22,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Swipeable } from "react-native-gesture-handler";
 import { useSelector } from "react-redux";
 import { Skeleton } from "moti/skeleton";
+import { getCurrentDateLocal } from "../../utils/dateHelpers";
 
 const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary }) => {
   const navigation = useNavigation();
@@ -41,8 +42,19 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary }) => {
 
   const removeFoodFromDiaryMutation = useMutation({
     mutationFn: removeFoodFromDiaryDay,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["DiaryDay"]);
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries(["DiaryDay", { date: variables.date }]);
+      if (variables.barcode) {
+        queryClient.invalidateQueries({
+          queryKey: ["FoodDetails"],
+          refetchType: "inactive",
+        });
+      } else if (variables.singleFoodId) {
+        queryClient.invalidateQueries({
+          queryKey: ["FoodDetailsIvy"],
+          refetchType: "inactive",
+        });
+      }
     },
     onError: (err) => {
       console.log(err, "HERE");
@@ -63,7 +75,7 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary }) => {
     setIsFasting(val);
     toggleFastedMutation.mutate({
       fastedState: val,
-      date: chosenDate || new Date().toISOString().split('T')[0],
+      date: chosenDate || getCurrentDateLocal(),
     });
   };
 
@@ -71,7 +83,7 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary }) => {
     removeFoodFromDiaryMutation.mutate({
       barcode: barcode,
       singleFoodId: singleFoodId,
-      date: chosenDate || new Date().toISOString().split('T')[0],
+      date: chosenDate || getCurrentDateLocal(),
     });
   };
 

@@ -24,6 +24,16 @@ import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 SplashScreen.preventAutoHideAsync(); // Prevent auto-hide
 
+
+// MAY NEED TO CHANGE STALE TIME? 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: Infinity,
+    },
+  },
+});
+
 const App = () => {
   return (
     <Provider store={store}>
@@ -36,7 +46,6 @@ const App = () => {
 const AppInitializer = () => {
   const [appIsReady, setAppIsReady] = useState(false);
   const { isLoggedIn, isLoading } = useAuthentication();
-  const queryClient = new QueryClient();
 
   let [fontsLoaded] = useFonts({
     Mulish_400Regular,
