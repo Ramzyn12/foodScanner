@@ -25,6 +25,8 @@ const CreateAccount = ({ navigation, route }) => {
     mutationFn: addUserNames,
     onSuccess: async () => {
       navigation.goBack();
+      queryClient.invalidateQueries({ queryKey: ["UserNames"] });
+
       // Show toast saying welcome? 
     },
     onError: (err) => {

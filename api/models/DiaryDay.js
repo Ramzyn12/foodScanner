@@ -41,8 +41,10 @@ DiaryDaySchema.methods.updateDiaryDayState = async function () {
     combinedFoods.some((food) => food.processedState === "Processed")
   ) {
     this.diaryDayState = "processed";
+    this.fastedState = false
   } else {
     this.diaryDayState = "unprocessed";
+    this.fastedState = false
   }
 
   await this.save();

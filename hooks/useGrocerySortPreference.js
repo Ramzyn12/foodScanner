@@ -32,7 +32,7 @@ export const useGrocerySortPreference = (data) => {
   const updateSortMutation = useMutation({
     mutationFn: updateSortPreference,
     onSuccess: () => {
-      queryClient.invalidateQueries(["Groceries"]);
+      queryClient.invalidateQueries({queryKey: ["Groceries"]});
     },
     onError: (err) => {
       console.log(err);

@@ -41,8 +41,7 @@ const Groceries = ({ navigation }) => {
   const { handleAddFirstItem, handleSortPress, updateSortMutation } =
     useGrocerySortPreference(data);
 
-
-  if (isLoading) return <ActivityIndicator />
+  if (isLoading) return <ActivityIndicator />;
 
   return (
     <SafeAreaView style={styles.container}>

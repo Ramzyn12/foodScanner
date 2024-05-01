@@ -1,5 +1,5 @@
 import { View, Text, Pressable } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Header from "../components/settings/Header";
 import COLOURS from "../constants/colours";
@@ -21,6 +21,8 @@ const Account = ({ navigation }) => {
   const [lastName, setLastName] = useState(""); // Get last name here for inital state
   const signInWith = auth()?.currentUser?.providerData[0]?.providerId;
   const queryClient = useQueryClient();
+  const firstNameInputRef = useRef(null);
+  const lastNameInputRef = useRef(null);
 
   const { data, isLoading } = useQuery({
     queryFn: getUserNames,
@@ -37,7 +39,13 @@ const Account = ({ navigation }) => {
   const addNamesMutation = useMutation({
     mutationFn: addUserNames,
     onSuccess: async () => {
-      queryClient.invalidateQueries(["UserNames"]);
+      queryClient.invalidateQueries({ queryKey: ["UserNames"] });
+      if (firstNameInputRef.current) {
+        firstNameInputRef.current.blur();
+      }
+      if (lastNameInputRef.current) {
+        lastNameInputRef.current.blur();
+      }
       Toast.show({
         text1: "Names saved",
       });
@@ -90,11 +98,17 @@ const Account = ({ navigation }) => {
       <Header headerText={"Account"} onNavigate={() => navigation.goBack()} />
       <View style={{ padding: 20, gap: 8 }}>
         <NameInput
+          ref={firstNameInputRef}
           name={firstName}
           text={"First name"}
           setName={setFirstName}
         />
-        <NameInput name={lastName} text={"Last name"} setName={setLastName} />
+        <NameInput
+          ref={lastNameInputRef}
+          name={lastName}
+          text={"Last name"}
+          setName={setLastName}
+        />
         <InformationInput
           defaultValue={auth().currentUser.email}
           inputText={"Email Address"}

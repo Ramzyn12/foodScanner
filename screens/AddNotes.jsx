@@ -25,7 +25,7 @@ const AddNotes = ({ route }) => {
   const updateNoteMutation = useMutation({
     mutationFn: updateNote,
     onSuccess: () => {
-      queryClient.invalidateQueries(["Note", date]);
+      queryClient.invalidateQueries({ queryKey: ["Note", date] });
     },
     onError: (err) => {
       console.log(err);
@@ -33,13 +33,17 @@ const AddNotes = ({ route }) => {
   });
 
   useEffect(() => {
+    let timer;
     if (isSuccess && data && data.note) {
       setNotes(data.note); // If there's existing note data, fill it in
+    } else if ((isError && !data) || notes === "") {
+      // notesInputRef.current?.blur();
+      timer = setTimeout(() => {
+        notesInputRef.current?.focus();
+      }, 300);
     }
-    // else if ((isError && !data) || notes === "") {
-    //   // notesInputRef.current?.blur();
-    //   notesInputRef.current?.focus();
-    // }
+
+    return () => clearTimeout(timer); // Clear timeout if component unmounts
   }, [data, isSuccess, isError]);
 
   const handleSaveNotes = () => {
@@ -64,8 +68,8 @@ const AddNotes = ({ route }) => {
         extraScrollHeight={100}
         viewIsInsideTabBar={true}
         directionalLockEnabled={true}
-      //   style={{flex: 1}}
-      // contentContainerStyle={{flex: 1}}
+        //   style={{flex: 1}}
+        // contentContainerStyle={{flex: 1}}
       >
         <TextInput
           ref={notesInputRef}

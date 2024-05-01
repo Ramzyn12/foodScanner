@@ -78,10 +78,10 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
     chosenDiaryDay?.diaryDayState === "unprocessed" ||
     chosenDiaryDay?.fastedState;
 
-  const subHeaderMessage = useMemo(() => {
-    if (!chosenDiaryDay) {
-      return "..."; // No diary day chosen yet
-    }
+  const subHeaderInfo = useMemo(() => {
+    // if (!chosenDiaryDay) {
+    //   return { message: "", svg: "" }; // No diary day chosen yet
+    // }
 
     const today = new Date(getCurrentDateLocal());
     const isToday = isSameDay(chosenDate, today);
@@ -89,15 +89,19 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
 
     if (isToday) {
       if (diaryDayStateGood || chosenDiaryDay?.diaryDayState === "empty")
-        return "All good so far";
+        return { message: "All good so far", svg: <GreenTickCircle /> };
       if (!diaryDayStateGood && chosenDiaryDay?.diaryDayState !== "empty")
-        return "Failed";
+        return { message: "Failed", svg: <GreyFail /> };
     } else if (isPast) {
-      if (diaryDayStateGood) return "Success";
-      if (!diaryDayStateGood) return "Failed";
+      if (diaryDayStateGood) {
+        return { message: "Success", svg: <GreenTickCircle /> };
+      }
+      if (!diaryDayStateGood) {
+        return { message: "Failed", svg: <GreyFail /> };
+      }
     }
 
-    return "Failed"; // Covers all failed states or future dates
+    return { message: "Failed", svg: <GreyFail /> }; // Covers all failed states or future dates
   }, [chosenDiaryDay, chosenDate]);
 
   const date = transformCurrentDate(chosenDate);
@@ -127,12 +131,13 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
   const processDiaryDaysToWeeks = (diaryDays) => {
     // Use the first item in the array as the earliest date, assuming array is in ascending order
     // const earliestDateUseable = diaryDays[0].date;
-    const earliestDate = new Date(diaryDays[0].date);
-    const latestDate = new Date(nowDateString); // Current date as the latest date
+    const earliestDate = getAnyDateLocal(diaryDays[0].date);
+    const latestDate = getAnyDateLocal(nowDateString); // Current date as the latest date
 
     const weeks = [];
     let currentWeekStart = startOfWeek(earliestDate, { weekStartsOn: 1 }); // ISO week starts on Monday
     let currentWeekStartLocal = getAnyDateLocal(currentWeekStart);
+
     while (
       isSameWeek(currentWeekStartLocal, latestDate, { weekStartsOn: 1 }) ||
       isBefore(currentWeekStartLocal, latestDate)
@@ -156,7 +161,7 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
         // const formattedDate = formatInTimeZone(dayDate, 'Europe/London', 'yyyy-MM-dd HH:mm:ssXXX').split(' ')[0] // 2014-10-25 06:46:20-04:00
 
         if (
-          isSameWeek(dayDate, currentWeekStartLocal, { weekStartsOn: 1 }) ||
+          isSameWeek(dayDate, currentWeekStartLocal, { weekStartsOn: 1 }) &&
           isBefore(dayDate, addDays(currentWeekStartLocal, 7))
         ) {
           const dayOfWeek = (dayDate.getDay() + 6) % 7;
@@ -176,8 +181,12 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
       });
 
       // Proceed to the next week
-      currentWeekStartLocal = addDays(currentWeekStartLocal, 7);
+      currentWeekStartLocal = getAnyDateLocal(
+        addDays(currentWeekStartLocal, 7)
+      );
     }
+
+    // console.log(weeks, "WEEKS");
 
     return weeks;
   };
@@ -273,7 +282,7 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
             {date}
           </Text>
           <View style={{ flexDirection: "row", gap: 4, alignItems: "center" }}>
-            {diaryDayStateGood ? <GreenTickCircle /> : <GreyFail />}
+            {subHeaderInfo.svg}
             <Text
               style={{
                 color: "#636566",
@@ -281,7 +290,7 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
                 fontFamily: "Mulish_700Bold",
               }}
             >
-              {subHeaderMessage}
+              {subHeaderInfo.message}
             </Text>
           </View>
         </View>

@@ -73,11 +73,11 @@ export const useFoodDetailsActions = (expectedId) => {
     onMutate: async (variables) => {
       mutationCounterDiary.current += 1;
       const queryKey = variables.singleFoodId
-        ? ["FoodDetailsIvy", variables.singleFoodId]
-        : ["FoodDetails", variables.barcode];
+        ? ["FoodDetailsIvy", variables.singleFoodId, variables.date]
+        : ["FoodDetails", variables.barcode, variables.date];
 
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries(queryKey);
+      await queryClient.cancelQueries({queryKey: queryKey});
 
       // Snapshot the previous value
       const previousFoodDetails = queryClient.getQueryData(queryKey);
@@ -93,23 +93,24 @@ export const useFoodDetailsActions = (expectedId) => {
     onSettled: (data, error, variables) => {
       mutationCounterDiary.current -= 1;
       if (mutationCounterDiary.current !== 0) return;
-      queryClient.invalidateQueries(["DiaryDay", { date: variables.date }]);
-      if (variables.barcode) {
-        queryClient.invalidateQueries(["FoodDetails", variables.barcode]);
-      } else if (variables.singleFoodId) {
-        queryClient.invalidateQueries([
-          "FoodDetailsIvy",
-          variables.singleFoodId,
-        ]);
-      }
+      queryClient.invalidateQueries({ queryKey: ["DiaryDay", variables.date] });
+      // if (variables.barcode) {
+      //   queryClient.invalidateQueries({
+      //     queryKey: ["FoodDetails", variables.barcode, variables.date],
+      //   });
+      // } else if (variables.singleFoodId) {
+      //   queryClient.invalidateQueries({
+      //     queryKey: ["FoodDetailsIvy", variables.singleFoodId, variables.date],
+      //   });
+      // }
     },
     // onSuccess: (data, variables) => {},
     onError: (err, variables, context) => {
       console.log(err);
       mutationCounterDiary.current = 0;
       const queryKey = variables.singleFoodId
-        ? ["FoodDetailsIvy", variables.singleFoodId]
-        : ["FoodDetails", variables.barcode];
+        ? ["FoodDetailsIvy", variables.singleFoodId, variables.date]
+        : ["FoodDetails", variables.barcode, variables.date];
       queryClient.setQueryData(queryKey, context.previousFoodDetails);
     },
   });
@@ -119,10 +120,10 @@ export const useFoodDetailsActions = (expectedId) => {
     onMutate: async (variables) => {
       mutationCounterDiary.current += 1;
       const queryKey = variables.singleFoodId
-        ? ["FoodDetailsIvy", variables.singleFoodId]
-        : ["FoodDetails", variables.barcode];
+        ? ["FoodDetailsIvy", variables.singleFoodId, variables.date]
+        : ["FoodDetails", variables.barcode, variables.date];
 
-      await queryClient.cancelQueries(queryKey);
+      await queryClient.cancelQueries({queryKey: queryKey});
       const previousFoodDetails = queryClient.getQueryData(queryKey);
 
       queryClient.setQueryData(queryKey, (old) => ({
@@ -135,71 +136,108 @@ export const useFoodDetailsActions = (expectedId) => {
     onSettled: (data, error, variables) => {
       mutationCounterDiary.current -= 1;
       if (mutationCounterDiary.current !== 0) return;
-      queryClient.invalidateQueries(["DiaryDay", { date: variables.date }]);
-      if (variables.barcode) {
-        queryClient.invalidateQueries(["FoodDetails", variables.barcode]);
-      } else if (variables.singleFoodId) {
-        queryClient.invalidateQueries([
-          "FoodDetailsIvy",
-          variables.singleFoodId,
-        ]);
-      }
+      queryClient.invalidateQueries({ queryKey: ["DiaryDay", variables.date] });
+      // if (variables.barcode) {
+      //   queryClient.invalidateQueries({
+      //     queryKey: ["FoodDetails", variables.barcode, variables.date],
+      //   });
+      // } else if (variables.singleFoodId) {
+      //   queryClient.invalidateQueries({
+      //     queryKey: ["FoodDetailsIvy", variables.singleFoodId, variables.date],
+      //   });
+      // }
     },
     onError: (err, variables, context) => {
       console.log(err);
       mutationCounterDiary.current = 0;
       const queryKey = variables.singleFoodId
-        ? ["FoodDetailsIvy", variables.singleFoodId]
-        : ["FoodDetails", variables.barcode];
+        ? ["FoodDetailsIvy", variables.singleFoodId, variables.date]
+        : ["FoodDetails", variables.barcode, variables.date];
       queryClient.setQueryData(queryKey, context.previousFoodDetails);
     },
   });
 
   const addToGroceryListMutation = useMutation({
     mutationFn: addFoodToGroceryList,
-    onMutate: () => {
+    onMutate: async (variables) => {
       mutationCounterGrocery.current += 1;
+      const queryKey = variables.singleFoodId
+        ? ["FoodDetailsIvy", variables.singleFoodId, chosenDate]
+        : ["FoodDetails", variables.barcode, chosenDate];
+
+      await queryClient.cancelQueries({queryKey: queryKey});
+      const previousFoodDetails = queryClient.getQueryData(queryKey);
+
+      queryClient.setQueryData(queryKey, (old) => ({
+        ...old,
+        isInGroceryList: true,
+      }));
+
+      return {previousFoodDetails}
     },
     onSettled: (data, error, variables) => {
       mutationCounterGrocery.current -= 1;
       if (mutationCounterGrocery.current !== 0) return;
-      queryClient.invalidateQueries(["Groceries"]);
-      if (variables.barcode) {
-        queryClient.invalidateQueries(["FoodDetails", variables.barcode]);
-      } else if (variables.singleFoodId) {
-        queryClient.invalidateQueries([
-          "FoodDetailsIvy",
-          variables.singleFoodId,
-        ]);
-      }
+      queryClient.invalidateQueries({ queryKey: ["Groceries"] });
+      // if (variables.barcode) {
+      //   queryClient.invalidateQueries({
+      //     queryKey: ["FoodDetails", variables.barcode, chosenDate],
+      //   });
+      // } else if (variables.singleFoodId) {
+      //   queryClient.invalidateQueries({
+      //     queryKey: ["FoodDetailsIvy", variables.singleFoodId, chosenDate],
+      //   });
+      // }
     },
     onError: (err) => {
       console.log(err, "HERE");
       mutationCounterGrocery.current = 0;
+      const queryKey = variables.singleFoodId
+        ? ["FoodDetailsIvy", variables.singleFoodId, chosenDate]
+        : ["FoodDetails", variables.barcode, chosenDate];
+      queryClient.setQueryData(queryKey, context.previousFoodDetails);
     },
   });
 
   const removeFromGroceryListMutation = useMutation({
     mutationFn: removeFoodFromGroceryList,
-    onMutate: () => {
+    onMutate: async (variables) => {
       mutationCounterGrocery.current += 1;
+      const queryKey = variables.singleFoodId
+      ? ["FoodDetailsIvy", variables.singleFoodId, chosenDate]
+      : ["FoodDetails", variables.barcode, chosenDate];
+
+    await queryClient.cancelQueries({queryKey: queryKey});
+    const previousFoodDetails = queryClient.getQueryData(queryKey);
+
+    queryClient.setQueryData(queryKey, (old) => ({
+      ...old,
+      isInGroceryList: false,
+    }));
+
+    return {previousFoodDetails}
     },
     onSettled: (data, error, variables) => {
       mutationCounterGrocery.current -= 1;
       if (mutationCounterGrocery.current !== 0) return;
-      queryClient.invalidateQueries(["Groceries"]);
-      if (variables.barcode) {
-        queryClient.invalidateQueries(["FoodDetails", variables.barcode]);
-      } else if (variables.singleFoodId) {
-        queryClient.invalidateQueries([
-          "FoodDetailsIvy",
-          variables.singleFoodId,
-        ]);
-      }
+      queryClient.invalidateQueries({ queryKey: ["Groceries"] });
+      // if (variables.barcode) {
+      //   queryClient.invalidateQueries({
+      //     queryKey: ["FoodDetails", variables.barcode, chosenDate],
+      //   });
+      // } else if (variables.singleFoodId) {
+      //   queryClient.invalidateQueries({
+      //     queryKey: ["FoodDetailsIvy", variables.singleFoodId, chosenDate],
+      //   });
+      // }
     },
     onError: (err) => {
       mutationCounterGrocery.current = 0;
       console.log(err, "HERE");
+      const queryKey = variables.singleFoodId
+        ? ["FoodDetailsIvy", variables.singleFoodId, chosenDate]
+        : ["FoodDetails", variables.barcode, chosenDate];
+      queryClient.setQueryData(queryKey, context.previousFoodDetails);
     },
   });
 

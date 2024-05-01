@@ -27,7 +27,7 @@ const FoodDetailsScoreStrip = ({ processedScore }) => {
       </View>
       {processedState === 'Processed' && <View style={styles.warningMessageContainer}>
         <DangerTriangle />
-        <Text style={styles.warningMessageText}>This product is processed. If you choose to eat this, it will reset your 26 day streak. </Text>
+        <Text style={styles.warningMessageText}>This product is processed. If you choose to eat this, it will reset your streak. </Text>
       </View>}
     </View>
   );

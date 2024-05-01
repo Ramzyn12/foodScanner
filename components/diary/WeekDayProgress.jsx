@@ -38,6 +38,8 @@ const WeekDayProgress = ({
     }
   }, [chosenDate, thisDateObj]);
 
+  // console.log(date, dayType, beforeEarliest, isFasting);
+
   return (
     <View
       style={[

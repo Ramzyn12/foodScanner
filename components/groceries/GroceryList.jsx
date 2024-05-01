@@ -3,7 +3,7 @@ import React, { useCallback, useState } from "react";
 import COLOURS from "../../constants/colours";
 import GroceryListItem from "./GroceryListItem";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {  updateOrder } from "../../axiosAPI/groceryAPI";
+import { updateOrder } from "../../axiosAPI/groceryAPI";
 import { useDispatch, useSelector } from "react-redux";
 import DraggableFlatList, {
   ScaleDecorator,
@@ -12,30 +12,25 @@ import * as Haptics from "expo-haptics";
 import { updateGroceryOrder } from "../../redux/grocerySlice";
 import { useFocusEffect } from "@react-navigation/native";
 
-
-
 const GroceryList = () => {
-  
   const groceries = useSelector((state) => state?.grocery?.currentGroceries);
   const dispatch = useDispatch();
-  const [newOrder, setNewOrder] = useState([]); 
+  const [newOrder, setNewOrder] = useState([]);
   const sortPreference = useSelector((state) => state.grocery.sortPreference);
-  const queryClient = useQueryClient()
-
+  const queryClient = useQueryClient();
+  const hapticsEnabled = useSelector((state) => state.user.hapticsEnabled);
 
   const updateOrderMutation = useMutation({
     mutationFn: updateOrder,
     onSuccess: () => {
-      queryClient.invalidateQueries(['Groceries'])
+      queryClient.invalidateQueries({ queryKey: ["Groceries"] });
     },
     onError: (err) => {
       console.log("Update Order Failed: ", err);
     },
   });
 
-
   const renderItem = ({ item, drag, isActive }) => {
-    
     // Don't allow drag unless in manual sort mode
     const onLongPress = sortPreference === "Manual" ? drag : null;
 
@@ -51,9 +46,7 @@ const GroceryList = () => {
     );
   };
 
-
   const renderPlaceholder = useCallback(({ item, isActive, drag }) => {
-
     return (
       <GroceryListItem
         foodItem={item.item}
@@ -64,7 +57,8 @@ const GroceryList = () => {
     );
   }, []);
 
-
+  // Save grocery list order when leave page
+  // maybe change this to throttle/debounce instead?
   useFocusEffect(
     useCallback(() => {
       return () => {
@@ -81,6 +75,12 @@ const GroceryList = () => {
     dispatch(updateGroceryOrder(data));
   };
 
+  const handleIndexChange = () => {
+    if (hapticsEnabled) {
+      Haptics.selectionAsync()
+    }
+  }
+
   return (
     <View style={{ paddingBottom: 120, flex: 1 }}>
       {groceries && groceries.length > 0 && (
@@ -88,7 +88,7 @@ const GroceryList = () => {
           data={groceries}
           renderItem={renderItem}
           renderPlaceholder={renderPlaceholder}
-          onPlaceholderIndexChange={() => Haptics.selectionAsync()}
+          onPlaceholderIndexChange={handleIndexChange}
           keyExtractor={(item, index) => `draggable-item-${item._id}`}
           onDragEnd={handleDragEnd}
           containerStyle={{ flexGrow: 1 }}

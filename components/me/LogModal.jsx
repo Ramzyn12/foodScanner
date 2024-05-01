@@ -40,8 +40,9 @@ const LogModal = forwardRef(({ onClose, metricType, date }, ref) => {
 
   const updateHealthMetricMutation = useMutation({
     mutationFn: updateHealthMetric,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["RecentMetric"]);
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({queryKey: ["RecentMetric", variables.metric]});
+      queryClient.invalidateQueries({queryKey: ["TimelineWeek"]});
     },
     onError: (err) => {
       console.log(err);

@@ -153,8 +153,18 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
 
   const updateHealthMetricMutation = useMutation({
     mutationFn: updateHealthMetric,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["RecentMetric"]);
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["RecentMetric", variables.metric],
+      });
+      queryClient.invalidateQueries({ queryKey: ["TimelineWeek"] });
+      queryClient.invalidateQueries({
+        queryKey: [
+          "MetricGraphData",
+          route.params.metricType,
+          selectedTimeFrame,
+        ],
+      });
     },
     onError: (err) => {
       console.log(err);

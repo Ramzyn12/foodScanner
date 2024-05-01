@@ -1,13 +1,13 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
-import React, { useState } from "react";
+import React, { forwardRef, useState } from "react";
 import ClearIcon from "../../svgs/ClearIcon";
-import COLOURS from '../../constants/colours'
+import COLOURS from "../../constants/colours";
 import { TextInput } from "react-native";
 
-const NameInput = ({name, setName, text}) => {
+const NameInput = forwardRef(({ name, setName, text }, ref) => {
   const [isNameFocused, setIsNameFocused] = useState(false);
 
-  const FocusedOrNonEmptyText = isNameFocused || name
+  const FocusedOrNonEmptyText = isNameFocused || name;
 
   return (
     <View
@@ -32,15 +32,16 @@ const NameInput = ({name, setName, text}) => {
         <TextInput
           onFocus={() => setIsNameFocused(true)}
           onBlur={() => setIsNameFocused(false)}
+          ref={ref}
           onChangeText={setName}
           value={name}
-          keyboardType='ascii-capable'
+          keyboardType="ascii-capable"
           autoCorrect={false}
           autoComplete={"off"}
           placeholder={FocusedOrNonEmptyText ? "" : text}
           style={{
             fontSize: 14,
-            width: '100%',
+            width: "100%",
             flex: 1,
             fontFamily:
               FocusedOrNonEmptyText || name.length > 0
@@ -57,7 +58,7 @@ const NameInput = ({name, setName, text}) => {
       )}
     </View>
   );
-};
+});
 
 export default NameInput;
 

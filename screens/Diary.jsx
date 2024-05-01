@@ -28,13 +28,14 @@ import { getRecentTimelineWeek } from "../axiosAPI/timelineAPI";
 import { getCurrentDateLocal } from "../utils/dateHelpers";
 import { useFocusNotifyOnChangeProps } from "../hooks/useFocusNotifyOnChangeProps";
 
-
 const Diary = ({ navigation }) => {
   const userCreated = useSelector((state) => state.auth.userCreated);
   // const token = useSelector((state) => state.auth.token);
-  const token = storage.getString('firebaseToken')
+  const token = storage.getString("firebaseToken");
   // const currentFood = useSelector((state) => state.food.currentFood);
-  const notifyOnChangeProps = useFocusNotifyOnChangeProps()
+  // const notifyOnChangeProps = useFocusNotifyOnChangeProps()
+
+  // focusManager.setFocused(true);
 
   const { data, refetch, isLoading, isError, error } = useQuery({
     queryKey: ["AllDiaryDays"],
@@ -43,21 +44,27 @@ const Diary = ({ navigation }) => {
     enabled: !!token,
   });
 
-  const {data: recentTimelineWeekData, isFetching, isStale} = useQuery({
-    queryKey: ['RecentTimelineWeek'],
+  const {
+    data: recentTimelineWeekData,
+    dataUpdatedAt,
+    isFetching,
+    isStale,
+  } = useQuery({
+    queryKey: ["RecentTimelineWeek"],
     queryFn: getRecentTimelineWeek,
-    gcTime: 12 * 60 * 60 * 1000,
+    gcTime: Infinity,
     staleTime: Infinity,
-    // enabled: !!token, 
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  
-  })
+    enabled: !!token,
+    // refetchOnMount: false,
+    // retryOnMount: false,
+    // refetchOnWindowFocus: false,
+    // refetchOnReconnect: false,
+  });
 
   useEffect(() => {
-    console.log("Fetching status:", isFetching);
+    // console.log("Fetching status:", isFetching);
     console.log("Stale status:", isStale);
+    // console.log("Data updated at:", dataUpdatedAt);
   }, [isFetching, isStale]);
 
   useEffect(() => {
@@ -65,6 +72,8 @@ const Diary = ({ navigation }) => {
       refetch();
     }
   }, [userCreated]);
+
+  console.log('Component re-rendering');
 
   if (isLoading)
     return (
@@ -79,14 +88,25 @@ const Diary = ({ navigation }) => {
         <Text style={{ fontSize: 34 }}>Loading diary screen data</Text>
       </View>
     );
-  if (isError) return <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}><Text>Server error, try again later</Text></View>;
+  if (isError)
+    return (
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <Text>Server error, try again later</Text>
+      </View>
+    );
 
   return (
     <SafeAreaView style={styles.container}>
-      <WeekHeader daysFinished={recentTimelineWeekData?.currentDay} diaryData={data} />
+      <WeekHeader
+        daysFinished={recentTimelineWeekData?.currentDay}
+        diaryData={data}
+      />
 
       {/* Main page */}
-      <ScrollView showsVerticalScrollIndicator={false} style={styles.mainSectionContainer}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={styles.mainSectionContainer}
+      >
         <StreakCard diaryData={data} />
         {/* <BenefitFactCard /> */}
         <Pressable style={{ marginTop: 25 }}>

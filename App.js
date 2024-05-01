@@ -26,13 +26,7 @@ SplashScreen.preventAutoHideAsync(); // Prevent auto-hide
 
 
 // MAY NEED TO CHANGE STALE TIME? 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: Infinity,
-    },
-  },
-});
+const queryClient = new QueryClient();
 
 const App = () => {
   return (

@@ -27,7 +27,8 @@ import { getCurrentDateLocal } from "../../utils/dateHelpers";
 const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary }) => {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
-  const chosenDate = useSelector((state) => state.diary.chosenDate);
+  const chosenDate =
+    useSelector((state) => state.diary.chosenDate) || getCurrentDateLocal();
   const [isFasting, setIsFasting] = useState(false);
 
   const numberOfItems =
@@ -43,15 +44,16 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary }) => {
   const removeFoodFromDiaryMutation = useMutation({
     mutationFn: removeFoodFromDiaryDay,
     onSuccess: (data, variables) => {
-      queryClient.invalidateQueries(["DiaryDay", { date: variables.date }]);
+      queryClient.invalidateQueries({ queryKey: ["DiaryDay", variables.date]});
+      queryClient.invalidateQueries({ queryKey: ["AllDiaryDays"]});
       if (variables.barcode) {
         queryClient.invalidateQueries({
-          queryKey: ["FoodDetails"],
+          queryKey: ["FoodDetails", variables.barcode],
           refetchType: "inactive",
         });
       } else if (variables.singleFoodId) {
         queryClient.invalidateQueries({
-          queryKey: ["FoodDetailsIvy"],
+          queryKey: ["FoodDetailsIvy", variables.singleFoodId],
           refetchType: "inactive",
         });
       }
@@ -64,7 +66,8 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary }) => {
   const toggleFastedMutation = useMutation({
     mutationFn: toggleFastedState,
     onSuccess: () => {
-      queryClient.invalidateQueries(["DiaryDay"]);
+      queryClient.invalidateQueries({queryKey: ["DiaryDay", chosenDate]});
+      queryClient.invalidateQueries({queryKey: ["AllDiaryDays"]});
     },
     onError: (err) => {
       console.log(err, "HERE");
@@ -75,7 +78,7 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary }) => {
     setIsFasting(val);
     toggleFastedMutation.mutate({
       fastedState: val,
-      date: chosenDate || getCurrentDateLocal(),
+      date: chosenDate,
     });
   };
 

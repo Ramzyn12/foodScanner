@@ -11,13 +11,29 @@ import { useDispatch, useSelector } from "react-redux";
 import MainTabsStack from "./navigation/MainTabsStack";
 
 import FoodDetails from "./screens/FoodDetails";
+import { useQuery } from "@tanstack/react-query";
+import { getUserHaptics } from "./axiosAPI/userAPI";
+import { setHapticSetting } from "./redux/userSlice";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 function MainComponent({ loggedIn }) {
+  const dispatch = useDispatch();
+  const { data: hapticsEnabledData } = useQuery({
+    queryFn: getUserHaptics,
+    queryKey: ["HapticsEnabled"],
+    // staleTime: Infinity,
+    // gcTime: 100000
+  });
 
-  const waitingForBackendApple = useSelector((state) => state.auth.waitingForBackend);
+  useEffect(() => {
+    dispatch(setHapticSetting(hapticsEnabledData));
+  }, [hapticsEnabledData]);
+
+  const waitingForBackendApple = useSelector(
+    (state) => state.auth.waitingForBackend
+  );
 
   return (
     <NavigationContainer>

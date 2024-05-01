@@ -6,16 +6,29 @@ import ArrowRight from "../../svgs/ArrowRight";
 import { validate } from "../../api/models/User";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { getUserHaptics, toggleUserHaptics } from "../../axiosAPI/userAPI";
+import { useDispatch, useSelector } from "react-redux";
+import { setHapticSetting } from "../../redux/userSlice";
 const SettingOption = ({ optionText, optionSvg, showArrow, onPress }) => {
-  const [isEnabled, setIsEnabled] = useState(false);
+  // const [isEnabled, setIsEnabled] = useState(false);
+  const isHapticsEnabled = useSelector(state => state.user.hapticsEnabled)
+  const dispatch = useDispatch()
 
   const toggleHaptics = useMutation({
     mutationFn: toggleUserHaptics,
-    onSuccess: () => {
-      console.log(isEnabled);
+    onMutate: (newSetting) => {
+      // Make sure isEnabled is the correct value??
+      const previousValue = isHapticsEnabled;
+
+      dispatch(setHapticSetting(newSetting));
+
+      return { previousValue };
+
     },
-    onError: (err) => {
-      console.log(err);
+    onError: (err, newSetting, context) => {
+      // Roll back to the previous setting if the mutation fails
+      if (context?.previousValue !== undefined) {
+        dispatch(setHapticSetting(context.previousValue));
+      }
     },
   });
 
@@ -25,14 +38,14 @@ const SettingOption = ({ optionText, optionSvg, showArrow, onPress }) => {
   });
 
   useEffect(() => {
-    if (hapticsEnabledData) {
-      setIsEnabled(hapticsEnabledData);
+    if (hapticsEnabledData !== undefined && hapticsEnabledData !== isHapticsEnabled) {
+      dispatch(setHapticSetting(hapticsEnabledData));
     }
   }, [hapticsEnabledData]);
 
   const toggleSwitch = (val) => {
-    setIsEnabled(val);
-    toggleHaptics.mutate();
+    // setIsEnabled(val);
+    toggleHaptics.mutate(val);
   };
 
   return (
@@ -61,7 +74,7 @@ const SettingOption = ({ optionText, optionSvg, showArrow, onPress }) => {
       {!showArrow && (
         <Switch
           trackColor={{ true: COLOURS.darkGreen }}
-          value={isEnabled}
+          value={isHapticsEnabled}
           onValueChange={toggleSwitch}
         />
       )}
