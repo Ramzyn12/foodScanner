@@ -14,6 +14,7 @@ import { Pressable } from "react-native";
 import HealthStatInfo from "../screens/HealthStatInfo";
 import UpdatePassword from "../screens/UpdatePassword";
 import DeleteAccount from "../screens/DeleteAccount";
+import Paywall from "../screens/Paywall";
 
 const Stack = createNativeStackNavigator();
 
@@ -76,6 +77,14 @@ const MeStack = () => {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="Paywall"
+        component={Paywall}
+        options={{
+          headerShown: false,
+        }}
+      />
+
     
 
     </Stack.Navigator>

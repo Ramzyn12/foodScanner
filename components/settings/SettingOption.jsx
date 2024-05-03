@@ -3,11 +3,11 @@ import React, { useEffect, useState } from "react";
 import COLOURS from "../../constants/colours";
 import { Path, Svg } from "react-native-svg";
 import ArrowRight from "../../svgs/ArrowRight";
-import { validate } from "../../api/models/User";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { getUserHaptics, toggleUserHaptics } from "../../axiosAPI/userAPI";
 import { useDispatch, useSelector } from "react-redux";
 import { setHapticSetting } from "../../redux/userSlice";
+
 const SettingOption = ({ optionText, optionSvg, showArrow, onPress }) => {
   // const [isEnabled, setIsEnabled] = useState(false);
   const isHapticsEnabled = useSelector(state => state.user.hapticsEnabled)

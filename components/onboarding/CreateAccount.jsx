@@ -14,6 +14,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useMutation } from "@tanstack/react-query";
 import { addFirstLastName } from "../../axiosAPI/authAPI";
 import { addUserNames } from "../../axiosAPI/userAPI";
+import auth from "@react-native-firebase/auth";
+
 
 const CreateAccount = ({ navigation, route }) => {
   const [firstName, setFirstName] = useState("");
@@ -26,7 +28,12 @@ const CreateAccount = ({ navigation, route }) => {
     onSuccess: async () => {
       navigation.goBack();
       queryClient.invalidateQueries({ queryKey: ["UserNames"] });
-
+      const user = auth().currentUser;
+      if (user) {
+        user.updateProfile({ displayName: firstName || lastName }).then(() => {
+          console.log("Success updating display name");
+        });
+      }
       // Show toast saying welcome? 
     },
     onError: (err) => {

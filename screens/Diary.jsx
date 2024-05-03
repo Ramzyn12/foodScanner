@@ -16,7 +16,7 @@ import StreakCard from "../components/diary/StreakCard";
 import BenefitFactCard from "../components/shared/BenefitFactCard";
 import FoodDiary from "../components/diary/FoodDiary";
 import Carousel from "react-native-reanimated-carousel";
-import moment from "moment"; // make sure moment is installed
+// import moment from "moment"; // make sure moment is installed
 import { BlurView } from "expo-blur";
 import { focusManager, useQuery } from "@tanstack/react-query";
 import { getAllDiaryDays } from "../axiosAPI/diaryDayAPI";
@@ -62,18 +62,10 @@ const Diary = ({ navigation }) => {
   });
 
   useEffect(() => {
-    // console.log("Fetching status:", isFetching);
-    console.log("Stale status:", isStale);
-    // console.log("Data updated at:", dataUpdatedAt);
-  }, [isFetching, isStale]);
-
-  useEffect(() => {
     if (userCreated) {
       refetch();
     }
   }, [userCreated]);
-
-  console.log('Component re-rendering');
 
   if (isLoading)
     return (

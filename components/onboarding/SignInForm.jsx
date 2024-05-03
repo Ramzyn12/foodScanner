@@ -68,9 +68,7 @@ const SignInForm = () => {
 
   const handleForgotPassword = () => {
     navigation.navigate('ForgotPassword')
-    // console.log('First go to another screen with email');
-    // console.log('Get the email through an input similar to change password');
-    // console.log('If successful send the email and show toast saying sent');
+   
   }
 
   return (

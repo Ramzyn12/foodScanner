@@ -14,15 +14,18 @@ import FoodDetails from "./screens/FoodDetails";
 import { useQuery } from "@tanstack/react-query";
 import { getUserHaptics } from "./axiosAPI/userAPI";
 import { setHapticSetting } from "./redux/userSlice";
+import { storage } from "./utils/MMKVStorage";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 function MainComponent({ loggedIn }) {
   const dispatch = useDispatch();
+  const token = storage.getString("firebaseToken");
   const { data: hapticsEnabledData } = useQuery({
     queryFn: getUserHaptics,
     queryKey: ["HapticsEnabled"],
+    enabled: !!token
     // staleTime: Infinity,
     // gcTime: 100000
   });

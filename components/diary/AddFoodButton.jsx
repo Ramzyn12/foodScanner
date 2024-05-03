@@ -9,11 +9,9 @@ const AddFoodButton = () => {
 
   const navigation = useNavigation();
 
-
   const handleFoodPress = () => {
     navigation.navigate("ScanStack");
   };
-
 
   return (
     <View style={{ paddingBottom: 14, paddingTop: 28 }}>

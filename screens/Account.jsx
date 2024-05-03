@@ -40,12 +40,21 @@ const Account = ({ navigation }) => {
     mutationFn: addUserNames,
     onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ["UserNames"] });
+
+      const user = auth().currentUser;
+      if (user) {
+        user.updateProfile({ displayName: firstName || lastName }).then(() => {
+          console.log("Success updating display name");
+        });
+      }
+
       if (firstNameInputRef.current) {
         firstNameInputRef.current.blur();
       }
       if (lastNameInputRef.current) {
         lastNameInputRef.current.blur();
       }
+
       Toast.show({
         text1: "Names saved",
       });

@@ -100,3 +100,17 @@ PROPOSED SOLUTION:
 
 Store all the dates on the backend as close to just the day as you can, for example best case scenario is just 2024-04-04 however if this doesnt work for mongoDB then try 2024-04-04T00:00:000Z or noon. Just consider the different options. This means that no matter where someone is in the world, if its april 24th we simply just store THEIR local time, so for jeff in brazil its 2024-04-04 and molly in italy its 2024-04-03, and so thats what we store in our database for each of them, we need to be able to get their local date of course. 
 Look at https://www.mongodb.com/docs/manual/reference/method/Date/ and https://stackoverflow.com/questions/2532729/daylight-saving-time-and-time-zone-best-practices
+
+
+IN APP PURCHASES:
+
+RevenueCat has 3 main areas, Entitlements, products and offerings
+
+Suppose users can either subscribe to a gold tier which gives you some more access or diamond tier with its own access,
+Maybe gold is monthly and diamond is yearly subscription. Gold and diamond are the entitlemnts and represetns a level of access a user is entitled to. 
+
+Products are the actual products a user will be purchasing, for example gold_monthly, gold_lifetime or diamond_yearly etc... Now we can add our products into each of our entitlements so in the app we can just check the entitlements rather than checkign every possible product. So we check if Gold... rather than if gold_monthly or gold_yearly etc...
+
+Offering is a collection of products you offer to customers in a paywall, For example in our paywall we may offer a gold_monthly, gold_yearly and diamond_yearly. Problem is that a single offering represents all the different platforms so 
+gold_monthly represnts andriod, ios, web
+

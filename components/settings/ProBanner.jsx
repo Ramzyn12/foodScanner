@@ -1,13 +1,16 @@
-import { View, Text } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import React from "react";
 import COLOURS from "../../constants/colours";
 import ArrowRight from "../../svgs/ArrowRight";
 import GreenIvyOne from "../../svgs/GreenIvyOne";
 import GreenIvyTwo from "../../svgs/GreenIvyTwo";
 import GreenIvyThree from "../../svgs/GreenIvyThree";
+import { useNavigation } from "@react-navigation/native";
 const ProBanner = () => {
+  const navigation = useNavigation();
   return (
-    <View
+    <Pressable
+      onPress={() => navigation.navigate("Paywall")}
       style={{
         width: "100%",
         height: 93,
@@ -17,7 +20,7 @@ const ProBanner = () => {
         borderRadius: 12,
         alignItems: "center",
         padding: 22,
-        overflow: 'hidden'
+        overflow: "hidden",
       }}
     >
       <View
@@ -56,7 +59,7 @@ const ProBanner = () => {
       <GreenIvyOne />
       <GreenIvyTwo />
       <GreenIvyThree />
-    </View>
+    </Pressable>
   );
 };
 

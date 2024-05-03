@@ -19,7 +19,6 @@ const AccordianMetricLog = ({ metric, date }) => {
     : "";
 
   const handleHideModal = useCallback(() => {
-    // console.log('close');
     bottomSheetRef.current?.close();
   }, []);
 

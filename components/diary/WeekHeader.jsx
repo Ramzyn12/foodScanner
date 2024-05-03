@@ -10,7 +10,7 @@ import { BlurView } from "expo-blur";
 import Carousel from "react-native-reanimated-carousel";
 import WeekDayProgress from "./WeekDayProgress";
 import { Dimensions } from "react-native";
-import moment from "moment";
+// import moment from "moment";
 import { StyleSheet } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { setChosenDate } from "../../redux/diarySlice";

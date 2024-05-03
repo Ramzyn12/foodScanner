@@ -24,12 +24,10 @@ const UnmarkButton = () => {
     },
   });
 
-
   const handleUnselectAll = () => {
     dispatch(unmarkAllChecked()) // Optimistic update
     unMarkMutation.mutate();
   };
-
 
   return (
     <Pressable onPress={handleUnselectAll} style={styles.container}>

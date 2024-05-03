@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "ivy Dev",
-    "slug": "ivy",
+    "name": "ivyDev",
+    "slug": "ivy-dev",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -41,7 +41,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "feacb2e0-be6f-44df-9585-db22a52774d8"
+        "projectId": "b34df258-d968-4b65-938a-9171d0737801"
       }
     },
     "plugins": [
@@ -71,7 +71,7 @@
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/feacb2e0-be6f-44df-9585-db22a52774d8"
+      "url": "https://u.expo.dev/b34df258-d968-4b65-938a-9171d0737801"
     }
   }
 }

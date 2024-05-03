@@ -9,9 +9,11 @@ import React, { useState } from "react";
 import ClearIcon from "../../svgs/ClearIcon";
 import COLOURS from "../../constants/colours";
 import { TextInput } from "react-native";
-const EmailInput = ({ email, setEmail }) => {
+const EmailInput = ({ email, setEmail, message }) => {
   //Maybe add some animations here so nicer focus
   const [isEmailFocused, setIsEmailFocused] = useState(false);
+
+  const text = message || 'Email Address'
 
   return (
     <View
@@ -30,7 +32,7 @@ const EmailInput = ({ email, setEmail }) => {
       >
         {isEmailFocused && (
           <Text style={{ fontSize: 11, fontFamily: "Mulish_700Bold" }}>
-            Email Address
+            {text}
           </Text>
         )}
         <TextInput
@@ -43,7 +45,7 @@ const EmailInput = ({ email, setEmail }) => {
           autoCorrect={false}
           keyboardType="email-address"
           autoComplete="email"
-          placeholder={isEmailFocused ? "" : "Email Address"}
+          placeholder={isEmailFocused ? "" : text}
           style={{
             fontSize: 14,
             width: "100%",

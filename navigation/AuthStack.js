@@ -100,7 +100,7 @@ const AuthStack = () => {
       <Stack.Screen
         name="ForgotPassword"
         component={ForgotPassword}
-        options={{ headerShown: false, presentation: 'modal' }}
+        options={{ headerShown: false }}
       />
       {/* <Stack.Screen
         name="CreateAccount"
