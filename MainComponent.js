@@ -15,6 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getUserHaptics } from "./axiosAPI/userAPI";
 import { setHapticSetting } from "./redux/userSlice";
 import { storage } from "./utils/MMKVStorage";
+import Purchases from "react-native-purchases";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -22,6 +23,7 @@ const Stack = createNativeStackNavigator();
 function MainComponent({ loggedIn }) {
   const dispatch = useDispatch();
   const token = storage.getString("firebaseToken");
+
   const { data: hapticsEnabledData } = useQuery({
     queryFn: getUserHaptics,
     queryKey: ["HapticsEnabled"],
@@ -34,9 +36,25 @@ function MainComponent({ loggedIn }) {
     dispatch(setHapticSetting(hapticsEnabledData));
   }, [hapticsEnabledData]);
 
+
   const waitingForBackendApple = useSelector(
     (state) => state.auth.waitingForBackend
   );
+
+  useEffect(() => {
+    Purchases.addCustomerInfoUpdateListener(info => {
+      console.log(info);
+      if (info.entitlements.active.pro) {
+        console.log("User's pro subscription is active.");
+        
+      } else {
+        console.log("User's pro subscription is not active.");
+        // Handle the removal of pro status in your app
+      }
+    });
+
+    // return () => purchaserInfoUpdateListener.remove();
+  }, []);
 
   return (
     <NavigationContainer>

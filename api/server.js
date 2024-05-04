@@ -34,6 +34,15 @@ app.use('/api/v1/health-metrics', metricRoutes);
 app.use('/api/v1/timeline-weeks', timelineRoutes);
 app.use('/api/v1/notes', noteRoutes);
 
+app.post('/webhooks', (req, res) => {
+  console.log('Received webhook:', req.body);
+
+
+  res.status(200).send('Webhook received');
+
+});
+
+
 // Error Handlers
 app.use("*", (req, res) => {
   res.status(404).json({ message: "Resource not found" });

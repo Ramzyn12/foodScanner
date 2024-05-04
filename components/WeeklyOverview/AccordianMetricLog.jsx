@@ -65,7 +65,7 @@ const AccordianMetricLog = ({ metric, date }) => {
       >
         {displayValue}
       </Text>
-      <Pressable onPress={() => bottomSheetRef.current.present()}>
+      <Pressable hitSlop={15} onPress={() => bottomSheetRef.current.present()}>
         <Text
           style={{
             fontSize: 14,

@@ -40,7 +40,7 @@ const AddNotes = ({ route }) => {
       // notesInputRef.current?.blur();
       timer = setTimeout(() => {
         notesInputRef.current?.focus();
-      }, 300);
+      }, 500);
     }
 
     return () => clearTimeout(timer); // Clear timeout if component unmounts

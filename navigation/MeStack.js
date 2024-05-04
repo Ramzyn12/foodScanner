@@ -82,6 +82,7 @@ const MeStack = () => {
         component={Paywall}
         options={{
           headerShown: false,
+          presentation: 'modal'
         }}
       />
 

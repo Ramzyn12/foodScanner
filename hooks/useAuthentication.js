@@ -9,6 +9,7 @@ import { Log } from "victory-native";
 export const useAuthentication = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [firebaseUid, setFirebaseUid] = useState(null);  // Add this line
   const dispatch = useDispatch();
   // const storage = useMMKV()
 
@@ -18,10 +19,10 @@ export const useAuthentication = () => {
         const token = await user.getIdToken();
         dispatch(setToken(token));
         if (token) storage.set("firebaseToken", token);
-        // await AsyncStorage.setItem('firebaseToken', token);
+        setFirebaseUid(user.uid);  // Set Firebase UID
         setIsLoggedIn(true);
       } else {
-        // await AsyncStorage.removeItem('firebaseToken');
+        setFirebaseUid(null);  // Reset Firebase UID
         storage.delete("firebaseToken");
         setIsLoggedIn(false);
       }
@@ -56,5 +57,5 @@ export const useAuthentication = () => {
     };
   }, []);
 
-  return { isLoggedIn, isLoading };
+  return { isLoggedIn, isLoading, firebaseUid };
 };

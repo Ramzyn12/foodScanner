@@ -7,7 +7,7 @@ import {
   ScrollView,
   Dimensions,
 } from "react-native";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Area,
   CartesianChart,
@@ -26,8 +26,7 @@ import {
 import { Mulish_300Light_Italic } from "@expo-google-fonts/mulish";
 import COLOURS from "../constants/colours";
 import ProBanner from "../components/settings/ProBanner";
-import ArrowRight from "../svgs/ArrowRight";
-
+import Purchases from "react-native-purchases";
 import HealthCard from "../components/me/HealthCard";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import SettingsIconNoFill from "../svgs/SettingsIconNoFill";
@@ -65,6 +64,22 @@ const Me = ({ navigation }) => {
     }
   );
 
+  const getCustomerInfo = async () => {
+    try {
+      const customerInfo = await Purchases.getCustomerInfo();
+      console.log(customerInfo, "CINFO");
+      if (typeof customerInfo.entitlements.active["Pro"] !== "undefined") {
+        // console.log(customerInfo);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    getCustomerInfo();
+  }, []);
+
   return (
     <View
       style={{
@@ -74,14 +89,21 @@ const Me = ({ navigation }) => {
         paddingHorizontal: 20,
       }}
     >
-      <View style={{ flexDirection: "row", width: "100%", alignItems: 'center', justifyContent: 'space-between' }}>
-      <View style={{ width: 28 }}></View>
+      <View
+        style={{
+          flexDirection: "row",
+          width: "100%",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <View style={{ width: 28 }}></View>
         {showSmallMe && (
           <Text
             style={{
               fontSize: 19,
               fontFamily: "Mulish_700Bold",
-              textAlign: 'center',
+              textAlign: "center",
               color: COLOURS.nearBlack,
             }}
           >
@@ -112,14 +134,33 @@ const Me = ({ navigation }) => {
             Me
           </Text>
           <ProBanner />
-          <HealthCard leftLable={'None'} rightLable={'Extreme'} onLog={handlePresentModalPress} metricType='Anxiety' />
-          <HealthCard leftLable={'Terrible'} rightLable={'Great'} onLog={handlePresentModalPress} metricType='Sleep Quality' />
-          <HealthCard leftLable={'Very Low'} rightLable={'Very High'} onLog={handlePresentModalPress} metricType='Energy' />
+          <HealthCard
+            leftLable={"None"}
+            rightLable={"Extreme"}
+            onLog={handlePresentModalPress}
+            metricType="Anxiety"
+          />
+          <HealthCard
+            leftLable={"Terrible"}
+            rightLable={"Great"}
+            onLog={handlePresentModalPress}
+            metricType="Sleep Quality"
+          />
+          <HealthCard
+            leftLable={"Very Low"}
+            rightLable={"Very High"}
+            onLog={handlePresentModalPress}
+            metricType="Energy"
+          />
           <HealthCard metricType="Weight" onLog={handlePresentModalPress} />
           <InviteFriendsCard />
         </View>
       </ScrollView>
-      <LogModal onClose={handleHideModal} metricType={currentMetric} ref={bottomSheetModalRef} />
+      <LogModal
+        onClose={handleHideModal}
+        metricType={currentMetric}
+        ref={bottomSheetModalRef}
+      />
     </View>
   );
 };

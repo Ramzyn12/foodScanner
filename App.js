@@ -21,23 +21,15 @@ import Toast from "react-native-toast-message";
 import * as SplashScreen from "expo-splash-screen";
 import { useAuthentication } from "./hooks/useAuthentication";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-import Purchases from 'react-native-purchases'
+import Purchases from "react-native-purchases";
 import { Platform } from "react-native";
+
 SplashScreen.preventAutoHideAsync(); // Prevent auto-hide
 
-
-// MAY NEED TO CHANGE STALE TIME? 
+// MAY NEED TO CHANGE STALE TIME?
 const queryClient = new QueryClient();
 
 const App = () => {
-  const RC_API_KEY = process.env.EXPO_PUBLIC_RC_IOS_KEY
-
-  useEffect(() => {
-    if (Platform.OS === 'ios' && RC_API_KEY) {
-      Purchases.configure({apiKey: RC_API_KEY});
-   }
-  }, [])
-
   return (
     <Provider store={store}>
       {/* Only necessary if want to use redux in App, else remove. */}
@@ -48,7 +40,8 @@ const App = () => {
 
 const AppInitializer = () => {
   const [appIsReady, setAppIsReady] = useState(false);
-  const { isLoggedIn, isLoading } = useAuthentication();
+  const { isLoggedIn, isLoading, firebaseUid } = useAuthentication();
+  const RC_API_KEY = process.env.EXPO_PUBLIC_RC_IOS_KEY;
 
   let [fontsLoaded] = useFonts({
     Mulish_400Regular,
@@ -65,6 +58,14 @@ const AppInitializer = () => {
       setAppIsReady(true);
     }
   }, [fontsLoaded, isLoading]);
+
+  useEffect(() => {
+    if (Platform.OS === "ios" && RC_API_KEY && firebaseUid) {
+      Purchases.configure({apiKey: RC_API_KEY, appUserID: firebaseUid});
+    }
+  }, [firebaseUid, RC_API_KEY]);
+
+ 
 
   const onLayoutRootView = useCallback(async () => {
     if (appIsReady) {
