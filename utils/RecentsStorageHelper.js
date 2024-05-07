@@ -26,7 +26,6 @@ export async function saveRecentScan(foodItem) {
 export async function getRecentScans() {
   try {
     const recents = await AsyncStorage.getItem(RECENTS_STORAGE_KEY);
-    console.log(recents);
     return recents ? JSON.parse(recents) : [];
   } catch (error) {
     console.error("Error fetching recent scans:", error);

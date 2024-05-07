@@ -33,6 +33,7 @@ import SettingsIconNoFill from "../svgs/SettingsIconNoFill";
 import LogModal from "../components/me/LogModal";
 import InviteFriendsCard from "../components/me/InviteFriendsCard";
 import { Animated } from "react-native";
+import { useSubscriptionState } from "../hooks/useSubscriptionState";
 
 const Me = ({ navigation }) => {
   const font = useFont(Mulish_300Light_Italic, 12);
@@ -64,21 +65,8 @@ const Me = ({ navigation }) => {
     }
   );
 
-  const getCustomerInfo = async () => {
-    try {
-      const customerInfo = await Purchases.getCustomerInfo();
-      console.log(customerInfo, "CINFO");
-      if (typeof customerInfo.entitlements.active["Pro"] !== "undefined") {
-        // console.log(customerInfo);
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  useEffect(() => {
-    getCustomerInfo();
-  }, []);
+  const { isSubscribed } = useSubscriptionState();
+  console.log(isSubscribed);
 
   return (
     <View

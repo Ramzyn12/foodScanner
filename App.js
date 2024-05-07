@@ -64,7 +64,6 @@ const AppInitializer = () => {
       Purchases.configure({apiKey: RC_API_KEY, appUserID: firebaseUid});
     }
   }, [firebaseUid, RC_API_KEY]);
-
  
 
   const onLayoutRootView = useCallback(async () => {

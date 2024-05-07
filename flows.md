@@ -102,15 +102,44 @@ Store all the dates on the backend as close to just the day as you can, for exam
 Look at https://www.mongodb.com/docs/manual/reference/method/Date/ and https://stackoverflow.com/questions/2532729/daylight-saving-time-and-time-zone-best-practices
 
 
-IN APP PURCHASES:
+IN APP PURCHASES FLOW
 
-RevenueCat has 3 main areas, Entitlements, products and offerings
+1. When app loads in App.js we configure the Purchases object with a custom app id, (to use in webhooks).
+2. When a user tries to use a paid feature we show them the paywall with options, they can then purchases the subscription and this will then update their customer info
+3. In MainComponent.js we have a listener for when customerInfo changes, these changes will then trigger a dispatch to redux where if they cancel then we can send them notification or somin, just realised that a cancel shouldn't stop the access in 
+app. I THINK THIS ISNT NEEDED THO SINCE POINT 4 IS SUFFICIENT
+4. we also have a Purhcases.customerInfo subscription status which could be called on each component to decide their subscription status? Could do it on each focus rather than mount? 
+5. We then use webhooks when subscription changes for reasons such as: for things like sending emails to say sorry your going when they unsubscribe or vice versa. Some people maintain documents of subscriptions or purchases but not sure we will. They say to call the REST API whenever someone uses webhook because different webhook events have different structures but rest api has same structure so easier to store in DB. The different webhook flows are simple if you read them.
 
-Suppose users can either subscribe to a gold tier which gives you some more access or diamond tier with its own access,
-Maybe gold is monthly and diamond is yearly subscription. Gold and diamond are the entitlemnts and represetns a level of access a user is entitled to. 
 
-Products are the actual products a user will be purchasing, for example gold_monthly, gold_lifetime or diamond_yearly etc... Now we can add our products into each of our entitlements so in the app we can just check the entitlements rather than checkign every possible product. So we check if Gold... rather than if gold_monthly or gold_yearly etc...
+OR if you feel we need to use the listner then maybe set it up like this:
+1. Fetch Initial Subscription Status: When your app or specific component mounts, immediately call getCustomerInfo() to fetch the current state of the user's subscriptions. This method will provide you with the necessary data to initialize your app's UI correctly.
+2. Set Up Listener for Updates: After fetching the initial data, set up addCustomerInfoUpdateListener to listen for any changes in subscription status. This ensures that your app reacts to updates in real-time after the initial load.
 
-Offering is a collection of products you offer to customers in a paywall, For example in our paywall we may offer a gold_monthly, gold_yearly and diamond_yearly. Problem is that a single offering represents all the different platforms so 
-gold_monthly represnts andriod, ios, web
+useEffect(() => {
+    const fetchSubscriptionInfo = async () => {
+      try {
+        const info = await Purchases.getCustomerInfo();
+        if (info.entitlements.active.pro) {
+          setIsProUser(true);
+        } else {
+          setIsProUser(false);
+        }
+      } catch (error) {
+        console.error("Failed to fetch purchaser info:", error);
+      }
+    };
+
+    fetchSubscriptionInfo();
+
+    const listener = Purchases.addCustomerInfoUpdateListener((info) => {
+      if (info.entitlements.active.pro) {
+        setIsProUser(true);
+      } else {
+        setIsProUser(false);
+      }
+    });
+
+    return () => listener.remove();
+  }, []);
 

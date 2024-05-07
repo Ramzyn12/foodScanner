@@ -17,11 +17,12 @@ import { BlurView } from "expo-blur";
 import FakeBlurComponent from "./FakeBlurComponent";
 import { Image } from "react-native";
 import FoodDetailReasonCard from "./FoodDetailReasonCard";
+import { useSubscriptionState } from "../../hooks/useSubscriptionState";
 // import { BlurView } from "@react-native-community/blur";
 
 const FoodDetailsMainInfo = () => {
   const currentFood = useSelector((state) => state.food.currentFood);
-  const [hasProSub, setHasProSub] = useState(false);
+  const { isSubscribed } = useSubscriptionState();
   const title =
     currentFood.processedState === "Processed"
       ? "Why you should avoid this"
@@ -47,7 +48,7 @@ const FoodDetailsMainInfo = () => {
 
   return (
     <View style={styles.container}>
-      {!hasProSub && (
+      {!isSubscribed && (
         <LinearGradient
           colors={["#5135C1", "#EE0A93"]}
           start={start}
@@ -58,7 +59,7 @@ const FoodDetailsMainInfo = () => {
         </LinearGradient>
       )}
       <Text style={styles.titleText}>{title}</Text>
-      {hasProSub && (
+      {isSubscribed && (
         <View style={{ gap: 14 }}>
           <Text
             style={{
@@ -82,14 +83,14 @@ const FoodDetailsMainInfo = () => {
           ))}
         </View>
       )}
-      {!hasProSub && (
+      {!isSubscribed && (
         <Image
           style={{ resizeMode: "contain", width: "100%", height: 280 }}
           source={require("../../assets/BlurImage.png")}
         />
       )}
-      {!hasProSub && (
-        <Pressable onPress={() => setHasProSub(true)}>
+      {!isSubscribed && (
+        <Pressable onPress={() => setisSubscribed(true)}>
           <LinearGradient
             colors={["#5135C1", "#EE0A93"]}
             start={start}

@@ -43,7 +43,6 @@ function MainComponent({ loggedIn }) {
 
   useEffect(() => {
     Purchases.addCustomerInfoUpdateListener(info => {
-      console.log(info);
       if (info.entitlements.active.pro) {
         console.log("User's pro subscription is active.");
         
