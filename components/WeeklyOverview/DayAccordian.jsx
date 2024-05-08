@@ -13,28 +13,35 @@ import PendingClock from "../../svgs/PendingClock";
 import LogModal from "../me/LogModal";
 import { useNavigation } from "@react-navigation/native";
 import { getCurrentDateLocal } from "../../utils/dateHelpers";
+import Animated, {
+  Easing,
+  Layout,
+  SlideInDown,
+  SlideOutUp,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 const DayAccordian = ({ dayData, day }) => {
   const [accordianOpen, setAccordianOpen] = useState(false);
-
-
+  const rotation = useSharedValue(0); // Rotation for the arrow
+  const [height, setHeight] = useState(0);
   const navigation = useNavigation();
   const dateOfEntry = new Date(dayData?.date);
-  const today = new Date(getCurrentDateLocal())
+  const today = new Date(getCurrentDateLocal());
 
-  
   const isPresent = today.toISOString() === dateOfEntry.toISOString();
   const isFuture = dateOfEntry > today;
 
-  
   const svgWithoutTime = isSuccess ? <GreenTickCircle /> : <GreyFail />;
 
   const svg = isPresent ? <PendingClock /> : isFuture ? "" : svgWithoutTime;
-  
+
   const isSuccess =
-  dayData.diaryDetails.fastedState === true ||
-  dayData.diaryDetails.diaryDayState === "unprocessed";
-  
+    dayData.diaryDetails.fastedState === true ||
+    dayData.diaryDetails.diaryDayState === "unprocessed";
+
   const messageWithoutTime = isSuccess
     ? "Success - no processed food"
     : "Failed - you consumed processed food";
@@ -48,8 +55,33 @@ const DayAccordian = ({ dayData, day }) => {
   const handleAccordianPress = () => {
     if (!isFuture) {
       setAccordianOpen((prev) => !prev);
+      rotation.value = withTiming(accordianOpen ? 0 : 180, {
+        duration: 300,
+        // easing: Easing.inOut,
+      });
     }
   };
+
+  const arrowStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ rotateZ: `${rotation.value}deg` }],
+    };
+  });
+
+  const onLayout = (e) => {
+    const layoutHeight = e.nativeEvent.layout.height;
+
+    if (layoutHeight > 0 && layoutHeight !== height) {
+      setHeight(layoutHeight);
+    }
+  };
+
+  const openAnimatedStyle = useAnimatedStyle(() => {
+    const animatedHeight = accordianOpen ? withTiming(height) : withTiming(0);
+    return {
+      height: animatedHeight,
+    };
+  });
 
   return (
     <Pressable
@@ -60,7 +92,7 @@ const DayAccordian = ({ dayData, day }) => {
         borderColor: COLOURS.lightGray,
         borderRadius: 20,
         paddingTop: 20,
-        paddingBottom: accordianOpen ? 0 : 20,
+        paddingBottom: 5,
         gap: 14,
       }}
     >
@@ -81,7 +113,9 @@ const DayAccordian = ({ dayData, day }) => {
         >
           Day {day}
         </Text>
-        <ArrowDownShort />
+        <Animated.View style={arrowStyle}>
+          <ArrowDownShort />
+        </Animated.View>
       </View>
       {svg && (
         <View
@@ -104,8 +138,12 @@ const DayAccordian = ({ dayData, day }) => {
           </Text>
         </View>
       )}
-      {accordianOpen && (
-        <View>
+
+      <Animated.View style={[openAnimatedStyle, { overflow: "hidden" }]}>
+        <View
+          onLayout={onLayout}
+          style={{ position: "absolute", width: "100%" }}
+        >
           {dayData.metrics.map((metric, index) => (
             <AccordianMetricLog
               date={dateOfEntry}
@@ -113,13 +151,12 @@ const DayAccordian = ({ dayData, day }) => {
               key={index}
             />
           ))}
-          {/* <AccordianMetricLog />
-          <AccordianMetricLog />
-          <AccordianMetricLog />
-          <AccordianMetricLog /> */}
           <Pressable
             onPress={() =>
-              navigation.navigate("AddNotes", { date: dateOfEntry.toISOString(), day })
+              navigation.navigate("AddNotes", {
+                date: dateOfEntry.toISOString(),
+                day,
+              })
             }
             style={{
               // backgroundColor: 'red',
@@ -142,7 +179,7 @@ const DayAccordian = ({ dayData, day }) => {
             <ArrowRight />
           </Pressable>
         </View>
-      )}
+      </Animated.View>
     </Pressable>
   );
 };

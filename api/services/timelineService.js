@@ -13,17 +13,14 @@ async function getRecentTimelineWeek({ userId }) {
   const recentDiaryDay = await DiaryDay.findOne({ userId: userId }).sort({
     date: 1,
   });
-
-  if (!recentDiaryDay) {
-    return res
-      .status(404)
-      .json({ message: "No diary days found for this user." });
-  }
+  
   const today = new Date(getCurrentDateLocal());
-  const lastDiaryDate = new Date(recentDiaryDay.date);
+  const lastDiaryDate = new Date(recentDiaryDay?.date || today);
   const differenceInDays = differenceInCalendarDays(today, lastDiaryDate);
 
-  const week = Math.ceil(differenceInDays / 7);
+  let week = Math.ceil(differenceInDays / 7);
+  if (week === 0) week = 1
+  console.log(week, 'WEEK');
   const currentDay = differenceInDays % 7;
 
   const latestTimelineWeek = await TimelineWeek.findOne({ week: week }).lean();

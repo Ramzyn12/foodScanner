@@ -58,7 +58,7 @@ const WeeklyOverview = ({ route }) => {
   return (
     <View style={{ paddingTop: insets.top, flex: 1, backgroundColor: "white" }}>
       <OverviewHeader week={week} title={weekData?.timelineWeek?.title} />
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         {/* UPPER */}
         <View style={{ gap: 20, padding: 20 }}>
           <View>

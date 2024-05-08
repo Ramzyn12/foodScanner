@@ -3,22 +3,46 @@ import React, { useEffect, useState } from "react";
 import Svg, { G, Path, ClipPath, Rect, Defs } from "react-native-svg";
 import COLOURS from "../../constants/colours";
 import { addDays, isSameDay } from "date-fns";
+import { eachDayOfInterval, parseISO, formatISO } from 'date-fns';
 
 const StreakCard = ({ diaryData }) => {
   const [streak, setStreak] = useState(0);
 
   useEffect(() => {
-    if (diaryData) {
-      const streakNum = calculateCurrentStreak(diaryData);
-      setStreak(streakNum);
-    }
+    // Call the fillDiaryData function when diaryData changes
+    const filled = fillDiaryData(diaryData);
+    const streakNum = calculateCurrentStreak(filled);
+    setStreak(streakNum);
   }, [diaryData]);
+
+  // Function to fill in the missing diary days
+  const fillDiaryData = (data) => {
+    if (!data || data.length === 0) return [];
+
+    const startDate = parseISO(data[0].date);
+    const endDate = new Date(); // Current date
+
+    // Generate a range of dates from the start date to the current date
+    const dateRange = eachDayOfInterval({ start: startDate, end: endDate });
+
+    // Map over the range and create or use existing diary data
+    return dateRange.map(day => {
+      const isoDay = formatISO(day, { representation: 'date' });
+      const existing = data.find(d => formatISO(parseISO(d.date), { representation: 'date' }) === isoDay);
+      // If need dates consistent use below return 
+      // return existing 
+      // ? { ...existing, date: isoDay } // Update existing entries to date-only format
+      // : { _id: null, date: isoDay, diaryDayState: "empty", fastedState: false }; // New entry with date-only
+      return existing || { _id: null, date: isoDay, diaryDayState: "empty", fastedState: false };
+    });
+  };
 
   const calculateCurrentStreak = (diaryDays) => {
     let currentStreak = 0;
     let i = 1;
     const sorted = [...diaryDays].reverse();
 
+    // console.log(sorted);
 
     // While its unprocessed or fasting and also consecutive days within length 
     while (

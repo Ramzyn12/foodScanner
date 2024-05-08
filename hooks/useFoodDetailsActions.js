@@ -270,7 +270,7 @@ export const useFoodDetailsActions = (expectedId) => {
   useFocusEffect(
     useCallback(() => {
       return () => {
-        queryClient.invalidateQueries('AllDiaryDays')
+        queryClient.invalidateQueries({queryKey: 'AllDiaryDays'})
       };
     }, []))
 

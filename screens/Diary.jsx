@@ -52,8 +52,8 @@ const Diary = ({ navigation }) => {
   } = useQuery({
     queryKey: ["RecentTimelineWeek"],
     queryFn: getRecentTimelineWeek,
-    gcTime: Infinity,
-    staleTime: Infinity,
+    // gcTime: 1000 * 60 * 60 * 4,
+    staleTime: 1000 * 60 * 60 * 4, // 6 hours
     enabled: !!token,
     // refetchOnMount: false,
     // retryOnMount: false,

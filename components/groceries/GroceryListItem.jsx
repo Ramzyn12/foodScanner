@@ -140,6 +140,7 @@ const GroceryListItem = ({ foodItem, id, onLongPress, isActive }) => {
     },
   });
 
+
   const foodItemSchema = {
     barcode: foodItem?.barcode,
     singleFoodId: singleFoodId,

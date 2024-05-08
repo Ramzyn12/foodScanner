@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Header from '../components/settings/Header'
 import NotificationOption from '../components/settings/NotificationOption'
 
-const Notifications = () => {
+const Notifications = ({navigation}) => {
   const insets = useSafeAreaInsets()
   return (
     <View
@@ -15,7 +15,7 @@ const Notifications = () => {
         paddingBottom: insets.bottom,
       }}
     >
-      <Header headerText={'Notifications'} />
+      <Header onNavigate={() => navigation.goBack()} headerText={'Notifications'} />
       <View style={{padding: 14, gap: 14}}>
         <NotificationOption title={'Health changes'} description={'Notify me when there is a change in my health stats'} />
         <NotificationOption title={'Food tracking reminder'} description={'Remind me to log the food I have eaten'} />

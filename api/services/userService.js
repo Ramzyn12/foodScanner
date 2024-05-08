@@ -13,6 +13,7 @@ const verifyAppleToken = require("../utils/verifyAppleToken");
 const { startSession } = require("mongoose");
 const { startOfDay } = require("date-fns");
 const { getCurrentDateLocal } = require("../utils/dateHelper");
+const HealthMetric = require("../models/HealthMetric");
 
 function handleFirebaseError(err) {
   console.error(err); // Log the original error for debugging purposes
@@ -145,7 +146,8 @@ async function removeUser(firebaseId, userId) {
     if (!user) throw new NotFoundError("Firebase Id invalid");
 
     // Assuming there's a relationship via the user's ID
-    await DiaryDay.deleteMany({ userId }, { session });
+    await DiaryDay.deleteMany({ userId: user._id }, { session });
+    await HealthMetric.deleteMany({ userId: user._id }, { session });
 
     await session.commitTransaction();
     session.endSession();

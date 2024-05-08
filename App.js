@@ -23,6 +23,7 @@ import { useAuthentication } from "./hooks/useAuthentication";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import Purchases from "react-native-purchases";
 import { Platform } from "react-native";
+import { useNotifications } from "./hooks/useNotifications";
 
 SplashScreen.preventAutoHideAsync(); // Prevent auto-hide
 
@@ -64,7 +65,11 @@ const AppInitializer = () => {
       Purchases.configure({apiKey: RC_API_KEY, appUserID: firebaseUid});
     }
   }, [firebaseUid, RC_API_KEY]);
- 
+
+
+  const {notification, expoPushToken} = useNotifications()
+
+  // console.log(notification, 'Notification', expoPushToken);
 
   const onLayoutRootView = useCallback(async () => {
     if (appIsReady) {

@@ -8,12 +8,23 @@ import { useNavigation } from "@react-navigation/native";
 import { SvgXml } from "react-native-svg";
 import WeekOverviewLines from "../WeeklyOverview/WeekOverviewLines";
 
-const TimelineEventCard = ({ unlocked, data, destination, daysFinished, remainingDaysToUnlock }) => {
+const TimelineEventCard = ({
+  unlocked,
+  data,
+  destination,
+  daysFinished,
+  remainingDaysToUnlock,
+}) => {
   const navigation = useNavigation();
 
+  const handleNavigateHealhWeek = () => {
+    if (unlocked) {
+      navigation.navigate(destination, { week: data?.week });
+    }
+  };
   return (
     <Pressable
-      onPress={() => navigation.navigate(destination, {week: data?.week})}
+      onPress={handleNavigateHealhWeek}
       style={[
         styles.cardContainer,
         { backgroundColor: unlocked ? COLOURS.lightGreen : "white" },
@@ -22,7 +33,6 @@ const TimelineEventCard = ({ unlocked, data, destination, daysFinished, remainin
     >
       {/* Top Section when locked */}
       <View style={styles.cardTopContainer}>
-        
         {/* Icon (Shown if locked) */}
         {!unlocked && (
           <View
@@ -45,21 +55,37 @@ const TimelineEventCard = ({ unlocked, data, destination, daysFinished, remainin
 
         {/* Show when both locked and unlocked */}
         <View style={{ flex: 1 }}>
-          <Text style={{ marginBottom: 8, fontFamily: "Mulish_700Bold" , fontSize: 16}}>
+          <Text
+            style={{
+              marginBottom: 8,
+              fontFamily: "Mulish_700Bold",
+              fontSize: 16,
+            }}
+          >
             {data?.title}
           </Text>
-          <Text style={{ marginBottom: 14, fontFamily: "Mulish_400Regular", fontSize: 14 }}>
+          <Text
+            style={{
+              marginBottom: 14,
+              fontFamily: "Mulish_400Regular",
+              fontSize: 14,
+            }}
+          >
             {data?.subtitle}
           </Text>
           {unlocked && (
             <View style={{ paddingBottom: 16 }}>
-              <WeekOverviewLines daysFinished={daysFinished + 1 || data?.currentDay} />
+              <WeekOverviewLines
+                daysFinished={daysFinished + 1 || data?.currentDay}
+              />
             </View>
           )}
           {unlocked && (
             <View style={styles.tipsTextContainer}>
               <Text style={{ fontSize: 11, fontFamily: "Mulish_800ExtraBold" }}>
-                {7 - daysFinished > 0 ? `${7 - daysFinished} days remaining` : 'Completed'}
+                {7 - daysFinished > 0
+                  ? `${7 - daysFinished} days remaining`
+                  : "Completed"}
                 {/* {7 - daysFinished} days remaining */}
               </Text>
             </View>
@@ -67,7 +93,6 @@ const TimelineEventCard = ({ unlocked, data, destination, daysFinished, remainin
         </View>
 
         <ArrowRight />
-
       </View>
 
       {!unlocked && (
