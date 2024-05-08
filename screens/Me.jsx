@@ -32,14 +32,18 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import SettingsIconNoFill from "../svgs/SettingsIconNoFill";
 import LogModal from "../components/me/LogModal";
 import InviteFriendsCard from "../components/me/InviteFriendsCard";
-import { Animated } from "react-native";
+import Animated, { interpolate } from "react-native-reanimated";
 import { useSubscriptionState } from "../hooks/useSubscriptionState";
+import {
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+} from "react-native-reanimated";
 
 const Me = ({ navigation }) => {
   const font = useFont(Mulish_300Light_Italic, 12);
   const bottomSheetModalRef = useRef(null);
-  const [showSmallMe, setShowSmallMe] = useState(false);
-  const scrollY = useRef(new Animated.Value(0)).current; // Use Animated.Value to track scroll position
+  const scrollY = useSharedValue(0); 
   const insets = useSafeAreaInsets();
 
   const [currentMetric, setCurrentMetric] = useState(null);
@@ -50,23 +54,29 @@ const Me = ({ navigation }) => {
   }, []);
 
   const handleHideModal = useCallback(() => {
-    // console.log('close');
     bottomSheetModalRef.current?.close();
   }, []);
 
-  const handleScroll = Animated.event(
-    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-    {
-      listener: (event) => {
-        const offsetY = event.nativeEvent.contentOffset.y;
-        setShowSmallMe(offsetY > 34);
-      },
-      useNativeDriver: false, // Use native driver for better performance
-    }
-  );
+  // Animated scroll handler
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
+  const animatedTextStyle = useAnimatedStyle(() => {
+    const opacity = interpolate(
+      scrollY.value,
+      [24, 60], // Start fading from 0 to 50 pixels scroll
+      [0, 1], // From fully transparent to fully opaque
+    );
+
+    return {
+      opacity,
+    };
+  });
 
   const { isSubscribed } = useSubscriptionState();
-  console.log(isSubscribed);
 
   return (
     <View
@@ -86,18 +96,21 @@ const Me = ({ navigation }) => {
         }}
       >
         <View style={{ width: 28 }}></View>
-        {showSmallMe && (
-          <Text
-            style={{
+
+        <Animated.Text
+          style={[
+            {
               fontSize: 19,
               fontFamily: "Mulish_700Bold",
               textAlign: "center",
               color: COLOURS.nearBlack,
-            }}
-          >
-            Me
-          </Text>
-        )}
+            },
+            animatedTextStyle,
+          ]}
+        >
+          Me
+        </Animated.Text>
+
         <Pressable
           onPress={() => navigation.navigate("Settings")}
           hitSlop={40}
@@ -106,9 +119,9 @@ const Me = ({ navigation }) => {
           <SettingsIconNoFill />
         </Pressable>
       </View>
-      <ScrollView
+      <Animated.ScrollView
         scrollEventThrottle={16}
-        onScroll={handleScroll}
+        onScroll={scrollHandler}
         showsVerticalScrollIndicator={false}
       >
         <View style={{ gap: 20, flex: 1, paddingBottom: 100 }}>
@@ -143,7 +156,7 @@ const Me = ({ navigation }) => {
           <HealthCard metricType="Weight" onLog={handlePresentModalPress} />
           <InviteFriendsCard />
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
       <LogModal
         onClose={handleHideModal}
         metricType={currentMetric}

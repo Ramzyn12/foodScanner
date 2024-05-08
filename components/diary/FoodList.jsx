@@ -35,6 +35,8 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary }) => {
     diaryFoodItems?.consumedFoods?.length +
     diaryFoodItems?.consumedSingleFoods?.length;
 
+  const itemsString = numberOfItems > 1 ? `${numberOfItems} items` : `${numberOfItems} item`
+
   useEffect(() => {
     if (diaryFoodItems) {
       setIsFasting(diaryFoodItems.fastedState);
@@ -150,7 +152,7 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary }) => {
             color: COLOURS.nearBlack,
           }}
         >
-          {numberOfItems} items
+          {itemsString}
         </Text>
       )}
 
