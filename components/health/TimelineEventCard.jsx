@@ -19,7 +19,7 @@ const TimelineEventCard = ({
 
   const handleNavigateHealhWeek = () => {
     if (unlocked) {
-      navigation.navigate(destination, { week: data?.week });
+      navigation.navigate(destination, { week: data?.week, title: data?.title });
     }
   };
   return (

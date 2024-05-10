@@ -24,12 +24,13 @@ import { useSelector } from "react-redux";
 import { Skeleton } from "moti/skeleton";
 import { getCurrentDateLocal } from "../../utils/dateHelpers";
 
-const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary }) => {
+const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary, isErrorFoodDiary }) => {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const chosenDate =
     useSelector((state) => state.diary.chosenDate) || getCurrentDateLocal();
   const [isFasting, setIsFasting] = useState(false);
+  const [isLoadingFasted, setIsLoadingFasted] = useState(false)
 
   const numberOfItems =
     diaryFoodItems?.consumedFoods?.length +
@@ -38,8 +39,13 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary }) => {
   const itemsString = numberOfItems > 1 ? `${numberOfItems} items` : `${numberOfItems} item`
 
   useEffect(() => {
+    setIsLoadingFasted(true)
     if (diaryFoodItems) {
       setIsFasting(diaryFoodItems.fastedState);
+    }
+    if (diaryFoodItems || isErrorFoodDiary) {
+      setIsLoadingFasted(false)
+
     }
   }, [diaryFoodItems]);
 
@@ -218,6 +224,7 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary }) => {
       )}
       {/* More food button */}
       {!isFasting && <AddFoodButton />}
+      
       {emptyFoodList && (
         <View
           style={{

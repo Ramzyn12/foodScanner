@@ -254,6 +254,14 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
     [weeksData]
   );
 
+  function findWeekIndexByDate(weeksArray, targetDate) {
+    // Loop through the array of weeks
+    return weeksArray.findIndex((week) => {
+      // Check if any day in the 'days' array of this week matches the target date
+      return week.days.some((day) => day.date === getAnyDateLocal(targetDate));
+    });
+  }
+
   return (
     <BlurView
       intensity={isReduceTransparencyEnabled ? 10 : 70}
@@ -310,7 +318,8 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
         data={weeksData}
         renderItem={renderWeek}
         loop={false}
-        defaultIndex={weeksData.length - 1} // start at the current week
+        // defaultIndex={weeksData.length - 1} // start at the current week
+        defaultIndex={findWeekIndexByDate(weeksData, chosenDate)}
         ref={carouselRef}
         width={windowWidth}
         height={100}

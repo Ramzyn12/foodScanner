@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setCurrentFood } from "../redux/foodSlice";
 import { saveRecentScan } from "../utils/RecentsStorageHelper";
+
+// CHANGE THIS??
 const DEFAULT_IMAGE =
   "https://static4.depositphotos.com/1026550/376/i/450/depositphotos_3763236-stock-photo-gold-star.jpg";
 
@@ -17,7 +19,7 @@ export const useFoodDetails = (foodDetails, singleFoodDetails) => {
         processedState: foodDetails.processedState,
         isConsumedToday: foodDetails.isConsumedToday,
         isInGroceryList: foodDetails?.isInGroceryList,
-        image_url: foodDetails?.image_url || DEFAULT_IMAGE,
+        image_url: foodDetails?.image_url,
         description: "",
         barcode: foodDetails.barcode,
         singleFoodId: "",

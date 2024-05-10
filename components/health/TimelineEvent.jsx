@@ -4,7 +4,8 @@ import COLOURS from "../../constants/colours";
 import { Path, Svg } from "react-native-svg";
 import TimelineEventCard from "./TimelineEventCard";
 
-const TimelineEvent = ({ unlocked, data, daysFinished, remainingDaysToUnlock }) => {
+const TimelineEvent = ({ unlocked, data, daysFinished, remainingDaysToUnlock, isLoading }) => {
+
   return (
     <View style={styles.container}>
       
@@ -17,6 +18,7 @@ const TimelineEvent = ({ unlocked, data, daysFinished, remainingDaysToUnlock }) 
 
       {/* Green Dot */}
       <View style={styles.circle}></View>
+
 
       <TimelineEventCard
         destination={"WeeklyOverview"}

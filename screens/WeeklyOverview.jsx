@@ -15,6 +15,7 @@ import DaysLeftCard from "../components/WeeklyOverview/DaysLeftCard";
 import DayAccordian from "../components/WeeklyOverview/DayAccordian";
 import { useQuery } from "@tanstack/react-query";
 import { getTimelineWeek } from "../axiosAPI/timelineAPI";
+import LoadingWeeklyOverview from "../components/WeeklyOverview/LoadingWeeklyOverview";
 
 const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
 <g clip-path="url(#clip0_1126_4878)">
@@ -53,11 +54,11 @@ const WeeklyOverview = ({ route }) => {
     queryKey: ["TimelineWeek", week],
   });
 
-  if (isLoading) return <ActivityIndicator />;
+  if (isLoading) return <LoadingWeeklyOverview route={route} />;
 
   return (
     <View style={{ paddingTop: insets.top, flex: 1, backgroundColor: "white" }}>
-      <OverviewHeader week={week} title={weekData?.timelineWeek?.title} />
+      <OverviewHeader week={week} title={route.params.title} />
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* UPPER */}
         <View style={{ gap: 20, padding: 20 }}>

@@ -22,13 +22,16 @@ import { useSubscriptionState } from "../../hooks/useSubscriptionState";
 
 const FoodDetailsMainInfo = () => {
   const currentFood = useSelector((state) => state.food.currentFood);
-  const { isSubscribed } = useSubscriptionState();
-  const title =
+  // const { isSubscribed } = useSubscriptionState()
+  const isSubscribed = true
+  const isUnknown = currentFood.processedState === "Unknown"
+  const title = isUnknown ? `We're not sure about this item` :
     currentFood.processedState === "Processed"
       ? "Why you should avoid this"
       : `Why it's a great choice`;
 
   const message =
+  isUnknown ? '' :
     currentFood.processedState === "Processed"
       ? "We recommend avoiding this product as it is considered highly processed based on the ingredients and additives."
       : "This product is a great choice as it occurs naturally on the earth, is nutrient dense, and does not contain harmful additives or ingredients.";

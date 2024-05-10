@@ -12,7 +12,7 @@ const authSlice = createSlice({
       state.token = action.payload;
     },
     setWaitingForBackend(state, action) {
-      state.userCreated = action.payload
+      state.waitingForBackend = action.payload
     },
     setLoadingAuth(state, action) {
       state.authLoading = action.payload

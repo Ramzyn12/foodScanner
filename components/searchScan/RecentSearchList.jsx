@@ -28,10 +28,10 @@ const RecentSearchList = () => {
     }, [])
   );
 
-  const handleClearRecent = async () => {
-    setRecentList([]);
-    await clearRecentScans(); // From storage
-  };
+  // const handleClearRecent = async () => {
+  //   setRecentList([]);
+  //   await clearRecentScans(); // From storage
+  // };
 
   const handleListItemPress = (item) => {
     navigation.navigate("FoodDetails", {
@@ -61,7 +61,7 @@ const RecentSearchList = () => {
             recentList.map((item) => (
               <Pressable
                 onPress={() => handleListItemPress(item)}
-                key={item.image_url}
+                key={item.image_url + item.name}
               >
                 <View style={styles.foodListItemContainer}>
                   <FoodListItem foodItem={item} />

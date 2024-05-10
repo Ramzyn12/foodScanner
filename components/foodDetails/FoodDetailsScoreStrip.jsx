@@ -12,18 +12,18 @@ const FoodDetailsScoreStrip = ({ processedScore }) => {
   const processedState = currentFood?.processedState
   const background = processedState === 'Processed' ? COLOURS.badFoodBackground : COLOURS.greatFoodBackground
   const textColour = processedState === 'Processed' ? COLOURS.badFoodText : COLOURS.greatFoodText
-
-  const message = processedState === 'Processed' ? 'Avoid' : 'Great choice'
+  const isUnknown = processedState === "Unknown"
+  const message = isUnknown ? 'Unknown' : processedState === 'Processed' ? 'Avoid' : 'Great choice'
 
   return (
     <View style={[styles.container, { backgroundColor: COLOURS.lightGreen }]}>
       <View style={styles.innerContainer}>
         <Text style={[styles.description]}>{message}</Text>
-        <View style={[styles.scoreBackground, { backgroundColor: background }]}>
+        {!isUnknown && <View style={[styles.scoreBackground, { backgroundColor: background }]}>
           <Text style={[styles.scoreText, { color: textColour }]}>
             {processedState}
           </Text>
-        </View>
+        </View>}
       </View>
       {processedState === 'Processed' && <View style={styles.warningMessageContainer}>
         <DangerTriangle />

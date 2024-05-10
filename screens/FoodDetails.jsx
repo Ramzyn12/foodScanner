@@ -31,6 +31,7 @@ import { useFoodDetails } from "../hooks/useFoodDetails";
 import FoodDetailsMainInfo from "../components/foodDetails/FoodDetailsMainInfo";
 import FoodDetailsEnvironment from "../components/foodDetails/FoodDetailsEnvironment";
 import { getCurrentDateLocal } from "../utils/dateHelpers";
+import LoadingFoodDetails from "../components/foodDetails/LoadingFoodDetails";
 
 const FoodDetails = ({ navigation, route }) => {
   const barcode = route?.params?.barcodeId;
@@ -40,7 +41,7 @@ const FoodDetails = ({ navigation, route }) => {
 
   const {
     data: foodDetails,
-    isLoading,
+    isLoading: isLoadingFoodDetails,
     isError,
     isFetching,
     error
@@ -52,9 +53,8 @@ const FoodDetails = ({ navigation, route }) => {
     queryFn: () => fetchFoodWithBarcode(barcode, chosenDate),
   });
 
-
   // Need to add loading states here ASWELL!!
-  const { data: singleFoodDetails, error: IvyError } = useQuery({
+  const { data: singleFoodDetails, error: IvyError, isLoading: isLoadingSingleFood } = useQuery({
     queryKey: ["FoodDetailsIvy", singleFoodId, chosenDate],
     retry: false,
     enabled: !!singleFoodId,
@@ -64,14 +64,11 @@ const FoodDetails = ({ navigation, route }) => {
   // handle the normalisation
   const readyToShow = useFoodDetails(foodDetails, singleFoodDetails);
 
-  if (isLoading || !readyToShow) {
+  if (isLoadingFoodDetails || isLoadingSingleFood || !readyToShow) {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <ActivityIndicator />
-      </View>
+      <LoadingFoodDetails />
     );
   }
-
 
   if (isError) {
     console.log(IvyError, error);

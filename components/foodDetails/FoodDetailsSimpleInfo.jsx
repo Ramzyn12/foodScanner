@@ -16,6 +16,7 @@ import FoodImageModal from "./FoodImageModal";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import ClearIcon from "../../svgs/ClearIcon";
+import unknown from "../../assets/unknown.webp";
 
 const FoodDetailsSimpleInfo = ({ foodItem, expectedId }) => {
   const navigation = useNavigation();
@@ -30,9 +31,8 @@ const FoodDetailsSimpleInfo = ({ foodItem, expectedId }) => {
         <TouchableOpacity onPress={() => setModalVisible(true)}>
           <Image
             style={styles.image}
-            source={{
-              uri: currentFood?.image_url,
-            }}
+            source={currentFood?.image_url ? { uri: currentFood.image_url } : unknown}
+
           />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>

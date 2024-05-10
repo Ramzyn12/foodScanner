@@ -4,6 +4,7 @@ import TimelineEvent from "../components/health/TimelineEvent";
 import { ScrollView } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { getAllTimelineWeeks } from "../axiosAPI/timelineAPI";
+import LoadingHealth from "../components/health/LoadingHealth";
 
 const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
 <g clip-path="url(#clip0_1126_4878)">
@@ -68,7 +69,6 @@ const data = [
 // If its 0 (which it will be after last step) then its locked
 
 const calculateWeekStatus = (daysSinceStart, weekIndex) => {
-  
   const daysPassed = daysSinceStart - weekIndex * 7;
   const remainingDaysToUnlock = weekIndex * 7 - daysSinceStart;
 
@@ -91,7 +91,7 @@ const Health = () => {
     queryKey: ["AllTimelineWeeks"],
   });
 
-  if (isLoading) return <ActivityIndicator />;
+  if (isLoading) return <LoadingHealth />;
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: "white" }}>

@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, Image } from "react-native";
 import React from "react";
 import COLOURS from "../../constants/colours";
-
+import unknown from "../../assets/unknown.webp";
 const FoodListItem = ({ foodSelected, foodItem }) => {
   //Change colours based on scores
   // THIS IS A SHARED COMPONENT hence the foodSelected from grocery
@@ -16,18 +16,14 @@ const FoodListItem = ({ foodSelected, foodItem }) => {
       ? COLOURS.badFoodText
       : COLOURS.greatFoodText;
 
-
   return (
     <View style={styles.foodListItemContainer}>
       {/* image */}
-      {foodItem?.image_url && (
-        <Image
-          style={styles.image}
-          source={{
-            uri: foodItem?.image_url, //Or some default?
-          }}
-        />
-      )}
+      <Image
+        style={styles.image}
+        source={foodItem?.image_url ? { uri: foodItem.image_url } : unknown}
+
+      />
       <View style={styles.foodListItem}>
         <Text
           style={[

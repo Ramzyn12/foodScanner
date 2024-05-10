@@ -267,12 +267,12 @@ export const useFoodDetailsActions = (expectedId) => {
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      return () => {
-        queryClient.invalidateQueries({queryKey: 'AllDiaryDays'})
-      };
-    }, []))
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     return () => {
+  //       queryClient.invalidateQueries({queryKey: ['AllDiaryDays']})
+  //     };
+  //   }, []))
 
   // Either we debounce like 500 to save some calls or not? Ask farid
   const debouncedDiaryHandler = useCallback(debounce(diaryHandler, 0), []);

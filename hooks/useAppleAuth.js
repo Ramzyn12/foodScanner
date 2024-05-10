@@ -16,16 +16,19 @@ import auth from "@react-native-firebase/auth";
 import { removeUserAccount } from "../axiosAPI/userAPI";
 import Toast from "react-native-toast-message";
 import { storage } from "../utils/MMKVStorage";
+import { useNavigation } from "@react-navigation/native";
 
 export const useAppleAuth = () => {
   const userInformation = useSelector(
     (state) => state.onboarding.userInformation
   );
   const dispatch = useDispatch();
+  const navigation = useNavigation()
 
   const signUpAppleMutation = useMutation({
     mutationFn: signUpApple,
     onSuccess: () => {
+      // Once user is created we can call things like diary days
       dispatch(setWaitingForBackend(false));
     },
     onError: (err) => {
@@ -77,13 +80,12 @@ export const useAppleAuth = () => {
 
       // Sign in the user with Firebase
       const userCredential = await auth().signInWithCredential(appleCredential);
-      const firebaseToken = await userCredential.user.getIdToken();
 
+      // const firebaseToken = await userCredential.user.getIdToken();
       // Store the Firebase token and proceed with any further sign-up process
       // Do we need this? 
       // await AsyncStorage.setItem("firebaseToken", firebaseToken);
       // storage.set('firebaseToken', firebaseToken) 
-
 
       // Call your backend API or perform further actions with the signed-in user
       signUpAppleMutation.mutate({
@@ -92,6 +94,8 @@ export const useAppleAuth = () => {
         idToken: identityToken,
         userInformation,
       });
+
+
     } catch (error) {
       console.error("Error during Apple sign-in:", error);
       auth().signOut();

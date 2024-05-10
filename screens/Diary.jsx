@@ -19,7 +19,7 @@ import Carousel from "react-native-reanimated-carousel";
 // import moment from "moment"; // make sure moment is installed
 import { BlurView } from "expo-blur";
 import { focusManager, useQuery } from "@tanstack/react-query";
-import { getAllDiaryDays } from "../axiosAPI/diaryDayAPI";
+import { getAllDiaryDays, getDiaryDay } from "../axiosAPI/diaryDayAPI";
 import { useSelector } from "react-redux";
 import WeekHeader from "../components/diary/WeekHeader";
 import TimelineEventCard from "../components/health/TimelineEventCard";
@@ -27,29 +27,30 @@ import { storage } from "../utils/MMKVStorage";
 import { getRecentTimelineWeek } from "../axiosAPI/timelineAPI";
 import { getCurrentDateLocal } from "../utils/dateHelpers";
 import { useFocusNotifyOnChangeProps } from "../hooks/useFocusNotifyOnChangeProps";
+import { useFocusEffect } from "@react-navigation/native";
+import LoadingDiary from "../components/diary/LoadingDiary";
 
 const Diary = ({ navigation }) => {
   const userCreated = useSelector((state) => state.auth.userCreated);
   // const token = useSelector((state) => state.auth.token);
   const token = storage.getString("firebaseToken");
-  // const currentFood = useSelector((state) => state.food.currentFood);
+  const firstTimeRef = useRef(true);
+  const waitingForBackendApple = useSelector(
+    (state) => state.auth.waitingForBackend
+  ); // const currentFood = useSelector((state) => state.food.currentFood);
   // const notifyOnChangeProps = useFocusNotifyOnChangeProps()
+  const chosenDate = useSelector((state) => state.diary.chosenDate) || getCurrentDateLocal()
 
   // focusManager.setFocused(true);
 
-  const { data, refetch, isLoading, isError, error } = useQuery({
+  const { data, refetch: refetchAllDiaryDays, isPending: isLoadingAllDiaryDays, isError, error } = useQuery({
     queryKey: ["AllDiaryDays"],
     queryFn: getAllDiaryDays,
     retry: false,
     enabled: !!token,
   });
 
-  const {
-    data: recentTimelineWeekData,
-    dataUpdatedAt,
-    isFetching,
-    isStale,
-  } = useQuery({
+  const { data: recentTimelineWeekData, isPending: isLoadingRecentTimeline } = useQuery({
     queryKey: ["RecentTimelineWeek"],
     queryFn: getRecentTimelineWeek,
     // gcTime: 1000 * 60 * 60 * 4,
@@ -61,25 +62,42 @@ const Diary = ({ navigation }) => {
     // refetchOnReconnect: false,
   });
 
+  // const {
+  //   data: diaryFoodItems,
+  //   // isError,
+  //   isPending: isLoadingDiaryDay,
+  //   // refetch,
+  //   // error,
+  // } = useQuery({
+  //   queryFn: () => getDiaryDay({ date: chosenDate }),
+  //   queryKey: ["DiaryDay", chosenDate],
+  //   enabled: !!token,
+  //   retry: false,
+  // });
+
+  // see if can remove this? Try login apple
   useEffect(() => {
     if (userCreated) {
-      refetch();
+      refetchAllDiaryDays();
     }
   }, [userCreated]);
 
-  if (isLoading)
+  // Refetches on each mount
+  useFocusEffect(
+    useCallback(() => {
+      if (firstTimeRef.current) {
+        firstTimeRef.current = false;
+        return;
+      }
+      refetchAllDiaryDays();
+    }, [refetchAllDiaryDays])
+  );
+
+  if (isLoadingAllDiaryDays || isLoadingRecentTimeline)
     return (
-      <View
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "yellow",
-        }}
-      >
-        <Text style={{ fontSize: 34 }}>Loading diary screen data</Text>
-      </View>
+      <LoadingDiary />
     );
+    
   if (isError)
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
@@ -109,7 +127,7 @@ const Diary = ({ navigation }) => {
             daysFinished={recentTimelineWeekData?.currentDay}
           />
         </Pressable>
-        <FoodDiary />
+        <FoodDiary  />
       </ScrollView>
     </SafeAreaView>
   );

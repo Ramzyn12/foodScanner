@@ -16,6 +16,7 @@ import { getUserHaptics } from "./axiosAPI/userAPI";
 import { setHapticSetting } from "./redux/userSlice";
 import { storage } from "./utils/MMKVStorage";
 import Purchases from "react-native-purchases";
+import LoadingDiary from "./components/diary/LoadingDiary";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -23,11 +24,14 @@ const Stack = createNativeStackNavigator();
 function MainComponent({ loggedIn }) {
   const dispatch = useDispatch();
   const token = storage.getString("firebaseToken");
+  const waitingForBackendApple = useSelector(
+    (state) => state.auth.waitingForBackend
+  );
 
   const { data: hapticsEnabledData } = useQuery({
     queryFn: getUserHaptics,
     queryKey: ["HapticsEnabled"],
-    enabled: !!token
+    enabled: !!token && !waitingForBackendApple,
     // staleTime: Infinity,
     // gcTime: 100000
   });
@@ -35,11 +39,6 @@ function MainComponent({ loggedIn }) {
   useEffect(() => {
     dispatch(setHapticSetting(hapticsEnabledData));
   }, [hapticsEnabledData]);
-
-
-  const waitingForBackendApple = useSelector(
-    (state) => state.auth.waitingForBackend
-  );
 
   useEffect(() => {
     Purchases.addCustomerInfoUpdateListener(info => {
@@ -81,16 +80,7 @@ function MainComponent({ loggedIn }) {
         </Stack.Navigator>
       )}
       {waitingForBackendApple && loggedIn && (
-        <View
-          style={{
-            flex: 1,
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "blue",
-          }}
-        >
-          <Text style={{ fontSize: 28 }}>Waiting for backend</Text>
-        </View>
+        <LoadingDiary />
       )}
       {!loggedIn && <AuthStack />}
     </NavigationContainer>

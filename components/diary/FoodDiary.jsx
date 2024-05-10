@@ -16,13 +16,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { storage } from "../../utils/MMKVStorage";
 import { setCurrentDiaryDay } from "../../redux/diarySlice";
 import { getCurrentDateLocal } from "../../utils/dateHelpers";
+import LoadingDiary from "./LoadingDiary";
 
-const FoodDiary = () => {
+const FoodDiary = ({}) => {
   // const token = useSelector(state => state.auth.token)
   const token = storage.getString("firebaseToken");
   const userCreated = useSelector((state) => state.auth.userCreated);
   const chosenDate = useSelector((state) => state.diary.chosenDate) || getCurrentDateLocal()
-
+  const waitingForBackendApple = useSelector(
+    (state) => state.auth.waitingForBackend
+  );
   const dispatch = useDispatch();
   useEffect(() => {
     if (userCreated) {
@@ -52,7 +55,7 @@ const FoodDiary = () => {
       1 * diaryFoodItems?.consumedSingleFoods.length ===
     0;
 
-  // if (isLoading) return <Skeleton radius="round" width={'100%'} />;
+  // if (isLoading) return <LoadingDiary />;
   if (isError) return <Text>{error.response.data.message}</Text>;
 
   return (
