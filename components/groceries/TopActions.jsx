@@ -10,7 +10,7 @@ const TopActions = () => {
 
   return (
     <View style={styles.container}>
-      <Pressable hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}>
+      <Pressable >
         <Text style={styles.editText}>Edit</Text>
       </Pressable>
       <Text style={styles.titleText}>Groceries</Text>
@@ -34,9 +34,10 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
   },
   editText: {
-    color: COLOURS.darkGreen,
+    color: 'transparent',
     fontSize: 14,
     fontFamily: "Mulish_600SemiBold",
+  
   },
   titleText: {
     color: COLOURS.nearBlack,

@@ -5,7 +5,7 @@ import Shuttle from "../../svgs/Shuttle";
 import ArrowRight from "../../svgs/ArrowRight";
 import TimerCircle from "../../svgs/TimerCircle";
 import { useNavigation } from "@react-navigation/native";
-import { SvgXml } from "react-native-svg";
+import { Svg, Path } from "react-native-svg";
 import WeekOverviewLines from "../WeeklyOverview/WeekOverviewLines";
 
 const TimelineEventCard = ({
@@ -19,9 +19,16 @@ const TimelineEventCard = ({
 
   const handleNavigateHealhWeek = () => {
     if (unlocked) {
-      navigation.navigate(destination, { week: data?.week, title: data?.title });
+      navigation.navigate(destination, {
+        week: data?.week,
+        title: data?.title,
+      });
     }
   };
+
+  const daysRemaining = 7 - daysFinished;
+  const completed = daysRemaining <= 0;
+
   return (
     <Pressable
       onPress={handleNavigateHealhWeek}
@@ -34,24 +41,6 @@ const TimelineEventCard = ({
       {/* Top Section when locked */}
       <View style={styles.cardTopContainer}>
         {/* Icon (Shown if locked) */}
-        {!unlocked && (
-          <View
-            style={[
-              styles.iconContainer,
-              { backgroundColor: unlocked ? COLOURS.darkGreen : "white" },
-              { borderWidth: unlocked ? 0 : 1, borderColor: COLOURS.lightGray },
-            ]}
-          >
-            <SvgXml
-              width={"100%"}
-              height={"100%"}
-              xml={data?.svg.replaceAll(
-                "white",
-                unlocked ? "white" : COLOURS.darkGreen
-              )}
-            />
-          </View>
-        )}
 
         {/* Show when both locked and unlocked */}
         <View style={{ flex: 1 }}>
@@ -81,13 +70,24 @@ const TimelineEventCard = ({
             </View>
           )}
           {unlocked && (
-            <View style={styles.tipsTextContainer}>
-              <Text style={{ fontSize: 11, fontFamily: "Mulish_800ExtraBold" }}>
-                {7 - daysFinished > 0
-                  ? `${7 - daysFinished} days remaining`
-                  : "Completed"}
-                {/* {7 - daysFinished} days remaining */}
+            <View style={[styles.tipsTextContainer, {backgroundColor: completed ? COLOURS.darkGreen : 'rgba(0, 0, 0, 0.08)'}]}>
+              <Text style={{ fontSize: 11, fontFamily: "Mulish_800ExtraBold", color: completed ? 'white' : 'black' }}>
+                {completed ? "Complete" : `${daysRemaining} days remaining`}
               </Text>
+              {completed && (
+                <Svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="12"
+                  height="9"
+                  viewBox="0 0 12 9"
+                  fill="none"
+                >
+                  <Path
+                    d="M11.7174 0.986761C11.8942 0.774623 11.8656 0.45934 11.6534 0.282558C11.4413 0.105776 11.126 0.134438 10.9492 0.346577L7.35544 4.65912C6.63355 5.52539 6.12573 6.13289 5.68526 6.53064C5.25507 6.91911 4.95818 7.04257 4.66667 7.04257C4.37516 7.04257 4.07827 6.91911 3.64808 6.53064C3.20761 6.13289 2.69979 5.52538 1.97789 4.65911L1.05078 3.54658C0.873998 3.33444 0.558715 3.30578 0.346577 3.48256C0.134438 3.65934 0.105776 3.97462 0.282558 4.18676L1.2354 5.33018C1.92558 6.15842 2.47831 6.8217 2.97788 7.27282C3.49392 7.73881 4.02143 8.04257 4.66667 8.04257C5.31191 8.04257 5.83942 7.73881 6.35546 7.27282C6.85503 6.82171 7.40774 6.15843 8.09791 5.3302L11.7174 0.986761Z"
+                    fill="white"
+                  />
+                </Svg>
+              )}
             </View>
           )}
         </View>
@@ -98,7 +98,13 @@ const TimelineEventCard = ({
       {!unlocked && (
         <View style={styles.cardLockedMessage}>
           <TimerCircle />
-          <Text style={{ fontSize: 14, fontFamily: "Mulish_600SemiBold" }}>
+          <Text
+            style={{
+              fontSize: 14,
+              fontFamily: "Mulish_600SemiBold",
+              paddingVertical: 2,
+            }}
+          >
             Unlock In {remainingDaysToUnlock} Days
           </Text>
         </View>
@@ -143,6 +149,9 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     paddingHorizontal: 14,
     paddingVertical: 6,
+    flexDirection: 'row',
+    gap: 6,
+    alignItems: 'center',
     borderRadius: 40,
   },
   cardLockedMessage: {

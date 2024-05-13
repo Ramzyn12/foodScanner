@@ -15,7 +15,7 @@ const WeightInput = ({
 
   return (
     <View style={{ gap: 14 }}>
-      <View style={{ flexDirection: "row", gap: 8 }}>
+      {bottomSheetBehaviour && <View style={{ flexDirection: "row", gap: 8 }}>
         <Pressable
           onPress={() => setWeightUnit("imperial")}
           style={{
@@ -62,7 +62,7 @@ const WeightInput = ({
             Metric
           </Text>
         </Pressable>
-      </View>
+      </View>}
 
       {bottomSheetBehaviour ? (
         <BottomSheetTextInput

@@ -8,6 +8,7 @@ import {
   getRecentScans,
 } from "../../utils/RecentsStorageHelper";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import NoRecentList from "./NoRecentList";
 
 const RecentSearchList = () => {
   const [recentList, setRecentList] = useState([]);
@@ -39,6 +40,8 @@ const RecentSearchList = () => {
       barcodeId: item.barcode,
     });
   };
+
+  if (recentList.length === 0) return <NoRecentList />
 
   return (
     <>

@@ -49,7 +49,7 @@ const calculateBarProgress = (progress) => {
 };
 
 const getLastLoggedText = (isoDateString) => {
-  if (!isoDateString) return "N/A";
+  if (!isoDateString) return null;
 
   const date = parseISO(isoDateString);
   const today = new Date(getCurrentDateLocal());
@@ -69,13 +69,14 @@ const getLastLoggedText = (isoDateString) => {
 const HealthCard = ({ onLog, metricType, leftLable, rightLable }) => {
   const navigation = useNavigation();
   const isWeight = metricType === "Weight";
+
   const { data } = useQuery({
     queryFn: () => getRecentMetric({ metric: metricType }),
     queryKey: ["RecentMetric", metricType], //Second param is the metric
   });
 
   const { barOneProgress, barTwoProgress, barThreeProgress } =
-    calculateBarProgress(data?.metricValue * 10);
+    calculateBarProgress(data?.metricValue ? data?.metricValue * 10 : 0);
   const lastLoggedText = getLastLoggedText(data?.date);
   const isLastLoggedToday = lastLoggedText === "Today";
 
@@ -109,7 +110,7 @@ const HealthCard = ({ onLog, metricType, leftLable, rightLable }) => {
           </Text>
           <ArrowRight />
         </View>
-        <View style={{ flexDirection: "row", gap: 2 }}>
+        {lastLoggedText && <View style={{ flexDirection: "row", gap: 2 }}>
           <Text
             style={{
               fontFamily: "Mulish_400Regular",
@@ -128,15 +129,15 @@ const HealthCard = ({ onLog, metricType, leftLable, rightLable }) => {
           >
             {lastLoggedText}
           </Text>
-        </View>
+        </View>}
       </View>
       {isWeight && (
         <View style={{ flexDirection: "row", gap: 20 }}>
           <View style={{ flexDirection: "row", alignItems: "baseline" }}>
-            <Text style={{ fontSize: 50, fontFamily: "700Mulish_Bold" }}>
+            <Text style={{ fontSize: 50, fontFamily: "700Mulish_Bold", color: COLOURS.nearBlack }}>
               {data?.metricValue}
             </Text>
-            <Text style={{ fontSize: 11, fontFamily: "700Mulish_Bold" }}>
+            <Text style={{ fontSize: 11, fontFamily: "700Mulish_Bold", color: COLOURS.nearBlack }}>
               {data?.unitOfMeasure}
             </Text>
           </View>

@@ -23,22 +23,21 @@ import { useSubscriptionState } from "../../hooks/useSubscriptionState";
 const FoodDetailsMainInfo = () => {
   const currentFood = useSelector((state) => state.food.currentFood);
   // const { isSubscribed } = useSubscriptionState()
-  const isSubscribed = true
-  const isUnknown = currentFood.processedState === "Unknown"
-  const title = isUnknown ? `We're not sure about this item` :
+  const isSubscribed = false;
+  const isUnknown = currentFood.processedState === "Unknown";
+  const title =
     currentFood.processedState === "Processed"
       ? "Why you should avoid this"
       : `Why it's a great choice`;
 
   const message =
-  isUnknown ? '' :
     currentFood.processedState === "Processed"
       ? "We recommend avoiding this product as it is considered highly processed based on the ingredients and additives."
       : "This product is a great choice as it occurs naturally on the earth, is nutrient dense, and does not contain harmful additives or ingredients.";
 
   const background =
     currentFood.processedState === "Processed" ? "#FAD8D5" : "#CAE2C3";
-  const angle = 109;
+  const angle = 91;
   const angleRad = (Math.PI * angle) / 180;
   const start = {
     x: 0.5 - Math.sin(angleRad) / 2,
@@ -49,16 +48,20 @@ const FoodDetailsMainInfo = () => {
     y: 0.5 - Math.cos(angleRad) / 2,
   };
 
+  if (isUnknown) {
+    return null
+  }
+
   return (
     <View style={styles.container}>
       {!isSubscribed && (
         <LinearGradient
-          colors={["#5135C1", "#EE0A93"]}
+          colors={["#0B5253", "#19999C"]}
           start={start}
           end={end}
           style={styles.proFeatureTextContainer}
         >
-          <Text style={styles.proFeatureText}>Pro feature</Text>
+          <Text style={styles.proFeatureText}>Pro</Text>
         </LinearGradient>
       )}
       <Text style={styles.titleText}>{title}</Text>
@@ -95,12 +98,21 @@ const FoodDetailsMainInfo = () => {
       {!isSubscribed && (
         <Pressable onPress={() => setisSubscribed(true)}>
           <LinearGradient
-            colors={["#5135C1", "#EE0A93"]}
+            colors={["#0B5253", "#19999C"]}
             start={start}
             end={end}
             style={styles.tryProButtonContainer}
           >
             <Text style={styles.tryProText}>Try Pro</Text>
+            <Text
+              style={{
+                color: "#F7F6EF",
+                fontSize: 12,
+                fontFamily: "Mulish_700Bold",
+              }}
+            >
+              7 days free then £4.99/month
+            </Text>
           </LinearGradient>
         </Pressable>
       )}
@@ -120,8 +132,8 @@ const styles = StyleSheet.create({
     gap: 14,
   },
   proFeatureTextContainer: {
-    paddingHorizontal: 14,
-    borderRadius: 6,
+    paddingHorizontal: 12,
+    borderRadius: 30,
     paddingVertical: 8,
     alignSelf: "flex-start",
   },
@@ -144,13 +156,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 12,
     paddingVertical: 8,
-    height: 44,
+    gap: 4,
+    height: 60,
     justifyContent: "center",
     alignItems: "center",
   },
   tryProText: {
     color: "white",
-    fontSize: 14,
+    fontSize: 18,
     fontFamily: "Mulish_700Bold",
   },
 });

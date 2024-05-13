@@ -3,7 +3,9 @@ import { useDispatch } from "react-redux";
 import {
   setCurrentGroceries,
   setSortPreference,
+  sortByDateAdded,
   sortByProcessedScore,
+  sortByTitle,
 } from "../redux/grocerySlice";
 import { updateSortPreference } from "../axiosAPI/groceryAPI";
 import { useEffect } from "react";
@@ -12,8 +14,8 @@ import { useNavigation } from "@react-navigation/native";
 export const useGrocerySortPreference = (data) => {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
-  const navigation = useNavigation()
-  
+  const navigation = useNavigation();
+
   useEffect(() => {
     if (data) {
       handleSortPreferenceChange(data?.sortPreference);
@@ -21,10 +23,12 @@ export const useGrocerySortPreference = (data) => {
   }, [data]);
 
   const handleSortPreferenceChange = (preference) => {
-    if (preference === "Processed Score") {
-      dispatch(sortByProcessedScore(data?.groceries));
+    if (preference === "Date added") {
+      dispatch(sortByDateAdded(data));
     } else if (preference === "Manual") {
       dispatch(setCurrentGroceries(data));
+    } else if (preference === "Title") {
+      dispatch(sortByTitle(data));
     }
     dispatch(setSortPreference(preference));
   };
@@ -32,7 +36,7 @@ export const useGrocerySortPreference = (data) => {
   const updateSortMutation = useMutation({
     mutationFn: updateSortPreference,
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ["Groceries"]});
+      queryClient.invalidateQueries({ queryKey: ["Groceries"] });
     },
     onError: (err) => {
       console.log(err);
@@ -47,14 +51,19 @@ export const useGrocerySortPreference = (data) => {
       dispatch(setSortPreference("Manual"));
     }
     if (e.nativeEvent.index === 1) {
-      updateSortMutation.mutate({ sortPreference: "Processed Score" });
-      dispatch(sortByProcessedScore(data?.groceries));
-      dispatch(setSortPreference("Processed Score"));
+      updateSortMutation.mutate({ sortPreference: "Date added" });
+      dispatch(sortByDateAdded(data?.groceries));
+      dispatch(setSortPreference("Date added"));
+    }
+    if (e.nativeEvent.index === 2) {
+      updateSortMutation.mutate({ sortPreference: "Title" });
+      dispatch(sortByTitle(data?.groceries));
+      dispatch(setSortPreference("Title"));
     }
   };
 
   const handleAddFirstItem = () => {
     navigation.navigate("ScanStack");
   };
-  return {handleSortPress, handleAddFirstItem, updateSortMutation};
+  return { handleSortPress, handleAddFirstItem, updateSortMutation };
 };

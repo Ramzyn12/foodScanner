@@ -8,6 +8,7 @@ const {
   addDays,
 } = require("date-fns");
 const { getCurrentDateLocal } = require("../utils/dateHelper");
+const Note = require("../models/Note");
 
 async function getRecentTimelineWeek({ userId }) {
   const recentDiaryDay = await DiaryDay.findOne({ userId: userId }).sort({
@@ -71,7 +72,7 @@ async function getTimelineWeek({ userId, week }) {
     addDays(firstDayOfWeek, i)
   );
 
-  const [timelineWeek, diaryDays, healthMetrics] = await Promise.all([
+  const [timelineWeek, diaryDays, healthMetrics, notes] = await Promise.all([
     TimelineWeek.findOne({ week }).select("title subtitle description"),
 
     DiaryDay.find({
@@ -97,6 +98,12 @@ async function getTimelineWeek({ userId, week }) {
       },
       { $sort: { _id: 1 } },
     ]),
+
+    Note.find({
+      userId,
+      date: { $in: arrayOfDates },
+    })
+      .sort({ date: 1 }).select('note date')
   ]);
 
   const metricTypes = ["Anxiety", "Sleep Quality", "Energy", "Weight"]; // Define all possible metrics
@@ -107,6 +114,9 @@ async function getTimelineWeek({ userId, week }) {
       (m) => m._id.toISOString() === date.toISOString()
     ) || { metrics: [] };
     const foundDiaryDay = diaryDays.find(
+      (d) => d.date.toISOString() === date.toISOString()
+    );
+    const foundNote = notes.find(
       (d) => d.date.toISOString() === date.toISOString()
     );
     // Ensure all metrics are present, even if they have null values
@@ -132,8 +142,11 @@ async function getTimelineWeek({ userId, week }) {
           }
         : { fastedState: false, diaryDayState: "empty" },
       metrics: metrics,
+      note: foundNote,  // Add the notes array to each day's data
     };
   });
+
+  console.log(combinedDataByDate);
 
   return {
     timelineWeek,

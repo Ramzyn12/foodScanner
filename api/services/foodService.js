@@ -27,7 +27,7 @@ async function fetchProductWithFallback(searchTerm) {
         fields: "brands,code,image_url,product_name,nova_group",
         // countries_tags: "united-kingdom",
         // lang: 'en',
-        page_size: 20,
+        page_size: 30,
       },
     });
     // Check if data is valid
@@ -48,7 +48,7 @@ async function fetchProductWithFallback(searchTerm) {
         action: "process",
         search_terms: searchTerm,
         sort_by: "popularity_key", // CHANGE THIS??
-        page_size: 20,
+        page_size: 30,
         fields: "brands,code,image_url,product_name,nova_group",
         countries_tags: "united-kingdom",
         json: 1,
@@ -201,7 +201,7 @@ async function fetchOFFWithSearch({ search_term }) {
   //     action: "process",
   //     search_terms: search_term,
   //     sort_by: "popularity_key",
-  //     page_size: 20,
+  //     page_size: 30,
   //     countries_tags: "united-kingdom",
   //     json: 1,
   //   },
@@ -220,11 +220,15 @@ async function fetchOFFWithSearch({ search_term }) {
   const foodList = products.map((product) => {
     const processedScore = 100 - (product.nova_group - 1) * 25;
     const processedState =
-      product.nova_group === 1
-        ? "Perfect"
-        : product.nova_group === 2
-        ? "Good"
-        : "Processed";
+    product.nova_group === 1
+      ? "Perfect"
+      : product.nova_group === 2
+      ? "Good"
+      : product.nova_group === 3
+      ? "Processed"
+      : product.nova_group === 4
+      ? "Processed"
+      : "Unknown";
 
     return {
       name: product.product_name,

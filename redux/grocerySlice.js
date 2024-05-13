@@ -40,9 +40,9 @@ const grocerySlice = createSlice({
       }
     },
     unmarkAllChecked(state) {
-      state.currentGroceries = state.currentGroceries.map(groceryItem => ({
+      state.currentGroceries = state.currentGroceries.map((groceryItem) => ({
         ...groceryItem,
-        checked: false
+        checked: false,
       }));
     },
     removeVirtualGroceryItem(state, action) {
@@ -77,12 +77,32 @@ const grocerySlice = createSlice({
         state.virtuallyRemovedIndex = -1; // Also reset the index
       }
     },
-    sortByProcessedScore(state, action) {
-      state.currentGroceries = [...action.payload].sort((a, b) => {
-        const scoreA = a?.item?.processedScore;
-        const scoreB = b?.item?.processedScore;
-        return scoreA - scoreB;
-      });
+    sortByTitle(state, action) {
+      const groceries = action.payload?.groceries;
+      if (groceries) {
+        state.currentGroceries = groceries.slice().sort((a, b) => {
+          const titleA = a.item.name.toUpperCase(); // assuming the title is stored under item.title
+          const titleB = b.item.name.toUpperCase();
+          if (titleA < titleB) {
+            return -1;
+          }
+          if (titleA > titleB) {
+            return 1;
+          }
+          return 0;
+        });
+      }
+    },
+    sortByDateAdded(state, action) {
+      const groceries = action.payload.groceries;
+      if (groceries) {
+        console.log(groceries);
+        state.currentGroceries = groceries.slice().sort((a, b) => {
+          const dateA = new Date(a.createdAt); // assuming createdAt is directly on the grocery item
+          const dateB = new Date(b.createdAt);
+          return dateA - dateB;
+        });
+      }
     },
     confirmDeletion(state, action) {
       // Remove the confirmed deleted item from the deletionPendingItems list
@@ -107,6 +127,8 @@ export const {
   addVirtualGroceryItem,
   unmarkAllChecked,
   confirmDeletion,
+  sortByTitle,
+  sortByDateAdded,
   setSortPreference,
 } = grocerySlice.actions;
 export default grocerySlice.reducer;

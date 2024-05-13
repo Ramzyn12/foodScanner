@@ -61,6 +61,7 @@ const SignInForm = () => {
       })
       .catch((error) => {
         const errorCode = error.code;
+        // Add a vibration or shake or something
         handleFirebaseError(errorCode);
         setSignInLoading(false);
       });
@@ -74,7 +75,7 @@ const SignInForm = () => {
   return (
     <View style={styles.container}>
       <View style={styles.formContainer}>
-        {errorMessage && <Text>{errorMessage}</Text>}
+        
         <EmailInput email={email} setEmail={setEmail} />
         <PasswordInput password={password} setPassword={setPassword} />
         <FormSubmissionButton
@@ -84,6 +85,7 @@ const SignInForm = () => {
           text={"Sign In"}
           onPress={handleSignIn}
         />
+        {errorMessage && <Text style={{fontSize: 14, fontFamily: 'Mulish_400Regular', color: '#DB1200'}}>{errorMessage}</Text>}
         <Pressable onPress={handleForgotPassword}>
           <Text style={{textAlign: 'center', marginTop: 14, fontSize: 14, fontFamily: 'Mulish_700Bold', color: COLOURS.nearBlack}}>Forgot Password</Text>
         </Pressable>

@@ -7,14 +7,17 @@ const FoodListItem = ({ foodSelected, foodItem }) => {
   // THIS IS A SHARED COMPONENT hence the foodSelected from grocery
 
   const processedState = foodItem?.processedState;
-  const background =
-    processedState === "Processed"
-      ? COLOURS.badFoodBackground
-      : COLOURS.greatFoodBackground;
-  const textColour =
-    processedState === "Processed"
-      ? COLOURS.badFoodText
-      : COLOURS.greatFoodText;
+  const isUnknown = foodItem?.processedState === "Unknown";
+  const background = isUnknown
+    ? "#F5F5F5"
+    : processedState === "Processed"
+    ? COLOURS.badFoodBackground
+    : COLOURS.greatFoodBackground;
+  const textColour = isUnknown
+    ? "#636566"
+    : processedState === "Processed"
+    ? COLOURS.badFoodText
+    : COLOURS.greatFoodText;
 
   return (
     <View style={styles.foodListItemContainer}>
@@ -22,7 +25,6 @@ const FoodListItem = ({ foodSelected, foodItem }) => {
       <Image
         style={styles.image}
         source={foodItem?.image_url ? { uri: foodItem.image_url } : unknown}
-
       />
       <View style={styles.foodListItem}>
         <Text

@@ -21,9 +21,20 @@ import unknown from "../../assets/unknown.webp";
 const FoodDetailsSimpleInfo = ({ foodItem, expectedId }) => {
   const navigation = useNavigation();
 
-
-  const currentFood = useSelector(state => state.food.currentFood)
-  const [modalVisible, setModalVisible] = useState(false)
+  const currentFood = useSelector((state) => state.food.currentFood);
+  const processedState = currentFood?.processedState;
+  const isUnknown = processedState === 'Unknown'
+  const [modalVisible, setModalVisible] = useState(false);
+  const background =
+  isUnknown ? '#F5F5F5' : 
+    processedState === "Processed"
+      ? COLOURS.badFoodBackground
+      : COLOURS.greatFoodBackground;
+  const textColour =
+  isUnknown ? '#636566' :
+    processedState === "Processed"
+      ? COLOURS.badFoodText
+      : COLOURS.greatFoodText;
 
   return (
     <View style={styles.container}>
@@ -31,16 +42,27 @@ const FoodDetailsSimpleInfo = ({ foodItem, expectedId }) => {
         <TouchableOpacity onPress={() => setModalVisible(true)}>
           <Image
             style={styles.image}
-            source={currentFood?.image_url ? { uri: currentFood.image_url } : unknown}
-
+            source={
+              currentFood?.image_url ? { uri: currentFood.image_url } : unknown
+            }
           />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
           <Text style={styles.foodSupplierText}>{currentFood?.brand}</Text>
           <Text style={styles.foodNameText}>{currentFood?.name}</Text>
+          <View
+            style={[styles.scoreBackground, { backgroundColor: background }]}
+          >
+            <Text style={[styles.scoreText, { color: textColour }]}>
+              {processedState}
+            </Text>
+          </View>
         </View>
         {/* exit svg */}
-        <Pressable style={{alignSelf: 'flex-start'}} onPress={() => navigation.goBack()}>
+        <Pressable
+          style={{ alignSelf: "flex-start" }}
+          onPress={() => navigation.goBack()}
+        >
           <ClearIcon size={28} />
         </Pressable>
       </View>
@@ -58,16 +80,31 @@ export default FoodDetailsSimpleInfo;
 
 const styles = StyleSheet.create({
   container: { padding: 20 },
-  simpleInfoContainer: { flexDirection: "row", alignItems: "center", gap: 15 },
-  image: { width: 48, height: 58, borderRadius: 10 },
+  simpleInfoContainer: { flexDirection: "row", alignItems: "flex: start", gap: 15 },
+  image: { width: 48, height: 65, borderRadius: 10, },
   foodSupplierText: {
-    fontFamily: "Mulish_600SemiBold",
+    fontFamily: "Mulish_700Bold",
     fontSize: 16,
     color: COLOURS.tabUnselected,
   },
   foodNameText: {
-    fontFamily: "Mulish_600SemiBold",
+    fontFamily: "Mulish_700Bold",
     fontSize: 16,
     color: COLOURS.nearBlack,
+  },
+  scoreBackground: {
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    // alignItems: "center",
+    marginBottom: 8,
+    alignSelf: 'flex-start',
+    marginTop: 14,
+    // justifyContent: "center",
+    borderRadius: 6,
+    backgroundColor: COLOURS.greatFoodText,
+  },
+  scoreText: {
+    fontFamily: "Mulish_700Bold",
+    fontSize: 14,
   },
 });

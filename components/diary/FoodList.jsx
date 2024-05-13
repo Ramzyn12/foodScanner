@@ -42,10 +42,11 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary, isErrorFood
     setIsLoadingFasted(true)
     if (diaryFoodItems) {
       setIsFasting(diaryFoodItems.fastedState);
-    }
-    if (diaryFoodItems || isErrorFoodDiary) {
       setIsLoadingFasted(false)
-
+    }
+    if (isErrorFoodDiary) {
+      setIsLoadingFasted(false)
+      console.log('errrrrr');
     }
   }, [diaryFoodItems]);
 
@@ -117,7 +118,7 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary, isErrorFood
     );
   };
 
-  if (loadingFoodDiary) {
+  if (loadingFoodDiary || isLoadingFasted) {
     return (
       <View
         style={[
@@ -129,7 +130,7 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary, isErrorFood
           {Array.from({ length: 3 }, (_, index) => (
             <Skeleton
               key={index}
-              colorMode="light"
+              colorMode='light'
               height={50} // Approximate height of your list items
               width="100%"
             />

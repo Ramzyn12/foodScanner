@@ -24,6 +24,7 @@ import Toast from "react-native-toast-message";
 import TopActions from "../components/groceries/TopActions";
 import FoodDetails from "./FoodDetails";
 import { useGrocerySortPreference } from "../hooks/useGrocerySortPreference";
+import LoadingGroceries from "../components/groceries/LoadingGroceries";
 
 const Groceries = ({ navigation }) => {
   const currentGroceries = useSelector(
@@ -41,7 +42,7 @@ const Groceries = ({ navigation }) => {
   const { handleAddFirstItem, handleSortPress, updateSortMutation } =
     useGrocerySortPreference(data);
 
-  if (isLoading) return <ActivityIndicator />;
+  if (isLoading) return <LoadingGroceries />;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -60,7 +61,6 @@ const Groceries = ({ navigation }) => {
               contentContainerStyle={styles.buttonsContainer}
             >
               <SortButton onPress={handleSortPress} />
-              <FilterButton />
               {anyChecked && <UnmarkButton />}
               <ShareList />
             </ScrollView>

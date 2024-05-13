@@ -46,6 +46,8 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchFoodWithSearchIvy } from "../../axiosAPI/searchSingleAPI";
 import { fetchFoodWithSearch } from "../../axiosAPI/openFoodFactsAPI";
 import NativeSearchBar from "./NativeSearchBar";
+import LoadingSearchList from "./LoadingSearchList";
+import NoResultsSearch from "./NoResultsSearch";
 
 const ScanSearchBottomSheet = ({ setSheetIndex }) => {
   const navigation = useNavigation();
@@ -160,12 +162,12 @@ const ScanSearchBottomSheet = ({ setSheetIndex }) => {
       />
 
       {/* Search Results */}
-      {isLoading && <Text>Searching for {search}...</Text>}
+      {isLoading && <LoadingSearchList />}
       {!isLoading && !hideRecent && <RecentSearchList />}
       {!isLoading && (DataOFF?.length > 0 || DataIvy?.length > 0) && (
         <SearchResultsList DataOFF={DataOFF} DataIvy={DataIvy} />
       )}
-      {noResults && <Text>No results for {search} try something else</Text>}
+      {noResults && <NoResultsSearch />}
     </BottomSheet>
   );
 };

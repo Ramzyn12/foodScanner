@@ -60,7 +60,6 @@ const SignUpForm = () => {
   return (
     <View style={styles.container}>
       <View style={styles.formContainer}>
-        {errorMessage && <Text>{errorMessage}</Text>}
         <EmailInput email={email} setEmail={setEmail} />
         <PasswordInput password={password} setPassword={setPassword} />
         <FormSubmissionButton
@@ -70,7 +69,17 @@ const SignUpForm = () => {
           text={"Create an account"}
           onPress={handleCreateAccount}
         />
-        
+        {errorMessage && (
+          <Text
+            style={{
+              fontSize: 14,
+              fontFamily: "Mulish_400Regular",
+              color: "#DB1200",
+            }}
+          >
+            {errorMessage}
+          </Text>
+        )}
       </View>
     </View>
   );

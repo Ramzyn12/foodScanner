@@ -113,9 +113,11 @@ const DayAccordian = ({ dayData, day }) => {
         >
           Day {day}
         </Text>
-        <Animated.View style={arrowStyle}>
-          <ArrowDownShort />
-        </Animated.View>
+        {!isFuture && (
+          <Animated.View style={arrowStyle}>
+            <ArrowDownShort />
+          </Animated.View>
+        )}
       </View>
       {svg && (
         <View
@@ -159,24 +161,29 @@ const DayAccordian = ({ dayData, day }) => {
               })
             }
             style={{
-              // backgroundColor: 'red',
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
               paddingHorizontal: 20,
               paddingVertical: 20,
             }}
           >
-            <Text
+            <View
               style={{
-                fontSize: 16,
-                fontFamily: "Mulish_700Bold",
-                color: COLOURS.nearBlack,
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
             >
-              Add notes
-            </Text>
-            <ArrowRight />
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontFamily: "Mulish_700Bold",
+                  color: COLOURS.nearBlack,
+                }}
+              >
+                Add notes
+              </Text>
+              <ArrowRight />
+            </View>
+            {dayData?.note?.note && <Text numberOfLines={3} ellipsizeMode='tail' style={{marginTop: 14, fontSize: 12, fontFamily: 'Mulish_500Medium', color: '#636566'}}>{dayData?.note?.note.trim().split('\n').join('.')}</Text>}
           </Pressable>
         </View>
       </Animated.View>

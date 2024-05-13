@@ -14,16 +14,15 @@ const SortButton = ({ onPress }) => {
     <ContextMenu
       actions={[
         { title: "Manual", selected: sortPreference === 'Manual' },
-        { title: "processedScore", selected: sortPreference === 'Processed Score' },
-        { title: "Date" },
-        
+        { title: "Date added", selected: sortPreference === 'Date added' },
+        { title: "Title", selected: sortPreference === 'Title'  },
       ]}
       dropdownMenuMode={true}
       onPress={onPress}
     >
       <Pressable style={styles.container}>
         <UpDownIcon />
-        <Text style={styles.buttonText}>Sort</Text>
+        <Text style={styles.buttonText}>{sortPreference}</Text>
         <DropdownIcon />
       </Pressable>
     </ContextMenu>

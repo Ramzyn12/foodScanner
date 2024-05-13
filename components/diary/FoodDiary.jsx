@@ -56,7 +56,7 @@ const FoodDiary = ({}) => {
     0;
 
   // if (isLoading) return <LoadingDiary />;
-  if (isError) return <Text>{error.response.data.message}</Text>;
+  // if (isError) return <Text>{error.response.data.message}</Text>;
 
   return (
     <View style={{ width: "100%", marginTop: 25, paddingBottom: 200 }}>
@@ -67,6 +67,7 @@ const FoodDiary = ({}) => {
         loadingFoodDiary={isLoading}
         emptyFoodList={emptyFoodList}
         diaryFoodItems={diaryFoodItems}
+        isErrorFoodDiary={isError}
       />
     </View>
   );

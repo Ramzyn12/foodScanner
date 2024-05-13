@@ -60,60 +60,12 @@ import { getCurrentDateLocal } from "../utils/dateHelpers";
 
 const screenWidth = Dimensions.get("screen").width;
 
-// function ToolTip({ x, y, value }) {
-//   const fontFamily = Platform.select({ ios: "Helvetica", default: "serif" });
-//   const fontStyle = {
-//     fontFamily,
-//     fontSize: 14,
-//     fontStyle: "italic",
-//     fontWeight: "bold",
-//   };
-//   const font = matchFont(fontStyle);
-
-//   if (!font) {
-//     console.log("no font!");
-//   }
-
-//   const activeValueDisplay = useDerivedValue(() => value.value.toFixed(0));
-
-//   const activeY = useDerivedValue(() => y.value - 20);
-
-//   const activeX = useDerivedValue(() => x?.value - 0);
-
-//   return (
-//     <Group>
-//       <Circle cx={x} cy={y} r={8} color="white" />
-//       <SkiaText
-//         x={activeX}
-//         y={activeY}
-//         text={activeValueDisplay} // Ensure value is a string
-//         font={font}
-//         color="white"
-//       />
-//     </Group>
-//   );
-// }
-
-const calcRunningData = (data) => {
-  let totalValue = 0;
-  let validCount = 0; // Initialize a counter for valid entries
-
-  return data.map((entry) => {
-    let averageValueUpToNow;
-
-    if (entry.metricValue !== null && entry.metricValue > 0) {
-      totalValue += entry.metricValue;
-      validCount++; // Only increment validCount for non-null, non-zero values
-    }
-
-    if (validCount > 0) {
-      averageValueUpToNow = totalValue / validCount;
-    } else {
-      averageValueUpToNow = null;
-    }
-
-    return { ...entry, runningAverage: averageValueUpToNow };
-  });
+const convertWeightValue = (value, fromUnit, toUnit) => {
+  if (!value) return null; // Handle null, undefined, and zero to prevent NaN results
+  if (fromUnit === toUnit) return value;
+  return fromUnit === "kg" && toUnit === "lbs"
+    ? value * 2.20462
+    : value * 0.453592;
 };
 
 const HealthStatInfo = ({ route, navigation, isSlider }) => {
@@ -124,11 +76,11 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
   const [value, setValue] = useState(0);
   const [weightValue, setWeightValue] = useState("");
   const [adjustedData, setAdjustedData] = useState([]);
-  const [showAverageLine, setShowAverageLine] = useState(false);
-  const [graphWeightUnit, setGraphWeightUnit] = useState("kg");
   const [selectedTimeFrame, setSelectedTimeFrame] = useState("Week");
   const [isLastLoggedToday, setIsLastLoggedToday] = useState(false);
   const [weightUnit, setWeightUnit] = useState("imperial");
+  const isImperial = weightUnit === "imperial";
+  const isMetric = weightUnit === "metric";
 
   const daysOfTimeFrame =
     selectedTimeFrame === "Week" ? 7 : selectedTimeFrame === "Month" ? 28 : 364;
@@ -151,6 +103,8 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
     queryKey: ["MetricGraphData", route.params.metricType, selectedTimeFrame],
   });
 
+  const noData = data?.every((item) => item.metricValue === null);
+
   const updateHealthMetricMutation = useMutation({
     mutationFn: updateHealthMetric,
     onSuccess: (data, variables) => {
@@ -171,62 +125,37 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
     },
   });
 
-  // useCallback?
-  const getValidCount = (data) => {
-    return data.reduce((a, c) => {
-      if (c.metricValue !== null) {
-        return (a += 1);
-      } else {
-        return a;
-      }
-    }, 0);
-  };
-
   useEffect(() => {
     if (data) {
       const lastLoggedToday = data[data.length - 1].metricValue !== null;
       setIsLastLoggedToday(lastLoggedToday);
-      const validDataPoints = getValidCount(data);
-      const validPointsPerLimit = (validDataPoints / daysOfTimeFrame) * 100;
-      if (validPointsPerLimit > 30) {
-        setShowAverageLine(true);
-      } else {
-        setShowAverageLine(false);
-      }
-      let newAdjustedData = calcRunningData(data);
+      let newAdjustedData = data;
       if (isWeight) {
-        newAdjustedData = normalizeDataToUnit(newAdjustedData, graphWeightUnit);
+        newAdjustedData = normalizeDataToUnit(newAdjustedData, weightUnit);
       }
       setAdjustedData(newAdjustedData);
     }
   }, [data]);
 
-  const convertWeightValue = (value, fromUnit, toUnit) => {
-    if (!value) return null; // Handle null, undefined, and zero to prevent NaN results
-    if (fromUnit === toUnit) return value;
-    return fromUnit === "kg" && toUnit === "lbs"
-      ? value * 2.20462
-      : value * 0.453592;
-  };
-
   const normalizeDataToUnit = (data, unit) => {
+    let measure = unit === "imperial" ? "kg" : "lbs";
     return data.map((entry) => ({
       ...entry,
       metricValue:
-        entry.unitOfMeasure !== unit
-          ? convertWeightValue(entry.metricValue, entry.unitOfMeasure, unit)
+        entry.unitOfMeasure !== measure
+          ? convertWeightValue(entry.metricValue, entry.unitOfMeasure, measure)
           : entry.metricValue,
-      unitOfMeasure: unit, // Normalize all data to the same unit
+      unitOfMeasure: measure, // Normalize all data to the same unit
     }));
   };
 
   const handleGraphUnitChange = (targetUnit) => {
-    if (targetUnit !== graphWeightUnit) {
+    if (targetUnit !== weightUnit) {
       // Map through data, converting only entries that need conversion
       const convertedData = normalizeDataToUnit(adjustedData, targetUnit);
       // Update the data and the unit state
       setAdjustedData(convertedData);
-      setGraphWeightUnit(targetUnit);
+      setWeightUnit(targetUnit);
     }
   };
 
@@ -248,6 +177,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
     }
   };
 
+  // Change Loading state?
   if (isLoading || adjustedData.length === 0) return <Text>Loading...</Text>;
 
   return (
@@ -282,18 +212,52 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
             {route.params.metricType}
           </Text>
           {isWeight && (
-            <View style={{ flexDirection: "row", gap: 30 }}>
+            <View style={{ flexDirection: "row", gap: 8 }}>
               <Pressable
-                onPress={() => handleGraphUnitChange("kg")}
-                style={{ padding: 10, borderWidth: 1, borderColor: "bluex" }}
+                onPress={() => handleGraphUnitChange("imperial")}
+                style={{
+                  height: 36,
+                  paddingHorizontal: 14,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: 30,
+                  backgroundColor: isImperial ? COLOURS.darkGreen : "white",
+                  borderWidth: 1,
+                  borderColor: isImperial ? "transparent" : COLOURS.lightGray,
+                }}
               >
-                <Text>kg</Text>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontFamily: "Mulish_700Bold",
+                    color: isImperial ? "white" : COLOURS.nearBlack,
+                  }}
+                >
+                  Imperial
+                </Text>
               </Pressable>
               <Pressable
-                onPress={() => handleGraphUnitChange("lbs")}
-                style={{ padding: 10, borderWidth: 1, borderColor: "bluex" }}
+                onPress={() => handleGraphUnitChange("metric")}
+                style={{
+                  height: 36,
+                  paddingHorizontal: 14,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: 30,
+                  backgroundColor: isMetric ? COLOURS.darkGreen : "white",
+                  borderWidth: 1,
+                  borderColor: isMetric ? "transparent" : COLOURS.lightGray,
+                }}
               >
-                <Text>lbs</Text>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontFamily: "Mulish_700Bold",
+                    color: isMetric ? "white" : COLOURS.nearBlack,
+                  }}
+                >
+                  Metric
+                </Text>
               </Pressable>
             </View>
           )}
@@ -316,42 +280,36 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
               domainPadding={{ x: [20, 10], y: 20 }}
               height={450}
               width={screenWidth - 40}
-              // containerComponent={
-              //   <VictoryVoronoiContainer
-              //     labels={({ datum }) => `${datum.runningAverage.toFixed(1)}`}
-              //     voronoiBlacklist={["bar1"]}
-              //     labelComponent={
-              //       <VictoryTooltip
-              //         constrainToVisibleArea
-              //         pointerLength={0}
-              //         // flyoutComponent={<View style={{width: 10, height: 10, backgroundColor: 'red'}}></View>}
-              //         // labelComponent={<Text>Hey</Text>}
-              //         flyoutStyle={{
-              //           stroke: "tomato",
-              //           strokeWidth: 2,
-              //           fill: "white",
-              //         }}
-              //         dy={-20} // Adjust vertical position
-              //       />
-              //     }
-              //   />
-              // }
             >
-              <VictoryAxis
-                style={{
-                  axis: { stroke: "transparent" }, // Hides the axis line
-                  tickLabels: {
-                    fill: "rgba(255, 255, 255, 0.40)",
-                    fontSize: 11,
+              {!noData && (
+                <VictoryAxis
+                  style={{
+                    axis: { stroke: "transparent" }, // Hides the axis line
+                    tickLabels: {
+                      fill: "rgba(255, 255, 255, 0.40)",
+                      fontSize: 11,
+                      fontFamily: "Mulish_700Bold",
+                    },
+                  }}
+                  tickFormat={(t) => {
+                    return t;
+                  }}
+                  dependentAxis
+                />
+              )}
+              {noData && (
+                <VictoryLabel
+                  text="No Data"
+                  x={screenWidth / 2 - 20} // Adjust x and y to center the label
+                  y={225}
+                  textAnchor="middle"
+                  style={{
+                    fill: "#ffffff", // Assuming a dark chart background
+                    fontSize: 20,
                     fontFamily: "Mulish_700Bold",
-                  },
-                }}
-                tickFormat={(t) => {
-                  if (isWeight) return `${t} ${graphWeightUnit}`;
-                  if (!isWeight) return t;
-                }}
-                dependentAxis
-              />
+                  }}
+                />
+              )}
               <VictoryAxis
                 tickCount={7}
                 style={{
@@ -401,78 +359,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                   },
                 }}
               />
-              {showAverageLine && (
-                <VictoryLine
-                  data={adjustedData}
-                  x="date"
-                  name="line1"
-                  interpolation="basis"
-                  style={{
-                    data: {
-                      stroke: "#FFFFFF",
-                      strokeWidth: 4,
-                      strokeLinecap: "round",
-                      borderRadius: 20,
-                    },
-                  }}
-                  y="runningAverage"
-                />
-              )}
             </VictoryChart>
-            {/* <CartesianChart
-              data={adjustedData} // 👈 specify your data
-              xKey="date" // 👈 specify data key for x-axis
-              yKeys={["metricValue", "runningAverage"]} // 👈 specify data keys used for y-axis
-              domainPadding={20}
-              padding={20}
-              chartPressState={state} // 👈 and pass it to our chart.
-              axisOptions={{
-                font,
-                lineColor: "transparent",
-                lineWidth: { grid: 0, frame: 0 },
-                labelColor: "rgba(255, 255, 255, 0.60)",
-                // tickCount: { x: 7, y: 5  },
-                labelOffset: { x: 10, y: 0 },
-                formatXLabel: (label) => getDayOfWeek(label),
-              }}
-            >
-              {({ points, chartBounds }) => (
-                <>
-                  <StockChart
-                    points={points.runningAverage}
-                    lineColour={"white"}
-                    colourOne={"rgba(255, 255, 255, 0.15)"}
-                    colourTwo={"rgba(255, 255, 255, 0.01)"}
-                    chartBounds={chartBounds}
-                    //Connect missing data
-                  /> */}
-            {/* <Line
-                    points={points.averageWeight}
-                    color="white"
-                    connectMissingData={true}
-                    strokeWidth={3}
-                    curveType="natural"
-                    animate={{ type: "timing", duration: 300 }}
-                  /> */}
-            {/* <Bar
-                    points={points.metricValue}
-                    innerPadding={0.7}
-                    chartBounds={chartBounds}
-                    color="rgba(255, 255, 255, 0.08)"
-                    roundedCorners={{ topLeft: 10, topRight: 10 }}
-                  />
-                  {isActive ? (
-                    <ToolTip
-                      x={state.x.position}
-                      y={state.y.runningAverage.position}
-                      value={state.y?.runningAverage?.value}
-                      font={font}
-                      top={chartBounds.top}
-                    />
-                  ) : null}
-                </>
-              )}
-            </CartesianChart> */}
           </View>
           <View style={{ gap: 14 }}>
             <Text style={{ fontSize: 17, fontFamily: "Mulish_600SemiBold" }}>

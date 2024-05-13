@@ -17,7 +17,7 @@ const GroceryItemSchema = new mongoose.Schema({
     enum: ['FoodItem', 'SingleFood'] // Specifies the models to which `item` can refer
   },
   checked: { type: Boolean, required: true, default: false },
-});
+}, {timestamps: true});
 
 const GrocerySchema = new mongoose.Schema(
   {
@@ -25,7 +25,7 @@ const GrocerySchema = new mongoose.Schema(
     groceries: [GroceryItemSchema],
     sortPreference: {
       type: String,
-      enum: ['Manual', 'Processed Score', 'Date'],
+      enum: ['Manual', 'Title', 'Date added'],
       default: 'Manual',
     },
     itemOrder: [{ type: mongoose.Schema.Types.ObjectId, ref: 'GroceryItem' }], // This holds the order of IDs
