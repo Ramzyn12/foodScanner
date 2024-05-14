@@ -60,12 +60,50 @@ import { getCurrentDateLocal } from "../utils/dateHelpers";
 
 const screenWidth = Dimensions.get("screen").width;
 
+const CustomTooltip = ({ x, y, datum, visible }) => {
+  // console.log(x, y, datum);
+
+  if (!visible || datum.metricValue === null) {
+    return null;
+  }
+
+  const metricValue =
+    datum.metric === "Weight"
+      ? datum.metricValue + datum.unitOfMeasure
+      : datum.metricValue;
+
+  const textLength = String(metricValue).length;
+  const leftAdjustment = textLength * 5; // Adjust this value based on your needs
+
+  return (
+    <View
+      style={{
+        backgroundColor: "rgba(255, 255, 255, 0.20)",
+        padding: 10,
+        borderRadius: 5,
+        position: "absolute",
+        left: x - 15 - textLength * 1.5 ,
+        top: y && y - 60,
+        gap: 8,
+        alignItems: "center",
+        // top: 75
+      }}
+    >
+      <Text
+        style={{ color: "white", fontSize: Math.max(24 - textLength * 1.2, 15), fontFamily: "Mulish_700Bold" }}
+      >
+        {metricValue}
+      </Text>
+    </View>
+  );
+};
+
 const convertWeightValue = (value, fromUnit, toUnit) => {
   if (!value) return null; // Handle null, undefined, and zero to prevent NaN results
   if (fromUnit === toUnit) return value;
-  return fromUnit === "kg" && toUnit === "lbs"
-    ? value * 2.20462
-    : value * 0.453592;
+  const convertedValue =
+    fromUnit === "kg" && toUnit === "lbs" ? value * 2.20462 : value * 0.453592;
+  return Math.round(convertedValue * 100) / 100; // Round to two decimal places
 };
 
 const HealthStatInfo = ({ route, navigation, isSlider }) => {
@@ -81,6 +119,16 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
   const [weightUnit, setWeightUnit] = useState("imperial");
   const isImperial = weightUnit === "imperial";
   const isMetric = weightUnit === "metric";
+  const [selectedX, setSelectedX] = useState(null);
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
+  const releaseTimeoutRef = useRef(null);
+
+  const handleBarPress = (datum) => {
+    setSelectedX(datum.date);
+    setTooltipVisible(true); // Show tooltip
+    setIsDisabled(true);
+  };
 
   const daysOfTimeFrame =
     selectedTimeFrame === "Week" ? 7 : selectedTimeFrame === "Month" ? 28 : 364;
@@ -178,7 +226,13 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
   };
 
   // Change Loading state?
-  if (isLoading || adjustedData.length === 0) return <Text>Loading...</Text>;
+  // if (isLoading || adjustedData.length === 0) return <Text>Loading...</Text>;
+
+  const handleBarRelease = () => {
+    setSelectedX(null);
+    setTooltipVisible(false); // Hide tooltip
+    setIsDisabled(false);
+  };
 
   return (
     <View style={{ paddingTop: insets.top, flex: 1, backgroundColor: "white" }}>
@@ -272,14 +326,45 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
               // justifyContent: 'center'
             }}
           >
+            {/* {noData && <Text style={{position: 'absolute', left: '50%', top: '50%', zIndex: 3000, color: 'yellow', fontSize: 20}}>HELLLLLOOO</Text>} */}
             <ChangeDateDropdown
               selectedTimeFrame={selectedTimeFrame}
               onTimeFrameChange={handleTimeFrameChange}
             />
             <VictoryChart
-              domainPadding={{ x: [20, 10], y: 20 }}
+              domainPadding={{ x: [20, 35], y: 80 }}
               height={450}
-              width={screenWidth - 40}
+              width={screenWidth - 20}
+              containerComponent={
+                <VictoryVoronoiContainer
+                  labels={({ datum }) => `${datum.metricValue}`}
+                  labelComponent={<CustomTooltip  visible={tooltipVisible} />} // Always render with visibility control
+                  voronoiPadding={40}
+                  // activateLabels={tooltipVisible}
+                  voronoiDimension="x"
+                  // disable={isDisabled}
+                  onActivated={(points) => {
+                    if (
+                      points &&
+                      points.length > 0 &&
+                      points[0].metricValue !== null
+                    ) {
+                      handleBarPress(points[0]);
+                    }
+                  }}
+                />
+              }
+              events={[
+                {
+                  target: "parent",
+                  eventHandlers: {
+                    onTouchEnd: () => {
+                      handleBarRelease();
+                      return null;
+                    },
+                  },
+                },
+              ]}
             >
               {!noData && (
                 <VictoryAxis
@@ -294,6 +379,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                   tickFormat={(t) => {
                     return t;
                   }}
+                  tickValues={isWeight ? undefined : [0, 2, 4, 6, 8, 10]}
                   dependentAxis
                 />
               )}
@@ -349,7 +435,12 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                 x="date"
                 name="bar1"
                 y="metricValue"
-                style={{ data: { fill: "#FFFFFF14" } }}
+                style={{
+                  data: {
+                    fill: ({ datum }) =>
+                      datum.date === selectedX ? "#FFFFFF" : "#FFFFFF14",
+                  },
+                }}
                 cornerRadius={{
                   topLeft: ({ barWidth }) => {
                     return barWidth / 2;
@@ -359,6 +450,24 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                   },
                 }}
               />
+              {/* {selectedX && (
+                <VictoryLine
+                  style={{
+                    data: {
+                      stroke: "#FFFFFF80",
+                      strokeWidth: 2,
+                      strokeDasharray: "5,5",
+                    },
+                  }}
+                  data={[
+                    { x: selectedX, y: 0 },
+                    {
+                      x: selectedX,
+                      y: Math.max(...adjustedData.map((d) => d.metricValue)),
+                    },
+                  ]}
+                />
+              )} */}
             </VictoryChart>
           </View>
           <View style={{ gap: 14 }}>

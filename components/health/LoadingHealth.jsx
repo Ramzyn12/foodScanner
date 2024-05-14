@@ -3,6 +3,7 @@ import React from "react";
 import { StyleSheet } from "react-native";
 import COLOURS from "../../constants/colours";
 import { ViewBase } from "react-native";
+import { Skeleton } from "moti/skeleton";
 
 const FakeEventCard = ({ week }) => {
   return (
@@ -31,21 +32,24 @@ const FakeEventCard = ({ week }) => {
       {/* Green Dot */}
       <View style={styles.circle}></View>
 
-      <View
-        style={{
-          flex: 1,
-          height: 150,
-          backgroundColor: "#F5F5F5",
-          borderRadius: 20,
-        }}
-      />
+      <View style={{flex: 1}}>
+        <Skeleton
+          colors={["#F5F5F5", COLOURS.lightGray, "#F5F5F5"]} // Custom colors for the skeleton
+          radius={20}
+          height={150}
+          width={"100%"}
+        />
+      </View>
     </View>
   );
 };
 
 const LoadingHealth = () => {
   return (
-    <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1, backgroundColor: "white" }}>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      style={{ flex: 1, backgroundColor: "white" }}
+    >
       <View style={styles.line}></View>
       <FakeEventCard week={1} />
       <FakeEventCard week={2} />

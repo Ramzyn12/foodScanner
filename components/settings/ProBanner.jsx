@@ -6,6 +6,21 @@ import GreenIvyOne from "../../svgs/GreenIvyOne";
 import GreenIvyTwo from "../../svgs/GreenIvyTwo";
 import GreenIvyThree from "../../svgs/GreenIvyThree";
 import { useNavigation } from "@react-navigation/native";
+import { LinearGradient } from "expo-linear-gradient";
+
+
+const angle = 109;
+const angleRad = (Math.PI * angle) / 180;
+const start = {
+  x: 0.5 - Math.sin(angleRad) / 2,
+  y: 0.5 + Math.cos(angleRad) / 2,
+};
+const end = {
+  x: 0.5 + Math.sin(angleRad) / 2,
+  y: 0.5 - Math.cos(angleRad) / 2,
+};
+
+
 const ProBanner = () => {
   const navigation = useNavigation();
   return (
@@ -19,11 +34,11 @@ const ProBanner = () => {
         backgroundColor: COLOURS.lightGreen,
         borderRadius: 12,
         alignItems: "center",
-        padding: 22,
+        paddingHorizontal: 40,
         overflow: "hidden",
       }}
     >
-      <View
+      {/* <View
         style={{
           paddingHorizontal: 8,
           paddingVertical: 4,
@@ -40,17 +55,28 @@ const ProBanner = () => {
         >
           PRO
         </Text>
-      </View>
-      <View style={{ gap: 6, flex: 1 }}>
-        <Text
+      </View> */}
+      <View style={{ gap: 8, flex: 1 }}>
+        <View style={{flexDirection: 'row', alignItems: 'center', gap: 6}}>
+          <Text
           style={{
             fontSize: 19,
             fontFamily: "Mulish_700Bold",
             color: COLOURS.nearBlack,
           }}
         >
-          Ivy Pro
+          Ivy
         </Text>
+        <LinearGradient
+          colors={["#0B5253", "#19999C"]}
+          start={start}
+          end={end}
+          style={{paddingHorizontal: 10, paddingVertical: 6, borderRadius:6 }}
+        >
+          <Text style={{fontSize: 14, fontFamily: 'Mulish_700Bold', color: 'white'}}>Pro</Text>
+        </LinearGradient>
+        </View>
+        
         <Text style={{ fontSize: 14, fontFamily: "Mulish_400Regular" }}>
           Plans and benefits of going Pro
         </Text>

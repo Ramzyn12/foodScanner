@@ -1,29 +1,87 @@
-import { View, Text, Pressable } from 'react-native'
-import React from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import ClearIcon from '../../svgs/ClearIcon'
-import { useNavigation } from '@react-navigation/native'
+import { View, Text, Pressable } from "react-native";
+import React from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import ClearIcon from "../../svgs/ClearIcon";
+import { useNavigation } from "@react-navigation/native";
+import COLOURS from "../../constants/colours";
+import { Skeleton } from "moti/skeleton";
 
 const LoadingFoodDetails = () => {
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   return (
-    <View style={{flex: 1, padding: 20, backgroundColor: 'white'}}>
-      <View style={{flexDirection: 'row', gap: 14}}>
-        <View style={{width: 60, height: 60, borderRadius: 20, backgroundColor: '#F5F5F5'}} />
-        <View style={{justifyContent: 'space-between', flex: 1}}>
-          <View style={{ height: 16, borderRadius: 12, backgroundColor: '#F5F5F5'}} />
-          <View style={{ height: 36, borderRadius: 12, backgroundColor: '#F5F5F5'}} />
+    <View style={{ flex: 1, padding: 20, backgroundColor: "white" }}>
+      <View style={{ flexDirection: "row", gap: 14 }}>
+        <Skeleton
+          colors={["#F5F5F5", COLOURS.lightGray, "#F5F5F5"]} // Custom colors for the skeleton
+          height={60}
+          width={60}
+          radius={20}
+        />
+        <View style={{ justifyContent: "space-between", flex: 1 }}>
+          <Skeleton
+            colors={["#F5F5F5", COLOURS.lightGray, "#F5F5F5"]} // Custom colors for the skeleton
+            height={16} // Approximate height of your list items
+            radius={12}
+            width={"100%"}
+          />
+
+          <Skeleton
+            colors={["#F5F5F5", COLOURS.lightGray, "#F5F5F5"]} // Custom colors for the skeleton
+            height={36} // Approximate height of your list items
+            radius={12}
+            width={"100%"}
+          />
         </View>
-        <Pressable style={{alignSelf: 'flex-start'}} onPress={() => navigation.goBack()}>
+        <Pressable
+          style={{ alignSelf: "flex-start" }}
+          onPress={() => navigation.goBack()}
+        >
           <ClearIcon size={28} />
         </Pressable>
       </View>
-      <View style={{ width: '100%', height: 135, marginTop: 30, borderRadius: 20, backgroundColor: '#F5F5F5'}}/>
-      <View style={{ width: '100%', height: 430, marginTop: 20, borderRadius: 20, backgroundColor: '#F5F5F5'}}/>
-      <View style={{ width: '100%', flex: 1, marginTop: 20, borderRadius: 20, backgroundColor: '#F5F5F5'}}/>
-    </View>
-  )
-}
 
-export default LoadingFoodDetails
+      <View
+        style={{
+          marginTop: 30,
+        }}
+      >
+        <Skeleton
+          colors={["#F5F5F5", COLOURS.lightGray, "#F5F5F5"]} // Custom colors for the skeleton
+          height={135} // Approximate height of your list items
+          radius={20}
+          width={"100%"}
+        />
+      </View>
+
+      <View
+        style={{
+          marginTop: 20,
+        }}
+      >
+        <Skeleton
+          colors={["#F5F5F5", COLOURS.lightGray, "#F5F5F5"]} // Custom colors for the skeleton
+          height={430} // Approximate height of your list items
+          radius={20}
+          width={"100%"}
+        />
+      </View>
+
+      <View
+        style={{
+          marginTop: 20,
+          flex: 1,
+        }}
+      >
+        <Skeleton
+          colors={["#F5F5F5", COLOURS.lightGray, "#F5F5F5"]} // Custom colors for the skeleton
+          radius={20}
+          height={"100%"}
+          width={"100%"}
+        />
+      </View>
+    </View>
+  );
+};
+
+export default LoadingFoodDetails;

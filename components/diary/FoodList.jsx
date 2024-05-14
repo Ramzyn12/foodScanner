@@ -126,13 +126,14 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary, isErrorFood
           { borderTopLeftRadius: 20, borderTopRightRadius: 20 },
         ]}
       >
-        <View style={{ width: "100%", gap: 6 }}>
+        <View style={{ width: "100%", gap: 14 }}>
           {Array.from({ length: 3 }, (_, index) => (
             <Skeleton
               key={index}
-              colorMode='light'
-              height={50} // Approximate height of your list items
+              colors={["#F5F5F5", COLOURS.lightGray, "#F5F5F5" ]} // Custom colors for the skeleton
+              height={65} // Approximate height of your list items
               width="100%"
+              radius={20}
             />
           ))}
         </View>
