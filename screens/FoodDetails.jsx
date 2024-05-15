@@ -41,7 +41,7 @@ const FoodDetails = ({ navigation, route }) => {
 
   const {
     data: foodDetails,
-    isLoading: isLoadingFoodDetails,
+    isPending: isLoadingFoodDetails,
     isError,
     isFetching,
     error
@@ -53,26 +53,27 @@ const FoodDetails = ({ navigation, route }) => {
     queryFn: () => fetchFoodWithBarcode(barcode, chosenDate),
   });
 
+
   // Need to add loading states here ASWELL!!
   const { data: singleFoodDetails, error: IvyError, isLoading: isLoadingSingleFood } = useQuery({
     queryKey: ["FoodDetailsIvy", singleFoodId, chosenDate],
     retry: false,
     enabled: !!singleFoodId,
-    queryFn: () => fetchFoodWithIvyId(singleFoodId, chosenDate),
+    queryFn: async () => await fetchFoodWithIvyId(singleFoodId, chosenDate),
   });
 
   // handle the normalisation
   const readyToShow = useFoodDetails(foodDetails, singleFoodDetails);
 
+  if (isError) {
+    console.log(IvyError, error);
+    return <Text>Product doesnt exist...</Text>;
+  }
+
   if (isLoadingFoodDetails || isLoadingSingleFood || !readyToShow) {
     return (
       <LoadingFoodDetails />
     );
-  }
-
-  if (isError) {
-    console.log(IvyError, error);
-    return <Text>Product doesnt exist...</Text>;
   }
 
   const toastConfig = {

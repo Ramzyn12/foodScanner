@@ -32,7 +32,6 @@ export const updateNote = async ({ date, note }) => {
     const res = await noteAPI.post(`/date/${date}`, { note });
     return res.data;
   } catch (error) {
-    console.error("Error adding user info:", error);
     throw error;
   }
 };

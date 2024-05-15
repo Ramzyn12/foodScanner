@@ -21,7 +21,6 @@ async function getRecentTimelineWeek({ userId }) {
 
   let week = Math.ceil(differenceInDays / 7);
   if (week === 0) week = 1
-  console.log(week, 'WEEK');
   const currentDay = differenceInDays % 7;
 
   const latestTimelineWeek = await TimelineWeek.findOne({ week: week }).lean();
@@ -145,8 +144,6 @@ async function getTimelineWeek({ userId, week }) {
       note: foundNote,  // Add the notes array to each day's data
     };
   });
-
-  console.log(combinedDataByDate);
 
   return {
     timelineWeek,

@@ -4,17 +4,14 @@ const userSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
+      maxLength: 50,
       default: null,
-      // required: true,
       trim: true,
-      // unique: [true, "username already taken!"],
     },
     lastName: {
       type: String,
       default: null,
-      // required: true,
       trim: true,
-      // unique: [true, "username already taken!"],
     },
     email: {
       type: String,
@@ -60,6 +57,7 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    
   }
 );
 

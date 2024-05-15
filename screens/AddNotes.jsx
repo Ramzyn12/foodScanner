@@ -16,11 +16,12 @@ const AddNotes = ({ route }) => {
   const notesInputRef = useRef(null); // Create a ref for the TextInput
   const queryClient = useQueryClient();
 
-  const { data, isLoading, isError, isSuccess } = useQuery({
+  const { data, isLoading, isError, isSuccess, error } = useQuery({
     queryKey: ["Note", date],
     queryFn: () => getNote({ date: getAnyDateLocal(date) }),
     retry: false,
   });
+
 
   const updateNoteMutation = useMutation({
     mutationFn: updateNote,
@@ -40,7 +41,7 @@ const AddNotes = ({ route }) => {
       // notesInputRef.current?.blur();
       timer = setTimeout(() => {
         notesInputRef.current?.focus();
-      }, 500);
+      }, 400);
     }
 
     return () => clearTimeout(timer); // Clear timeout if component unmounts

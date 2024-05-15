@@ -18,10 +18,12 @@ openFoodFactsAPI.interceptors.request.use(async(config) => {
 export const fetchFoodWithBarcode = async (barcode, date) => {
   try {
     const res = await openFoodFactsAPI.get(`products/${barcode}/date/${date}`);
+    console.log(res);
     return res.data;
-  } catch {
+  } catch (error) {
     //else jsut show we dont have that product in DB
-    console.error(error, "MY ERROR");
+    // console.log(error, "MY ERROR");
+    throw error
   }
 };
 
@@ -29,7 +31,7 @@ export const fetchFoodWithSearch = async (search_term) => {
   try {
     const res = await openFoodFactsAPI.get(`products/search/${search_term}`);
     return res.data;
-  } catch {
+  } catch (error) {
     //else jsut show we dont have that product in DB
     console.error(error, "MY ERROR");
   }

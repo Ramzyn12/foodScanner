@@ -1,21 +1,21 @@
 require("dotenv").config();
 const express = require("express");
-require('express-async-errors');
+require("express-async-errors");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
 const cors = require("cors");
 const app = express();
 
 // Import routes and middlewares
-const authRoutes = require('./routes/authRoutes');
-const openFoodFactsRoutes = require('./routes/openFoodFactsRoutes');
-const diaryRoutes = require('./routes/diaryRoutes');
-const groceryRoutes = require('./routes/groceryRoutes');
-const searchSingleRoutes = require('./routes/searchSingleRoutes');
-const userRoutes = require('./routes/userRoutes');
-const metricRoutes = require('./routes/metricRoutes');
-const timelineRoutes = require('./routes/timelineRoutes');
-const noteRoutes = require('./routes/noteRoutes');
+const authRoutes = require("./routes/authRoutes");
+const openFoodFactsRoutes = require("./routes/openFoodFactsRoutes");
+const diaryRoutes = require("./routes/diaryRoutes");
+const groceryRoutes = require("./routes/groceryRoutes");
+const searchSingleRoutes = require("./routes/searchSingleRoutes");
+const userRoutes = require("./routes/userRoutes");
+const metricRoutes = require("./routes/metricRoutes");
+const timelineRoutes = require("./routes/timelineRoutes");
+const noteRoutes = require("./routes/noteRoutes");
 const errorHandler = require("./middleware/errorHandler");
 // const authMiddleware = require("./middleware/authMiddleware");
 
@@ -24,24 +24,21 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 
-app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/open-food-facts', openFoodFactsRoutes);
-app.use('/api/v1/diary-days', diaryRoutes);
-app.use('/api/v1/ivy', searchSingleRoutes);
-app.use('/api/v1/groceries', groceryRoutes);
-app.use('/api/v1/users', userRoutes);
-app.use('/api/v1/health-metrics', metricRoutes);
-app.use('/api/v1/timeline-weeks', timelineRoutes);
-app.use('/api/v1/notes', noteRoutes);
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/open-food-facts", openFoodFactsRoutes);
+app.use("/api/v1/diary-days", diaryRoutes);
+app.use("/api/v1/ivy", searchSingleRoutes);
+app.use("/api/v1/groceries", groceryRoutes);
+app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/health-metrics", metricRoutes);
+app.use("/api/v1/timeline-weeks", timelineRoutes);
+app.use("/api/v1/notes", noteRoutes);
 
-app.post('/webhooks', (req, res) => {
-  console.log('Received webhook:', req.body);
+app.post("/webhooks", (req, res) => {
+  console.log("Received webhook:", req.body);
 
-
-  res.status(200).send('Webhook received');
-
+  res.status(200).send("Webhook received");
 });
-
 
 // Error Handlers
 app.use("*", (req, res) => {
