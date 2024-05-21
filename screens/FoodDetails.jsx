@@ -41,7 +41,7 @@ const FoodDetails = ({ navigation, route }) => {
 
   const {
     data: foodDetails,
-    isPending: isLoadingFoodDetails,
+    isLoading: isLoadingFoodDetails, // isPending made it pend when not enabled? 
     isError,
     isFetching,
     error
@@ -65,8 +65,7 @@ const FoodDetails = ({ navigation, route }) => {
   // handle the normalisation
   const readyToShow = useFoodDetails(foodDetails, singleFoodDetails);
 
-  if (isError) {
-    console.log(IvyError, error);
+  if (isError || IvyError) {
     return <Text>Product doesnt exist...</Text>;
   }
 

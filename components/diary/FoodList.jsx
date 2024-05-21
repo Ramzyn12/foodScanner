@@ -23,38 +23,44 @@ import { Swipeable } from "react-native-gesture-handler";
 import { useSelector } from "react-redux";
 import { Skeleton } from "moti/skeleton";
 import { getCurrentDateLocal } from "../../utils/dateHelpers";
+import Toast from "react-native-toast-message";
 
-const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary, isErrorFoodDiary }) => {
+const FoodList = ({
+  diaryFoodItems,
+  emptyFoodList,
+  loadingFoodDiary,
+  isErrorFoodDiary,
+}) => {
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const chosenDate =
     useSelector((state) => state.diary.chosenDate) || getCurrentDateLocal();
   const [isFasting, setIsFasting] = useState(false);
-  const [isLoadingFasted, setIsLoadingFasted] = useState(false)
+  const [isLoadingFasted, setIsLoadingFasted] = useState(false);
 
   const numberOfItems =
     diaryFoodItems?.consumedFoods?.length +
     diaryFoodItems?.consumedSingleFoods?.length;
 
-  const itemsString = numberOfItems > 1 ? `${numberOfItems} items` : `${numberOfItems} item`
+  const itemsString =
+    numberOfItems > 1 ? `${numberOfItems} items` : `${numberOfItems} item`;
 
   useEffect(() => {
-    setIsLoadingFasted(true)
+    setIsLoadingFasted(true);
     if (diaryFoodItems) {
       setIsFasting(diaryFoodItems.fastedState);
-      setIsLoadingFasted(false)
+      setIsLoadingFasted(false);
     }
     if (isErrorFoodDiary) {
-      setIsLoadingFasted(false)
-      console.log('errrrrr');
+      setIsLoadingFasted(false);
     }
   }, [diaryFoodItems]);
 
   const removeFoodFromDiaryMutation = useMutation({
     mutationFn: removeFoodFromDiaryDay,
     onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["DiaryDay", variables.date]});
-      queryClient.invalidateQueries({ queryKey: ["AllDiaryDays"]});
+      queryClient.invalidateQueries({ queryKey: ["DiaryDay", variables.date] });
+      queryClient.invalidateQueries({ queryKey: ["AllDiaryDays"] });
       if (variables.barcode) {
         queryClient.invalidateQueries({
           queryKey: ["FoodDetails", variables.barcode],
@@ -68,18 +74,30 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary, isErrorFood
       }
     },
     onError: (err) => {
-      console.log(err, "HERE");
+      Toast.show({
+        type: 'customErrorToast',
+        text1: 'Failed to delete food, please try again later'
+      })
     },
   });
 
   const toggleFastedMutation = useMutation({
     mutationFn: toggleFastedState,
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ["DiaryDay", chosenDate]});
-      queryClient.invalidateQueries({queryKey: ["AllDiaryDays"]});
+      queryClient.invalidateQueries({ queryKey: ["DiaryDay", chosenDate] });
+      queryClient.invalidateQueries({ queryKey: ["AllDiaryDays"] });
     },
-    onError: (err) => {
-      console.log(err, "HERE");
+    onMutate: async () => {
+      // Save the previous state before mutation
+      const previousState = queryClient.getQueryData(["DiaryDay", chosenDate]);
+      return { previousState };
+    },
+    onError: (err, variables, context) => {
+      setIsFasting(context?.previousState?.fastedState); // Rollback to previous state
+      Toast.show({
+        type: 'customErrorToast',
+        text1: 'Failed to set fasted state, please try again later'
+      })
     },
   });
 
@@ -118,6 +136,9 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary, isErrorFood
     );
   };
 
+  if (isErrorFoodDiary)
+    return <Text>Error Fetching Food Diary, please try again later</Text>;
+
   if (loadingFoodDiary || isLoadingFasted) {
     return (
       <View
@@ -130,7 +151,7 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary, isErrorFood
           {Array.from({ length: 3 }, (_, index) => (
             <Skeleton
               key={index}
-              colors={["#F5F5F5", COLOURS.lightGray, "#F5F5F5" ]} // Custom colors for the skeleton
+              colors={["#F5F5F5", COLOURS.lightGray, "#F5F5F5"]} // Custom colors for the skeleton
               height={65} // Approximate height of your list items
               width="100%"
               radius={20}
@@ -226,7 +247,7 @@ const FoodList = ({ diaryFoodItems, emptyFoodList, loadingFoodDiary, isErrorFood
       )}
       {/* More food button */}
       {!isFasting && <AddFoodButton />}
-      
+
       {emptyFoodList && (
         <View
           style={{

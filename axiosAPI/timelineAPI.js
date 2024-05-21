@@ -21,7 +21,6 @@ export const getRecentTimelineWeek = async () => {
     const res = await timelineAPI.get(`/recent`);
     return res.data;
   } catch (error) {
-    console.error("Error adding user info:", error);
     throw error;
   }
 };
@@ -31,7 +30,6 @@ export const getAllTimelineWeeks = async () => {
     const res = await timelineAPI.get(`/`);
     return res.data;
   } catch (error) {
-    console.error("Error adding user info:", error);
     throw error;
   }
 };
@@ -41,7 +39,6 @@ export const getTimelineWeek = async ({ week }) => {
     const res = await timelineAPI.get(`/week/${week}`);
     return res.data;
   } catch (error) {
-    console.error("Error adding user info:", error);
     throw error;
   }
 };

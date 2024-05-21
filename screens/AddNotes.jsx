@@ -30,6 +30,8 @@ const AddNotes = ({ route }) => {
     },
     onError: (err) => {
       console.log(err);
+      // Need to show toast, and try go back to previous note?
+      //or just say try again later
     },
   });
 

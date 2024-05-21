@@ -1,21 +1,21 @@
 const HealthMetric = require("../models/HealthMetric");
-const { startOfDay, endOfDay, addDays, format } = require('date-fns');
+const { addDays, format } = require('date-fns');
 const { getCurrentDateLocal } = require("../utils/dateHelper");
+const { BadRequestError, NotFoundError } = require("../utils/error");
 
-function getNormalizedDate(date = new Date()) {
-  const normalizedDate = new Date(date);
-  normalizedDate.setHours(0, 0, 0, 0);
-  return normalizedDate;
-}
 
 async function updateHealthMetric({ date, metric, userId, metricValue, unitOfMeasure }) {
-  // const normalizedDate = getNormalizedDate(date);
   const localDate = new Date(date + "T00:00:00.000Z");
   const updateOptions = { upsert: true, new: true, runValidators: true };
   const updateData = { metricValue };
 
+  const validMetrics = ['Weight', 'Anxiety', 'Energy', 'Sleep Quality'];
+  if (!validMetrics.includes(metric)) {
+    throw new BadRequestError('Invalid metric value', {validMetrics})
+  }
   // Only add 'unitOfMeasure' to the update document if the metric is 'Weight'
   if (metric === 'Weight') {
+    if (!unitOfMeasure) throw new BadRequestError('Need to specify unit of measure for weight!', {unitOfMeasure})
     updateData.unitOfMeasure = unitOfMeasure;
   }
 
@@ -26,10 +26,13 @@ async function updateHealthMetric({ date, metric, userId, metricValue, unitOfMea
     updateOptions
   );
 
+  // Probs wont get triggered because of upsert: true
+  if (!updatedMetric) throw new NotFoundError('Error updating health metric')
 
   return updatedMetric;
 }
 
+//Gets the most recent metric value for the metric e.g Sleep Quality
 async function getRecentMetric({ metric, userId }) {
   // DONT need to return everything e.g userId etc...
 
@@ -37,15 +40,20 @@ async function getRecentMetric({ metric, userId }) {
     .sort({ date: -1 }) // Sort by date descending
     .exec();
 
+  // If no recent metric, frontend just shows empty state, no need for error
+
   return recentMetric;
 }
 
 async function getAllDataForMetric({ metric, userId, timeFrame }) {
+
+  if (!['Week', 'Month', 'Year'].includes(timeFrame)) {
+    throw new BadRequestError('Invalid time frame value', { timeFrame });
+  }
   const days = timeFrame === 'Month' ? 28 : timeFrame === 'Year' ? 364 : 7
   const today = new Date(getCurrentDateLocal());
   const endDate = today; // Set end of today
   const startDate = addDays(today, -days + 1); // 7 days ago, including today
-
   
   const metricData = await HealthMetric.find({
     userId,
@@ -67,6 +75,7 @@ async function getAllDataForMetric({ metric, userId, timeFrame }) {
     if (dataByDate.has(dateString)) {
       results.push(dataByDate.get(dateString));
     } else {
+      // "Empty" state
       results.push({
         userId,
         metric,
@@ -76,7 +85,6 @@ async function getAllDataForMetric({ metric, userId, timeFrame }) {
       });
     }
   }
-
 
   return results;
 }

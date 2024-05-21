@@ -32,10 +32,13 @@ const queryClient = new QueryClient();
 
 const App = () => {
   return (
-    <Provider store={store}>
-      {/* Only necessary if want to use redux in App, else remove. */}
-      <AppInitializer />
-    </Provider>
+    <>
+      <Provider store={store}>
+        {/* Only necessary if want to use redux in App, else remove. */}
+        <AppInitializer />
+      </Provider>
+      <Toast position="bottom" bottomOffset={95} config={toastConfig} />
+    </>
   );
 };
 
@@ -62,12 +65,11 @@ const AppInitializer = () => {
 
   useEffect(() => {
     if (Platform.OS === "ios" && RC_API_KEY && firebaseUid) {
-      Purchases.configure({apiKey: RC_API_KEY, appUserID: firebaseUid});
+      Purchases.configure({ apiKey: RC_API_KEY, appUserID: firebaseUid });
     }
   }, [firebaseUid, RC_API_KEY]);
 
-
-  const {notification, expoPushToken} = useNotifications()
+  const { notification, expoPushToken } = useNotifications();
 
   // console.log(notification, 'Notification', expoPushToken);
 
@@ -95,7 +97,6 @@ const AppInitializer = () => {
           </GestureHandlerRootView>
         </Provider>
       </QueryClientProvider>
-      <Toast position="bottom" bottomOffset={95} config={toastConfig} />
     </>
   );
 };

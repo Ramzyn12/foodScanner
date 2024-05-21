@@ -3,6 +3,7 @@ import { signInWithCustomToken } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { storage } from "../utils/MMKVStorage";
 import auth from '@react-native-firebase/auth'
+
 const authAPI = axios.create({
   baseURL: "http://192.168.0.145:3000/api/v1/auth/",
 });
@@ -12,16 +13,12 @@ export const signUpApple = async ({ email, uid, idToken, userInformation }) => {
     const response = await authAPI.post("signUpApple", {
       email,
       uid,
-      idToken,
+      idToken: idToken,
       userInformation
     });
     return response.data;
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      console.error("Error during sign up:", error.response.data);
-    }
-    console.log("Error during sign up:", error);
-    throw new Error(error.response.data);
+    throw error
   }
 };
 
@@ -44,27 +41,13 @@ export const signUp = async ({ email, password, userInfo }) => {
       const userCredential = await auth().signInWithCustomToken(data.token);
       const user = userCredential.user;
       const token = await user.getIdToken(); // Get Firebase token
-      // await AsyncStorage.setItem("firebaseToken", token); // Store token
       storage.set('firebaseToken', token)
       return { user, token, firebaseId: data.firebaseId };
     }
   } catch (error) {
-    console.log("Error during sign up: authAPI", error);
+    // console.log("Error during sign up with email in authAPI", error);
     throw error;
 
   }
 };
 
-// export const addFirstLastName = async ({ firstName, lastName, firebaseId }) => {
-//   try {
-//     const response = await authAPI.post("names", {
-//       firstName,
-//       lastName,
-//       firebaseId
-//     });
-//     const data = response.data;
-//     return data;
-//   } catch (error) {
-//     console.log("Error during adding first and last name:", error);
-//   }
-// };

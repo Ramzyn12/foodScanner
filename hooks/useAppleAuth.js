@@ -18,12 +18,25 @@ import Toast from "react-native-toast-message";
 import { storage } from "../utils/MMKVStorage";
 import { useNavigation } from "@react-navigation/native";
 
+const handleErrorSigningIn = (err) => {
+  auth()
+    .signOut()
+    .catch((err) => {
+      console.log(err, "Unable to sign out from apple");
+    });
+  Toast.show({
+    type: "customErrorToast",
+    bottomOffset: 45,
+    text1: "Error signing into apple, Please try again later",
+  });
+};
+
 export const useAppleAuth = () => {
   const userInformation = useSelector(
     (state) => state.onboarding.userInformation
   );
   const dispatch = useDispatch();
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   const signUpAppleMutation = useMutation({
     mutationFn: signUpApple,
@@ -32,16 +45,8 @@ export const useAppleAuth = () => {
       dispatch(setWaitingForBackend(false));
     },
     onError: (err) => {
-      console.log(err, "APPLE Hooks");
-      // Need to add an error toast here as wont know why got logged out!
-      auth()
-        .signOut()
-        .then(() => {
-          console.log("User signed out cos error signign in to apple");
-        })
-        .catch((err) => {
-          console.log(err, "Error signign out from apple mistkae");
-        });
+      console.log(err.response.data, "Error in signUpAppleMutation"); //Can remove in prod
+      handleErrorSigningIn(err);
     },
   });
 
@@ -51,12 +56,16 @@ export const useAppleAuth = () => {
       console.log("successfully removed accounts");
     },
     onError: (err) => {
-      console.log(err, "Error removing user from mongoDB");
+      console.log(err, 'Error removing user mutation');
+      Toast.show({
+        type: "customErrorToast",
+        bottomOffset: 45,
+        text1: "Error deleting account, Please contact customer support",
+      });
     },
   });
 
   const handleAppleLogin = async () => {
-
     dispatch(setWaitingForBackend(true));
 
     try {
@@ -83,9 +92,9 @@ export const useAppleAuth = () => {
 
       // const firebaseToken = await userCredential.user.getIdToken();
       // Store the Firebase token and proceed with any further sign-up process
-      // Do we need this? 
+      // Do we need this?
       // await AsyncStorage.setItem("firebaseToken", firebaseToken);
-      // storage.set('firebaseToken', firebaseToken) 
+      // storage.set('firebaseToken', firebaseToken)
 
       // Call your backend API or perform further actions with the signed-in user
       signUpAppleMutation.mutate({
@@ -94,11 +103,8 @@ export const useAppleAuth = () => {
         idToken: identityToken,
         userInformation,
       });
-
-
     } catch (error) {
-      console.error("Error during Apple sign-in:", error);
-      auth().signOut();
+      handleErrorSigningIn(error);
     }
   };
 
@@ -127,6 +133,7 @@ export const useAppleAuth = () => {
         nonce
       );
 
+      // Nicer toast
       Toast.show({
         text1: "Account Deleting...",
         autoHide: false,
@@ -137,7 +144,6 @@ export const useAppleAuth = () => {
       await auth().currentUser.reauthenticateWithCredential(appleCredential);
 
       if (auth().currentUser) {
-
         const firebaseId = auth().currentUser.uid;
 
         removeUserMutation.mutate({ firebaseId });
@@ -149,25 +155,14 @@ export const useAppleAuth = () => {
         Toast.hide();
 
         // await AsyncStorage.removeItem("firebaseToken"); // Example of cleaning up
-        storage.delete('firebaseToken')
+        storage.delete("firebaseToken");
       }
     } catch (err) {
-      if (err.code === "auth/requires-recent-login") {
-        Toast.show({
-          text1: "Please sign in again to confirm account deletion.",
-          text2: "For security reasons, a recent login is required.",
-          autoHide: true,
-          type: "error",
-        });
-      } else {
-        Toast.show({
-          text1: "An error occurred",
-          text2: "Please try again or contact support if the problem persists.",
-          autoHide: true,
-          type: "error",
-        });
-      }
-      console.log(err, "Error processing account revocation");
+      Toast.show({
+        type: "customErrorToast",
+        bottomOffset: 45,
+        text1: "Error deleting account, Please contact customer support",
+      });
     }
   };
 

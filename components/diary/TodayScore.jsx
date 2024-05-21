@@ -5,7 +5,7 @@ import COLOURS from '../../constants/colours'
 import Leaf from "../../svgs/Leaf";
 
 const TodayScore = ({score}) => {
-
+ // NOT IN USE ANYMORE
   return (
     <View style={styles.todayScoreContainer}>
       <View style={styles.todayScoreTextContainer}>

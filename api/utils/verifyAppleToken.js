@@ -8,12 +8,16 @@ const client = jwksClient({
 
 function getKey(header, callback) {
   client.getSigningKey(header.kid, (err, key) => {
+    if (err) {
+      return callback(err, null); // Pass the error to the JWT verify callback
+    }
+    if (!key) {
+      return callback(new Error('No signing key found'), null);
+    }
     const signingKey = key.publicKey || key.rsaPublicKey;
     callback(null, signingKey);
   });
 }
-
-//I think its fine to not use service ID for when using apple
 
 const verifyToken = (idToken) => {
   return new Promise((resolve, reject) => {
@@ -21,7 +25,7 @@ const verifyToken = (idToken) => {
       idToken,
       getKey,
       {
-        audience: 'com.ramzyn12.Ivy.dev', // Your app's identifier
+        audience: 'com.ramzyn12.Ivy.dev', // app's identifier
         issuer: 'https://appleid.apple.com',
         algorithms: ['RS256'],
       },

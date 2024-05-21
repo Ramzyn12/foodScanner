@@ -3,17 +3,21 @@ const TimelineWeek = require("../models/TimelineWeek");
 const HealthMetric = require("../models/HealthMetric");
 const {
   differenceInCalendarDays,
-  startOfDay,
   addWeeks,
   addDays,
 } = require("date-fns");
 const { getCurrentDateLocal } = require("../utils/dateHelper");
 const Note = require("../models/Note");
+const { NotFoundError } = require("../utils/error");
 
 async function getRecentTimelineWeek({ userId }) {
   const recentDiaryDay = await DiaryDay.findOne({ userId: userId }).sort({
     date: 1,
   });
+
+  if (!recentDiaryDay) {
+    throw new NotFoundError('Error trying to fetch recent diary day')
+  }
   
   const today = new Date(getCurrentDateLocal());
   const lastDiaryDate = new Date(recentDiaryDay?.date || today);
@@ -36,9 +40,7 @@ async function getAllTimelineWeeks({ userId }) {
   const recentDiaryDay = diaryDays[0];
 
   if (!recentDiaryDay) {
-    return res
-      .status(404)
-      .json({ message: "No diary days found for this user." });
+    throw new NotFoundError('No diary day found for this user')
   }
 
   const today = new Date(getCurrentDateLocal())
@@ -58,18 +60,23 @@ async function getTimelineWeek({ userId, week }) {
   });
 
   if (!recentDiaryDay) {
-    return res
-      .status(404)
-      .json({ message: "No diary days found for this user." });
+    throw new NotFoundError('No diary day found for this user')
   }
 
   const lastDiaryDate = new Date(recentDiaryDay.date);
   const today = new Date(getCurrentDateLocal())
   const differenceInDays = differenceInCalendarDays(today, lastDiaryDate);
-  const firstDayOfWeek = addWeeks(lastDiaryDate, week - 1); //
+  const firstDayOfWeek = addWeeks(lastDiaryDate, week - 1); 
+  
   const arrayOfDates = Array.from({ length: 7 }, (_, i) =>
     addDays(firstDayOfWeek, i)
-  );
+  ); 
+  /* arrayOfDates [
+  2024-05-21T00:00:00.000Z,
+  2024-05-22T00:00:00.000Z,
+ ...
+  ]
+  */
 
   const [timelineWeek, diaryDays, healthMetrics, notes] = await Promise.all([
     TimelineWeek.findOne({ week }).select("title subtitle description"),
@@ -105,8 +112,8 @@ async function getTimelineWeek({ userId, week }) {
       .sort({ date: 1 }).select('note date')
   ]);
 
-  const metricTypes = ["Anxiety", "Sleep Quality", "Energy", "Weight"]; // Define all possible metrics
-
+  const metricTypes = ["Anxiety", "Sleep Quality", "Energy", "Weight"]
+  
   // Maybe optimise this if slow on server and defo put as own function
   let combinedDataByDate = arrayOfDates.map((date) => {
     const foundMetrics = healthMetrics.find(
@@ -130,7 +137,6 @@ async function getTimelineWeek({ userId, week }) {
         },
       };
     });
-
 
     return {
       date: date,

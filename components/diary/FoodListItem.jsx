@@ -2,9 +2,9 @@ import { View, Text, StyleSheet, Image } from "react-native";
 import React from "react";
 import COLOURS from "../../constants/colours";
 import unknown from "../../assets/unknown.webp";
+
 const FoodListItem = ({ foodSelected, foodItem }) => {
-  //Change colours based on scores
-  // THIS IS A SHARED COMPONENT hence the foodSelected from grocery
+  // This should be shared component
 
   const processedState = foodItem?.processedState;
   const isUnknown = foodItem?.processedState === "Unknown";

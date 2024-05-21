@@ -14,6 +14,7 @@ const { startSession } = require("mongoose");
 const { startOfDay } = require("date-fns");
 const { getCurrentDateLocal } = require("../utils/dateHelper");
 const HealthMetric = require("../models/HealthMetric");
+const Note = require("../models/Note");
 
 function handleFirebaseError(err) {
   console.error(err); // Log the original error for debugging purposes
@@ -24,7 +25,7 @@ function handleFirebaseError(err) {
         "User account already exists with the given email address."
       );
     case "auth/weak-password":
-      throw new BadRequestError("The password is not strong enough.");
+      throw new BadRequestError("This password is not strong enough.");
     case "auth/user-not-found":
     case "auth/wrong-password":
     case "auth/invalid-email":
@@ -43,25 +44,15 @@ function handleFirebaseError(err) {
         "An account already exists with the same email address but different sign-in credentials."
       );
     default:
-      // Throw a generic error or rethrow the original error
-      throw new Error("An error occurred while processing your request.");
+      throw new Error("An error occurred, Please try again later");
   }
 }
 
 async function createUser(email, password, userInfo) {
-  // const today = new Date();
-  // today.setHours(0, 0, 0, 0);
-
-  // const timeZoneTwo = "Europe/London";
-  // const dateInUTC = fromZonedTime(date, timeZoneTwo);
 
   // MAY NEED TO CHANGE THIS BASED ON TIMEZONE, since node doesnt use timezone of user but 
   // Rather timezone of node env, COULD GET TIMEZONE OFFset from frontend!
   const localDate = getCurrentDateLocal()
-
-
-  // const startOfDayUTC = fromZonedTime(startOfDay(date), timeZoneTwo);
-  // const endOfDayUTC = fromZonedTime(endOfDay(date), timeZoneTwo);
 
   const newFirebaseUser = await admin
     .auth()
@@ -93,11 +84,8 @@ async function createUser(email, password, userInfo) {
 }
 
 async function createAppleUser(email, uid, idToken, userInformation) {
-  // const today = new Date();
-  // today.setHours(0, 0, 0, 0);
 
   try {
-    // Is this still correct?
     await verifyAppleToken(idToken);
   } catch (error) {
     throw new BadRequestError("Invalid Apple ID token.");
@@ -120,7 +108,7 @@ async function updateFirstLastName(firstName, lastName, userId) {
     { new: true, runValidators: true }
   );
 
-  if (!user) throw new NotFoundError("User Id is most likely invalid");
+  if (!user) throw new NotFoundError("Could not find user to update names");
 
   return user;
 }
@@ -128,7 +116,7 @@ async function updateFirstLastName(firstName, lastName, userId) {
 async function getUserNames(userId) {
   const user = await User.findById(userId).lean();
 
-  if (!user) throw new NotFoundError("User Id is most likely invalid");
+  if (!user) throw new NotFoundError("Could not find user to fetch names");
   const firstName = user?.firstName || '';
   const lastName = user?.lastName || '';
 
@@ -138,16 +126,19 @@ async function getUserNames(userId) {
 async function removeUser(firebaseId, userId) {
   const session = await startSession();
 
+  // We do need try catch here becuase of the transaction by the way!
   try {
     session.startTransaction();
     // Maybe just need userId not firebaseId?
     const user = await User.findOneAndDelete({ firebaseId }, { session });
 
-    if (!user) throw new NotFoundError("Firebase Id invalid");
+    if (!user) throw new NotFoundError("User was not found");
 
     // Assuming there's a relationship via the user's ID
+    // What else do we need to delete? 
     await DiaryDay.deleteMany({ userId: user._id }, { session });
     await HealthMetric.deleteMany({ userId: user._id }, { session });
+    await Note.deleteMany({ userId: user._id }, { session });
 
     await session.commitTransaction();
     session.endSession();

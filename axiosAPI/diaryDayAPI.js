@@ -22,7 +22,6 @@ export const addFoodToDiaryDay = async ({ barcode, singleFoodId, name, brand, in
     const res = await diaryDayAPI.post('/', { barcode, singleFoodId, name, brand, ingredients, additives, processedScore, processedState, image_url, date });
     return res.data
   } catch (error) {
-    console.error("Error adding user info:", error);
     throw error;
   }
 };
@@ -32,7 +31,6 @@ export const removeFoodFromDiaryDay = async ({ barcode, singleFoodId, date }) =>
     const res = await diaryDayAPI.post(`/remove`, {barcode, singleFoodId, date});
     return res.data
   } catch (error) {
-    console.error("Error deleting user info:", error);
     throw error;
   }
 };
@@ -42,7 +40,6 @@ export const getDiaryDay = async ({ date }) => {
     const res = await diaryDayAPI.get(`/${date}`);
     return res.data
   } catch (error) {
-    console.error("Error getting diary DAy", error);
     throw error;
   }
 };
@@ -52,7 +49,6 @@ export const getAllDiaryDays = async () => {
     const res = await diaryDayAPI.get(`/all`);
     return res.data
   } catch (error) {
-    console.error("Error getting diary DAysss:", error);
     throw error;
   }
 };
@@ -61,7 +57,6 @@ export const toggleFastedState = async ({fastedState, date}) => {
     const res = await diaryDayAPI.post(`/toggle-fasting`, {fastedState, date});
     return res.data
   } catch (error) {
-    console.error("Error getting diary DAysss:", error);
     throw error;
   }
 };

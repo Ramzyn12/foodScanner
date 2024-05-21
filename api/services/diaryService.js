@@ -20,9 +20,10 @@ async function addFoodToDiary({ userId, foodDetails }) {
     }
 
     diaryDay = await DiaryDay.findOneAndUpdate(
-      { userId: userId, date: localDate },
+      { userId: userId, date: localDate }, 
       {
-        $addToSet: { consumedFoods: foodItem._id },
+        // addToSet: Ensures can't add duplicate item
+        $addToSet: { consumedFoods: foodItem._id }, 
       },
       { new: true, upsert: true }
     );
@@ -37,13 +38,14 @@ async function addFoodToDiary({ userId, foodDetails }) {
       { new: true, upsert: true }
     );
   }
+  
+  if (!diaryDay) throw new NotFoundError("Error when updating diary day (Adding)");
 
-  if (!diaryDay) throw new NotFoundError("Error when creating diary day");
-
-  await diaryDay.updateDiaryDayState();
+  await diaryDay.updateDiaryDayState(); // Processed, Unprocessed, Empty
 
   return diaryDay;
 }
+
 
 async function removeFoodFromDiaryDay({ userId, barcode, singleFoodId, date }) {
   const localDate = new Date(date + "T00:00:00.000Z");
@@ -52,14 +54,15 @@ async function removeFoodFromDiaryDay({ userId, barcode, singleFoodId, date }) {
 
   if (barcode) {
     const foodItem = await FoodItem.findOne({ barcode });
+
     if (!foodItem) {
-      throw new NotFoundError("Not found food item");
+      throw new NotFoundError("Food item not found in database", {barcode});
     }
     update = { $pull: { consumedFoods: foodItem._id } };
   } else if (singleFoodId) {
     const foodItem = await SingleFood.findById(singleFoodId);
     if (!foodItem) {
-      throw new NotFoundError("Not found food item");
+      throw new NotFoundError("Food item not found in database", {singleFoodId});
     }
     update = { $pull: { consumedSingleFoods: foodItem._id } };
   }
@@ -71,7 +74,7 @@ async function removeFoodFromDiaryDay({ userId, barcode, singleFoodId, date }) {
   );
 
   if (!diaryDay) {
-    throw new NotFoundError("Update failed for the diary day?");
+    throw new NotFoundError("Error when updating diary day (Removing)");
   }
 
   await diaryDay.updateDiaryDayState();
@@ -90,7 +93,7 @@ async function getDiaryDay({ userId, date }) {
     .populate("consumedSingleFoods")
     .lean();
 
-  // If no diary day exists for the date, return an empty diary day object
+  // If no diary day exists for the date, return an initial state diary day object
   // Or we should be creating one?
   if (!diaryDay) {
     diaryDay = {
@@ -109,7 +112,7 @@ async function getDiaryDay({ userId, date }) {
 
 async function getAllDiaryDays({ userId }) {
   // Need to make this truly local like get timezone offset from frontend!
-  const localDate = getCurrentDateLocal();
+  const localDate = getCurrentDateLocal()
 
   let diaryDays = await DiaryDay.find({ userId: userId })
     .sort("date")
@@ -137,6 +140,10 @@ async function updateFastedState({ userId, date, fastedState }) {
     { $set: update },
     options
   );
+
+  if (!diaryDay) {
+    throw new NotFoundError('Updated fasted state failed for diary day', {date: localDate})
+  }
 
   return diaryDay;
 }

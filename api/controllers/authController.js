@@ -16,7 +16,7 @@ const signUpUser = async (req, res) => {
 
   // console.log(errors);
   if (!errors.isEmpty()) {
-    throw new ValidationError("Validation failed", errors.array());
+    throw new ValidationError("Validation failed", errors.errors);
   }
 
   const user = await userService.createUser(email, password, userInfo);
@@ -28,7 +28,7 @@ const signUpUserApple = async (req, res) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    throw new ValidationError("Validation failed", errors.array());
   }
 
   const user = await userService.createAppleUser(

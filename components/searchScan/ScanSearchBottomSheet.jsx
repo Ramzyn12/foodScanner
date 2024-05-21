@@ -67,14 +67,14 @@ const ScanSearchBottomSheet = ({ setSheetIndex }) => {
     enabled: triggerSearch.trim().length > 2,
   });
 
-  const { data: DataOFF, isLoading: isLoadingIvyOFf } = useQuery({
+  const { data: DataOFF, isLoading: isLoadingOFF, isError: isErrorOFF, error: errorOFF } = useQuery({
     queryKey: ["SearchOFF", triggerSearch],
     queryFn: () => fetchFoodWithSearch(triggerSearch),
     retry: false,
     enabled: triggerSearch.trim().length > 2,
   });
 
-  const isLoading = isLoadingIvy || isLoadingIvyOFf;
+  const isLoading = isLoadingIvy || isLoadingOFF;
   const hideRecent = triggerSearch.trim().length > 2 || isLoading;
   const noResults = DataOFF?.length === 0 && DataIvy?.length === 0 && !isLoading
 
@@ -122,6 +122,7 @@ const ScanSearchBottomSheet = ({ setSheetIndex }) => {
     };
   });
 
+
   return (
     <BottomSheet
       ref={bottomSheetRef}
@@ -167,6 +168,7 @@ const ScanSearchBottomSheet = ({ setSheetIndex }) => {
       {!isLoading && (DataOFF?.length > 0 || DataIvy?.length > 0) && (
         <SearchResultsList DataOFF={DataOFF} DataIvy={DataIvy} />
       )}
+      {isErrorOFF && <Text>Error! Please try again later</Text>}
       {noResults && <NoResultsSearch />}
     </BottomSheet>
   );

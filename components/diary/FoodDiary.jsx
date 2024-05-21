@@ -27,6 +27,8 @@ const FoodDiary = ({}) => {
     (state) => state.auth.waitingForBackend
   );
   const dispatch = useDispatch();
+
+  // Do we still need this when use waitingForBackend in mainComponent? 
   useEffect(() => {
     if (userCreated) {
       refetch();
@@ -54,9 +56,7 @@ const FoodDiary = ({}) => {
     1 * diaryFoodItems?.consumedFoods.length +
       1 * diaryFoodItems?.consumedSingleFoods.length ===
     0;
-
-  // if (isLoading) return <LoadingDiary />;
-  // if (isError) return <Text>{error.response.data.message}</Text>;
+  
 
   return (
     <View style={{ width: "100%", marginTop: 25, paddingBottom: 200 }}>

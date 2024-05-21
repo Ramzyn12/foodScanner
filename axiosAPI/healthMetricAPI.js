@@ -34,7 +34,6 @@ export const getRecentMetric = async ({ metric }) => {
     const res = await healthMetricAPI.get(`/recent?metric=${metric}`);
     return res.data;
   } catch (error) {
-    console.error("Error adding user info:", error);
     throw error;
   }
 };

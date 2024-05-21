@@ -12,9 +12,10 @@ const updateNote = async (req, res) => {
     { upsert: true, new: true }
   );
 
-  if (!updatedNote) {
-    throw new Error("No note");
-  }
+  // Since upsert, it will create it? 
+  // if (!updatedNote) {
+  //   
+  // }
 
   res.status(200).json(updatedNote);
 };
@@ -26,7 +27,7 @@ const getNote = async (req, res) => {
   const note = await Note.findOne({ userId, date });
 
   if (!note) {
-    throw new NotFoundError("No note created yet");
+    throw new NotFoundError("Note not found", {note, date});
   }
 
   res.status(200).json(note);

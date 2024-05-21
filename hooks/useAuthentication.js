@@ -17,6 +17,7 @@ export const useAuthentication = () => {
     const unsubscribeAuthChange = auth().onAuthStateChanged(async (user) => {
       if (user) {
         const token = await user.getIdToken();
+        // console.log(token, 'for testing');
         dispatch(setToken(token));
         if (token) storage.set("firebaseToken", token);
         setFirebaseUid(user.uid);  // Set Firebase UID

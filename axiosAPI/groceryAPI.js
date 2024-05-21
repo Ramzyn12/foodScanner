@@ -22,7 +22,7 @@ export const addFoodToGroceryList = async ({ barcode, singleFoodId, name, brand,
     const res = await groceryAPI.post('/', { barcode, singleFoodId, name, brand, ingredients, additives, processedScore, processedState, image_url });
     return res.data
   } catch (error) {
-    console.error("Error adding user info:", error);
+    // console.error("Error adding user info:", error);
     throw error;
   }
 };
@@ -32,7 +32,7 @@ export const removeFoodFromGroceryList = async ({barcode, singleFoodId}) => {
     const res = await groceryAPI.post(`/remove`, {barcode, singleFoodId});
     return res.data
   } catch (error) {
-    console.error("Error deleting user info:", error);
+    // console.error("Error deleting user info:", error);
     throw error;
   }
 };
@@ -42,7 +42,7 @@ export const toggleCheckedState = async ({groceryItemId}) => {
     const res = await groceryAPI.patch(`/${groceryItemId}/toggle`);
     return res.data
   } catch (error) {
-    console.error("Error deleting user info:", error);
+    // console.error("Error deleting user info:", error);
     throw error;
   }
 };
@@ -52,7 +52,7 @@ export const uncheckAllItems = async () => {
     const res = await groceryAPI.post(`/uncheck-all`);
     return res.data
   } catch (error) {
-    console.error("Error deleting user info:", error);
+    // console.error("Error deleting user info:", error);
     throw error;
   }
 };
@@ -62,7 +62,7 @@ export const getGroceryList = async () => {
     const res = await groceryAPI.get(`/`);
     return res.data
   } catch (error) {
-    console.error("Error fetching user info:", error.response.data.message);
+    // console.error("Error fetching user info:", error.response.data.message);
     throw error;
   }
 };
@@ -72,7 +72,7 @@ export const updateSortPreference = async ({sortPreference}) => {
     const res = await groceryAPI.post(`/sort`, {sortPreference});
     return res.data
   } catch (error) {
-    console.error("Error fetching user info:", error.response.data.message);
+    // console.error("Error fetching user info:", error.response.data.message);
     throw error;
   }
 };
@@ -83,7 +83,7 @@ export const updateOrder = async ({itemOrder}) => {
     const res = await groceryAPI.post(`/updateOrder`, {itemOrder});
     return res.data
   } catch (error) {
-    console.error("Error fetching user info:", error.response.data.message);
+    // console.error("Error fetching user info:", error.response.data.message);
     throw error;
   }
 };

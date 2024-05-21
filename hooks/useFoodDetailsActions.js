@@ -94,17 +94,7 @@ export const useFoodDetailsActions = (expectedId) => {
       mutationCounterDiary.current -= 1;
       if (mutationCounterDiary.current !== 0) return;
       queryClient.invalidateQueries({ queryKey: ["DiaryDay", variables.date] });
-      // if (variables.barcode) {
-      //   queryClient.invalidateQueries({
-      //     queryKey: ["FoodDetails", variables.barcode, variables.date],
-      //   });
-      // } else if (variables.singleFoodId) {
-      //   queryClient.invalidateQueries({
-      //     queryKey: ["FoodDetailsIvy", variables.singleFoodId, variables.date],
-      //   });
-      // }
     },
-    // onSuccess: (data, variables) => {},
     onError: (err, variables, context) => {
       console.log(err);
       mutationCounterDiary.current = 0;
@@ -148,7 +138,6 @@ export const useFoodDetailsActions = (expectedId) => {
       // }
     },
     onError: (err, variables, context) => {
-      console.log(err);
       mutationCounterDiary.current = 0;
       const queryKey = variables.singleFoodId
         ? ["FoodDetailsIvy", variables.singleFoodId, variables.date]
@@ -189,8 +178,8 @@ export const useFoodDetailsActions = (expectedId) => {
       //   });
       // }
     },
-    onError: (err) => {
-      console.log(err, "HERE");
+    onError: (err, variables, context) => {
+      console.log(err);
       mutationCounterGrocery.current = 0;
       const queryKey = variables.singleFoodId
         ? ["FoodDetailsIvy", variables.singleFoodId, chosenDate]
@@ -231,9 +220,9 @@ export const useFoodDetailsActions = (expectedId) => {
       //   });
       // }
     },
-    onError: (err) => {
-      mutationCounterGrocery.current = 0;
+    onError: (err, variables, context) => {
       console.log(err, "HERE");
+      mutationCounterGrocery.current = 0;
       const queryKey = variables.singleFoodId
         ? ["FoodDetailsIvy", variables.singleFoodId, chosenDate]
         : ["FoodDetails", variables.barcode, chosenDate];
@@ -308,6 +297,10 @@ export const useFoodDetailsActions = (expectedId) => {
     addedToDiary,
     addedToGroceries,
     buttonsLoaded,
+    addFoodToDiaryMutation,
+    removeFoodFromDiaryMutation,
+    addToGroceryListMutation,
+    removeFromGroceryListMutation,
     handleAddToDiary: handleAddToDiaryFinal,
     handleRemoveFromDiary: handleRemoveFromDiaryFinal,
     handleAddToGroceryList: handleAddToGroceryFinal,

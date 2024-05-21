@@ -3,19 +3,17 @@ const DiaryDay = require("../models/DiaryDay");
 const Grocery = require("../models/Grocery");
 const SingleFood = require("../models/SingleFood");
 const { NotFoundError } = require("../utils/error");
-const { startOfDay, endOfDay, parseISO } = require("date-fns");
-const { zonedTimeToUtc } = require("date-fns-tz");
 
 // REMEMBER TO CHANGE TO ORG!
 const openFoodFactsAPI = axios.create({
-  baseURL: "https://world.openfoodfacts.net",
+  baseURL: "https://world.openfoodfacts.org",
 });
 
 const openFoodFactsSearchAPI = axios.create({
   baseURL: "https://search.openfoodfacts.org",
 });
 
-
+// We need try catch here to make sure it doesn't just exit and bubble up...
 async function fetchProductWithFallback(searchTerm) {
   try {
     // First try to fetch using the search API
@@ -32,9 +30,6 @@ async function fetchProductWithFallback(searchTerm) {
     if (response.data) {
       return response.data.hits;
     }
-    console.error(
-      "Invalid response from openFoodFactsSearchAPI, attempting fallback"
-    );
   } catch (error) {
     console.error("Error with openFoodFactsSearchAPI:", error.message);
   }
@@ -54,8 +49,6 @@ async function fetchProductWithFallback(searchTerm) {
     });
     if (fallbackResponse.data && fallbackResponse.data.products) {
       return fallbackResponse.data.products;
-    } else {
-      console.error("Fallback response from openFoodFactsAPI is invalid");
     }
   } catch (fallbackError) {
     console.error("Error with openFoodFactsAPI:", fallbackError.message);
@@ -66,12 +59,11 @@ async function fetchProductWithFallback(searchTerm) {
 }
 
 async function checkIsInGroceryList(userId, identifier, isBarcode = true) {
-  //ERROR HANDLING?
   const groceries = await Grocery.findOne({ userId: userId }).populate(
     "groceries.item"
   );
 
-  if (!groceries) return false;
+  if (!groceries) return false; // Not in grocery list since none made yet
 
   return groceries.groceries.some((groceryItem) =>
     isBarcode
@@ -94,7 +86,7 @@ async function checkIsConsumedToday(
     date: localDate,
   }).populate(isBarcode ? "consumedFoods" : "consumedSingleFoods");
 
-  if (!diaryDay) return false;
+  if (!diaryDay) return false; // Not in diary day since none made yet..
 
   return diaryDay[isBarcode ? "consumedFoods" : "consumedSingleFoods"].some(
     (foodItem) =>
@@ -105,90 +97,93 @@ async function checkIsConsumedToday(
 }
 
 async function fetchOFFWithBarcode({ userId, barcode, date }) {
-    const [isInGroceryList, isConsumedToday, fullResponse] = await Promise.all([
-      checkIsInGroceryList(userId, barcode, true),
-      checkIsConsumedToday(userId, barcode, true, date),
-      openFoodFactsAPI.get(
-        `/api/v3/product/${barcode}?fields=knowledge_panels,ingredients_text_en,ingredients_analysis_tags,nova_group,ingredients_hierarchy,brands,image_url,product_name`
-      ),
-    ]);
+  const [isInGroceryList, isConsumedToday, fullResponse] = await Promise.all([
+    checkIsInGroceryList(userId, barcode, true),
+    checkIsConsumedToday(userId, barcode, true, date),
+    openFoodFactsAPI.get(
+      `/api/v3/product/${barcode}?fields=knowledge_panels,ingredients_text_en,ingredients_analysis_tags,nova_group,ingredients_hierarchy,brands,image_url,product_name`
+    ),
+  ]);
 
-    const product = fullResponse?.data?.product
+  const product = fullResponse?.data?.product;
 
-    if (!product) {
-      throw new NotFoundError("Product data not available");
-    }
+  if (!product) {
+    throw new NotFoundError("Product data not available");
+  }
 
-    const knowledgePanels = product.knowledge_panels || {};
+  const knowledgePanels = product.knowledge_panels || {};
 
-    const ingredients = product.ingredients_text_en || "";
+  const ingredients = product.ingredients_text_en || "";
 
-    const additives = (knowledgePanels.additives?.elements || []).map((el) => {
-      // Safely navigate to the desired title using optional chaining.
-      const title =
-        knowledgePanels[el.panel_element?.panel_id]?.title_element?.title;
-      // If the title doesn't exist, return a default string.
-      // return title || "Unknown additive found";
-      return title;
-    });
+  const additives = (knowledgePanels.additives?.elements || []).map((el) => {
+    // Safely navigate to the desired title using optional chaining.
+    const title =
+      knowledgePanels[el.panel_element?.panel_id]?.title_element?.title;
+    // If the title doesn't exist, return a default string.
+    // return title || "Unknown additive found";
+    return title;
+  });
 
-    // Maybe unknown should be the last one instead of "No", need to relook at tags
-    const hasPalmOil = Array.isArray(product.ingredients_analysis_tags)
-      ? product.ingredients_analysis_tags.includes("en:palm-oil")
-        ? "Yes"
-        : product.ingredients_analysis_tags.includes(
-            "en:palm-oil-content-unknown"
-          )
-        ? "Unknown"
-        : "No"
-      : "Unknown"; 
+  // Maybe unknown should be the last one instead of "No"
+  // Need to relook at tags!
+  const hasPalmOil = Array.isArray(product.ingredients_analysis_tags)
+    ? product.ingredients_analysis_tags.includes("en:palm-oil")
+      ? "Yes"
+      : product.ingredients_analysis_tags.includes(
+          "en:palm-oil-content-unknown"
+        )
+      ? "Unknown"
+      : "No"
+    : "Unknown";
 
-    const co2Footprint = [
-      knowledgePanels?.carbon_footprint?.title_element?.subtitle,
-      knowledgePanels?.carbon_footprint?.title_element?.title,
-    ];
-    const processedState =
-      product.nova_group === 1
-        ? "Perfect"
-        : product.nova_group === 2
-        ? "Good"
-        : product.nova_group === 3
-        ? "Processed"
-        : product.nova_group === 4
-        ? "Processed"
-        : "Unknown";
+  const co2Footprint = [
+    knowledgePanels.carbon_footprint?.title_element?.subtitle,
+    knowledgePanels.carbon_footprint?.title_element?.title,
+  ];
 
-    // Need to deal with this on frontend
-    const hasVegetableOil = Array.isArray(product.ingredients_hierarchy)
-      ? product?.ingredients_hierarchy?.includes("en:vegetable-oil-and-fat")
+  const processedState =
+    product.nova_group === 1
+      ? "Perfect"
+      : product.nova_group === 2
+      ? "Good"
+      : product.nova_group === 3
+      ? "Processed"
+      : product.nova_group === 4
+      ? "Processed"
       : "Unknown";
 
-    const ecoscore =
-      knowledgePanels?.ecoscore_total?.title_element?.grade?.toUpperCase();
+  // Need to deal with this on frontend and make sure its correct way to find it
+  const hasVegetableOil = Array.isArray(product.ingredients_hierarchy)
+    ? product.ingredients_hierarchy?.includes("en:vegetable-oil-and-fat")
+    : "Unknown";
 
-    return {
-      name: product.product_name,
-      processedScore: 100,
-      processedState,
-      brand: Array.isArray(product.brands) ? product.brands[0] : product.brands,
-      image_url: product.image_url,
-      ingredients: ingredients,
-      additives: additives,
-      barcode: barcode,
-      isConsumedToday,
-      isInGroceryList,
-      hasPalmOil,
-      hasVegetableOil,
-      co2Footprint,
-      ecoscore,
-    };
+  const ecoscore =
+    knowledgePanels.ecoscore_total?.title_element?.grade?.toUpperCase();
+
+  return {
+    name: product.product_name,
+    processedScore: 100,
+    processedState,
+    brand: Array.isArray(product.brands) ? product.brands[0] : product.brands,
+    image_url: product.image_url,
+    ingredients: ingredients,
+    additives: additives,
+    barcode: barcode,
+    isConsumedToday,
+    isInGroceryList,
+    hasPalmOil,
+    hasVegetableOil,
+    co2Footprint,
+    ecoscore,
+  };
 }
 
 async function fetchOFFWithSearch({ search_term }) {
-  const response = await fetchProductWithFallback(search_term);
+  const response = await fetchProductWithFallback(search_term); 
 
   // Maybe return empty array instead so dont need to throw error?
-  if (!response)
+  // Test this to see what happens
+  if (!response) // response = [] 
     throw new NotFoundError("No search results for this search term");
 
   const products = response;
@@ -248,7 +243,6 @@ async function fetchSingleFoodsWithSearch({ searchTerm }) {
 }
 
 async function fetchSingleFoodsWithIvyId({ IvyId, userId, date }) {
-
   const singleFood = await SingleFood.findById(IvyId).lean();
 
   if (!singleFood) throw new Error("No single food with this IvyId");

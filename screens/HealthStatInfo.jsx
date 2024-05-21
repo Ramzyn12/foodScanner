@@ -82,7 +82,7 @@ const CustomTooltip = ({ x, y, datum, visible }) => {
         padding: 10,
         borderRadius: 5,
         position: "absolute",
-        left: x - 15 - textLength * 1.5 ,
+        left: x - 15 - textLength * 1.5,
         top: y && y - 60,
         gap: 8,
         alignItems: "center",
@@ -90,7 +90,11 @@ const CustomTooltip = ({ x, y, datum, visible }) => {
       }}
     >
       <Text
-        style={{ color: "white", fontSize: Math.max(24 - textLength * 1.2, 15), fontFamily: "Mulish_700Bold" }}
+        style={{
+          color: "white",
+          fontSize: Math.max(24 - textLength * 1.2, 15),
+          fontFamily: "Mulish_700Bold",
+        }}
       >
         {metricValue}
       </Text>
@@ -142,12 +146,14 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
       ? "How is your anxiety today?"
       : "How well did you sleep last night?";
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
+    // Should be called get graph data
     queryFn: () =>
       getAllDataForMetric({
         metric: route.params.metricType,
         timeFrame: selectedTimeFrame,
       }),
+    retry: 2,
     queryKey: ["MetricGraphData", route.params.metricType, selectedTimeFrame],
   });
 
@@ -338,7 +344,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
               containerComponent={
                 <VictoryVoronoiContainer
                   labels={({ datum }) => `${datum.metricValue}`}
-                  labelComponent={<CustomTooltip  visible={tooltipVisible} />} // Always render with visibility control
+                  labelComponent={<CustomTooltip visible={tooltipVisible} />} // Always render with visibility control
                   voronoiPadding={40}
                   // activateLabels={tooltipVisible}
                   voronoiDimension="x"

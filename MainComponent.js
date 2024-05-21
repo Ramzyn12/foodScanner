@@ -17,6 +17,8 @@ import { setHapticSetting } from "./redux/userSlice";
 import { storage } from "./utils/MMKVStorage";
 import Purchases from "react-native-purchases";
 import LoadingDiary from "./components/diary/LoadingDiary";
+import Toast from "react-native-toast-message";
+import { toastConfig } from "./toastConfig";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();

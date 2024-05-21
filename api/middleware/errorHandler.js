@@ -1,76 +1,70 @@
-/* 
-Success: 
-Already handled by axios so I just pass data
-{
-  status: 200 / 201,
-  data: { myData }
-}
-
-// Omitting status since react query makes it obvious?
-ValidationError:
-{
-  statusCode: 400,
-  error: 'Validation Error',
-  message: 'Valiation not passed',
-  errors: [
-    {
-      field: 'firstName',
-      value: 'aojfoadbfodabf',
-      message: 'not valid name'
-    },
-    {
-      field: 'email',
-      value: 'ram@gmail.com',
-      message: 'email taken'
-    }
-  ]
-}
-
-Non validation error:
-{
-  statusCode: 400,
-  error: 'Not Found Error',
-  message: 'This route cannot be found',
-  details: {path: 'badroute/route', }
-}
-*/
-
 const { ValidationError } = require("../utils/error");
-const { castErrorHandler, duplicateKeyErrorHandler, validationErrorHandler } = require("../utils/mongooseErrorHandlers");
+const {
+  castErrorHandler,
+  duplicateKeyErrorHandler,
+  validationErrorHandler,
+} = require("../utils/mongooseErrorHandlers");
 
-const errorHandler = (err, req, res, next) => {
-  // If the error does not have a statusCode, set it to 500 (Internal Server Error)
-
-  // MAYBE HANDLE 500 STATUS CODE BETTER SINCE NEED FOR DEBUGGING
-
-  // Handle Mongoose Cases
-  if (err.name === 'CastError') {
-    err = castErrorHandler(err)
-  }
-  if (err.code === 11000) err = duplicateKeyErrorHandler(err)
-  if (err.name === 'ValidationError') err = validationErrorHandler(err)
-
-  const statusCode = err.statusCode || 500;
-
+const sendErrorDev = (err, req, res) => {
   const errorResponse = {
-    statusCode: statusCode,
-    error: err.name || 'Internal Server Error',
-    message: err.message || 'An unexpected error occurred',
-    details: err.details || null,
+    statusCode: err.statusCode,
+    error: err.name || "Internal Server Error",
+    message: err.message || "An unexpected error occurred",
+    // stack: err.stack, // Can include if want
+    details: err.details || {},
   };
 
-  if (err instanceof ValidationError) {
-    errorResponse.errors = err.details.errors;
-    delete errorResponse.details;
+  if (err.errors) {
+    errorResponse.errors = err.errors || [];
   }
 
-  
+  console.log(errorResponse, "MIDDLEWARE DEV");
 
-  res.status(statusCode).send(errorResponse);
-
+  return res.status(err.statusCode).json(errorResponse);
 };
 
+const sendErrorProd = (err, req, res) => {
+  if (err.isOperational) {
+    // Operational, trusted error: send message to client
+    res.status(err.statusCode).json({
+      statusCode: err.statusCode,
+      error: err.name || "Internal Server Error",
+      message: err.message || "An unexpected error occurred",
+    });
+  } else {
+    // Programming or other unknown error: don't leak error details
+    console.error("ERROR 💥:", err); //Winston or sentry here
 
-//Maybe add some Error extends class so that we can have custom message and error code
+    res.status(500).json({
+      status: "error",
+      message: "Something went very wrong!",
+    });
+  }
+};
 
-module.exports = errorHandler
+const errorHandler = (err, req, res, next) => {
+  err.statusCode = err.statusCode || 500;
+
+  // Handle Mongoose Cases, Add more and seperate into function
+  if (err.name === "CastError") err = castErrorHandler(err);
+  if (err.code === 11000) err = duplicateKeyErrorHandler(err);
+  if (err.name === "ValidationError") err = validationErrorHandler(err);
+  // The Mongoose Validation Error will be thrown as a express validation error for consistency
+  if (err.name === "ValidationErrorExpress") {
+    err.errors = err.details?.errors || [];
+    delete err.details;
+  }
+
+  if (process.env.NODE_ENV === "development") {
+    sendErrorDev(err, req, res);
+  } else if (process.env.NODE_ENV === "production") {
+    sendErrorProd(err, req, res);
+  } else {
+    res.status(err.statusCode).json({
+      error: err.name || "Error",
+      message: err.message || "An unexpected error occurred",
+    });
+  }
+};
+
+module.exports = errorHandler;

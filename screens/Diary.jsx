@@ -39,28 +39,36 @@ const Diary = ({ navigation }) => {
     (state) => state.auth.waitingForBackend
   ); // const currentFood = useSelector((state) => state.food.currentFood);
   // const notifyOnChangeProps = useFocusNotifyOnChangeProps()
-  const chosenDate = useSelector((state) => state.diary.chosenDate) || getCurrentDateLocal()
+  const chosenDate =
+    useSelector((state) => state.diary.chosenDate) || getCurrentDateLocal();
 
   // focusManager.setFocused(true);
 
-  const { data, refetch: refetchAllDiaryDays, isPending: isLoadingAllDiaryDays, isError, error } = useQuery({
+  const {
+    data,
+    refetch: refetchAllDiaryDays,
+    isPending: isLoadingAllDiaryDays,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ["AllDiaryDays"],
     queryFn: getAllDiaryDays,
     retry: false,
     enabled: !!token,
   });
 
-  const { data: recentTimelineWeekData, isPending: isLoadingRecentTimeline } = useQuery({
-    queryKey: ["RecentTimelineWeek"],
-    queryFn: getRecentTimelineWeek,
-    // gcTime: 1000 * 60 * 60 * 4,
-    staleTime: 1000 * 60 * 60 * 4, // 6 hours
-    enabled: !!token,
-    // refetchOnMount: false,
-    // retryOnMount: false,
-    // refetchOnWindowFocus: false,
-    // refetchOnReconnect: false,
-  });
+  const { data: recentTimelineWeekData, isPending: isLoadingRecentTimeline, isError: isErrorRecentWeek } =
+    useQuery({
+      queryKey: ["RecentTimelineWeek"],
+      queryFn: getRecentTimelineWeek,
+      // gcTime: 1000 * 60 * 60 * 4,
+      staleTime: 1000 * 60 * 60 * 4, // 6 hours
+      enabled: !!token,
+      // refetchOnMount: false,
+      // retryOnMount: false,
+      // refetchOnWindowFocus: false,
+      // refetchOnReconnect: false,
+    });
 
   // const {
   //   data: diaryFoodItems,
@@ -93,17 +101,16 @@ const Diary = ({ navigation }) => {
     }, [refetchAllDiaryDays])
   );
 
-  if (isLoadingAllDiaryDays || isLoadingRecentTimeline)
-    return (
-      <LoadingDiary />
-    );
-    
-  if (isError)
+  if (isLoadingAllDiaryDays || isLoadingRecentTimeline) return <LoadingDiary />;
+
+  if (isError) {
+    console.log(error);
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
         <Text>Server error, try again later</Text>
       </View>
     );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -119,15 +126,15 @@ const Diary = ({ navigation }) => {
       >
         <StreakCard diaryData={data} />
         {/* <BenefitFactCard /> */}
-        <Pressable style={{ marginTop: 25 }}>
+        {!isErrorRecentWeek && <Pressable style={{ marginTop: 25 }}>
           <TimelineEventCard
             destination={"HealthStack"}
             unlocked={true}
             data={recentTimelineWeekData}
             daysFinished={recentTimelineWeekData?.currentDay}
           />
-        </Pressable>
-        <FoodDiary  />
+        </Pressable>}
+        <FoodDiary />
       </ScrollView>
     </SafeAreaView>
   );

@@ -4,6 +4,8 @@ const SingleFood = require("../models/SingleFood");
 const { NotFoundError } = require("../utils/error");
 
 async function addFoodToGroceryList({ userId, foodDetails }) {
+  // Dont let it add two duplicates
+
   const { barcode, singleFoodId } = foodDetails;
 
   let item, itemModel;
@@ -20,7 +22,7 @@ async function addFoodToGroceryList({ userId, foodDetails }) {
   }
 
   if (!item) {
-    throw new NotFoundError("Food item not found or created.");
+    throw new NotFoundError("Item not found to add to grocery list");
   }
 
   const groceryItem = { item: item._id, itemModel, checked: false };
@@ -52,18 +54,21 @@ async function getGroceryList({ userId }) {
 }
 
 async function removeFoodFromGroceryList({ userId, barcode, singleFoodId }) {
+
   let itemId;
 
   if (barcode) {
     const foodItem = await FoodItem.findOne({ barcode: barcode });
     if (!foodItem) {
-      return res.status(404).send("Food item with given barcode not found.");
+      throw new NotFoundError("Food item not found in database", { barcode });
     }
     itemId = foodItem._id;
   } else if (singleFoodId) {
     const singleFood = await SingleFood.findById(singleFoodId);
     if (!singleFood) {
-      return res.status(404).send("Single food item not found.");
+      throw new NotFoundError("Food item not found in database", {
+        singleFoodId,
+      });
     }
     itemId = singleFood._id;
   }
@@ -87,14 +92,13 @@ async function toggleCheckedState({ userId, groceryItemId }) {
   const groceryList = await Grocery.findOne({ userId: userId });
 
   if (!groceryList) {
-    return res.status(404).send("Grocery list not found.");
+    throw new NotFoundError("Grocery list not found", { userId });
   }
-
   // Find the grocery item and toggle its checked state
   const groceryItem = groceryList.groceries.id(groceryItemId);
 
   if (!groceryItem) {
-    return res.status(404).send("Grocery item not found.");
+    throw new NotFoundError("Grocery Item Not Found", { groceryItem });
   }
 
   groceryItem.checked = !groceryItem.checked;
@@ -108,7 +112,7 @@ async function uncheckAllItems({ userId }) {
   const groceryList = await Grocery.findOne({ userId });
 
   if (!groceryList) {
-    return res.status(404).send("Grocery list not found.");
+    throw new NotFoundError("Grocery list not found", { userId });
   }
 
   groceryList.groceries.forEach((item) => {
@@ -121,10 +125,11 @@ async function uncheckAllItems({ userId }) {
 }
 
 async function updateSortPreference({ userId, sortPreference }) {
+  // Need to change this as can update sort preference to anything like Hello...
   const groceries = await Grocery.findOneAndUpdate(
     { userId },
     { sortPreference },
-    { new: true }
+    { new: true, runValidators: true }
   );
 
   if (!groceries) {
