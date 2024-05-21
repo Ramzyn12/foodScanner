@@ -5,6 +5,7 @@ const { BadRequestError, NotFoundError } = require("../utils/error");
 
 
 async function updateHealthMetric({ date, metric, userId, metricValue, unitOfMeasure }) {
+
   const localDate = new Date(date + "T00:00:00.000Z");
   const updateOptions = { upsert: true, new: true, runValidators: true };
   const updateData = { metricValue };
@@ -34,6 +35,7 @@ async function updateHealthMetric({ date, metric, userId, metricValue, unitOfMea
 
 //Gets the most recent metric value for the metric e.g Sleep Quality
 async function getRecentMetric({ metric, userId }) {
+
   // DONT need to return everything e.g userId etc...
 
   const recentMetric = await HealthMetric.findOne({ userId, metric })

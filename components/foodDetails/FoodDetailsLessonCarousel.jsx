@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 const FoodDetailsLessonCarousel = ({ additives }) => {
   const currentFood = useSelector(state => state.food.currentFood)
 
+  // NO LOGNER ACFIVE
   return (
     <>
       {currentFood.additives?.length > 0 && (

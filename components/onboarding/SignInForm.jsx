@@ -33,7 +33,9 @@ const SignInForm = () => {
       case "auth/user-disabled":
       case "auth/user-not-found":
       case "auth/wrong-password":
+      case "auth/account-exists-with-different-credential":
       case "auth/invalid-credential":
+        
         message = "Invalid email or password. Please try again.";
         break;
       case "auth/too-many-requests":
@@ -55,7 +57,6 @@ const SignInForm = () => {
       .signInWithEmailAndPassword(email, password)
       .then(async (userCredential) => {
         const token = await userCredential.user.getIdToken();
-        // await AsyncStorage.setItem("firebaseToken", token);
         storage.set("firebaseToken", token);
         setSignInLoading(false);
       })
@@ -69,7 +70,6 @@ const SignInForm = () => {
 
   const handleForgotPassword = () => {
     navigation.navigate('ForgotPassword')
-   
   }
 
   return (

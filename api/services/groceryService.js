@@ -54,7 +54,7 @@ async function getGroceryList({ userId }) {
 }
 
 async function removeFoodFromGroceryList({ userId, barcode, singleFoodId }) {
-
+  
   let itemId;
 
   if (barcode) {
@@ -109,6 +109,7 @@ async function toggleCheckedState({ userId, groceryItemId }) {
 }
 
 async function uncheckAllItems({ userId }) {
+  // throw new Error('Random')
   const groceryList = await Grocery.findOne({ userId });
 
   if (!groceryList) {
@@ -140,6 +141,7 @@ async function updateSortPreference({ userId, sortPreference }) {
 }
 
 async function updateOrder({ userId, itemOrder }) {
+
   const groceryList = await Grocery.findOneAndUpdate(
     { userId },
     { $set: { itemOrder } },

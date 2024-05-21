@@ -27,15 +27,13 @@ const ForgotPassword = ({ navigation }) => {
     auth()
       .sendPasswordResetEmail(email)
       .then(() => {
-        // navigation.goBack()
         setShowContinueMessage(true);
-        // Toast.show({
-        //   text1: 'Email Sent',
-        //   position: 'top'
-        // })
       })
       .catch((err) => {
-        console.log(err);
+        Toast.show({
+          type: "customErrorMessage",
+          text1: "Failed to send email, try again",
+        });
       })
       .finally(() => {
         setIsLoading(false);

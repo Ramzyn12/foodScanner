@@ -102,6 +102,7 @@ async function createAppleUser(email, uid, idToken, userInformation) {
 }
 
 async function updateFirstLastName(firstName, lastName, userId) {
+  
   const user = await User.findByIdAndUpdate(
     userId,
     { firstName, lastName },

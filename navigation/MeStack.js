@@ -2,7 +2,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import Health from "../screens/Health";
-import UnlockedDetails from "../screens/UnlockedDetails";
 import Me from "../screens/Me";
 import Settings from "../screens/Settings";
 import Account from "../screens/Account";

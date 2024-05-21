@@ -4,28 +4,47 @@ import { Path, Svg } from "react-native-svg";
 import COLOURS from "../../constants/colours";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { uncheckAllItems } from "../../axiosAPI/groceryAPI";
-import { useDispatch } from "react-redux";
-import { restartCount, setCurrentGroceries, unmarkAllChecked } from "../../redux/grocerySlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  restartCount,
+  setCurrentGroceries,
+  unmarkAllChecked,
+} from "../../redux/grocerySlice";
 import UnmarkIcon from "../../svgs/UnmarkIcon";
+import Toast from "react-native-toast-message";
 
 const UnmarkButton = () => {
-
   const queryClient = useQueryClient();
-  const dispatch = useDispatch()
-
+  const dispatch = useDispatch();
 
   const unMarkMutation = useMutation({
     mutationFn: uncheckAllItems,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["Groceries"]);
+    onSettled: () => {
+      queryClient.invalidateQueries({queryKey: ["Groceries"]});
     },
-    onError: (err) => {
-      console.log(err);
+    onMutate: async () => {
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries(['Groceries']);
+
+      // Snapshot the previous value
+      const previousGroceries = queryClient.getQueryData(['Groceries']);
+
+      // Optimistically update to the new value
+      dispatch(unmarkAllChecked());
+
+      return { previousGroceries };
+    },
+    onError: (err, variables, context) => {
+      // If the mutation fails, use the context returned from onMutate to roll back
+      dispatch(setCurrentGroceries(context.previousGroceries))
+      Toast.show({
+        type: 'customErrorToast',
+        text1: 'Unmark all failed, please try again later'
+      });
     },
   });
 
   const handleUnselectAll = () => {
-    dispatch(unmarkAllChecked()) // Optimistic update
     unMarkMutation.mutate();
   };
 

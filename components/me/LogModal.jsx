@@ -12,11 +12,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateHealthMetric } from "../../axiosAPI/healthMetricAPI";
 import WeightInput from "./WeightInput";
 import { getAnyDateLocal, getCurrentDateLocal } from "../../utils/dateHelpers";
+import Toast from "react-native-toast-message";
 
 const LogModal = forwardRef(({ onClose, metricType, date }, ref) => {
   const isWeight = metricType === "Weight";
   const [value, setValue] = useState(0);
-  const [weightValue, setWeightValue] = useState('');
+  const [weightValue, setWeightValue] = useState("");
   const [weightUnit, setWeightUnit] = useState("imperial");
   const question =
     metricType === "Weight"
@@ -37,27 +38,30 @@ const LogModal = forwardRef(({ onClose, metricType, date }, ref) => {
     );
   }, []);
 
-
   const updateHealthMetricMutation = useMutation({
     mutationFn: updateHealthMetric,
     onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({queryKey: ["RecentMetric", variables.metric]});
-      queryClient.invalidateQueries({queryKey: ["TimelineWeek"]});
+      queryClient.invalidateQueries({
+        queryKey: ["RecentMetric", variables.metric],
+      });
+      queryClient.invalidateQueries({ queryKey: ["TimelineWeek"] });
     },
     onError: (err) => {
-      console.log(err);
+      Toast.show({
+        type: "customErrorToast",
+        text1: "Failed to update value, please try again later",
+      });
     },
   });
 
-  const handleSave = () => {
+  const handleSaveValue = () => {
     updateHealthMetricMutation.mutate({
       metric: metricType,
       date: date ? getAnyDateLocal(date) : getCurrentDateLocal(),
       metricValue: isWeight ? weightValue : value,
-      unitOfMeasure: weightUnit === 'imperial' ? 'kg' : 'lbs'
+      unitOfMeasure: weightUnit === "imperial" ? "kg" : "lbs",
     });
     ref.current.close();
-    // ("Maybe add toast?");
   };
 
   return (
@@ -105,14 +109,24 @@ const LogModal = forwardRef(({ onClose, metricType, date }, ref) => {
           }}
         >
           {isWeight ? (
-            <WeightInput weightUnit={weightUnit} setWeightUnit={setWeightUnit} value={weightValue} setValue={setWeightValue} bottomSheetBehaviour={true} />
+            <WeightInput
+              weightUnit={weightUnit}
+              setWeightUnit={setWeightUnit}
+              value={weightValue}
+              setValue={setWeightValue}
+              bottomSheetBehaviour={true}
+            />
           ) : (
-            <HealthSlider metricType={metricType} value={value} setValue={setValue} />
+            <HealthSlider
+              metricType={metricType}
+              value={value}
+              setValue={setValue}
+            />
           )}
         </BottomSheetView>
         <View style={{ paddingHorizontal: 20, paddingVertical: 10 }}>
           <Pressable
-            onPress={handleSave}
+            onPress={handleSaveValue}
             style={{
               width: "100%",
               height: 44,

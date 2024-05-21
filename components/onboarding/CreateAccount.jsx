@@ -15,6 +15,7 @@ import { useMutation } from "@tanstack/react-query";
 import { addFirstLastName } from "../../axiosAPI/authAPI";
 import { addUserNames } from "../../axiosAPI/userAPI";
 import auth from "@react-native-firebase/auth";
+import Toast from "react-native-toast-message";
 
 
 const CreateAccount = ({ navigation, route }) => {
@@ -34,10 +35,13 @@ const CreateAccount = ({ navigation, route }) => {
           console.log("Success updating display name");
         });
       }
-      // Show toast saying welcome? 
     },
     onError: (err) => {
-      console.log(err);
+      navigation.goBack();
+      Toast.show({
+        type: 'customErrorToast',
+        text1: 'Failed to add names, please try again later'
+      })
     },
   });
 

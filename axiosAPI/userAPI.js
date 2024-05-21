@@ -22,7 +22,6 @@ export const addUserNames = async ({ firstName, lastName }) => {
     const res = await userAPI.post("/names", { firstName, lastName });
     return res.data;
   } catch (error) {
-    console.error("Error adding user info:", error);
     throw error;
   }
 };
@@ -32,7 +31,6 @@ export const getUserNames = async () => {
     const res = await userAPI.get("/names");
     return res.data;
   } catch (error) {
-    console.error("Error adding user info:", error);
     throw error;
   }
 };
@@ -42,7 +40,6 @@ export const removeUserAccount = async ({ firebaseId }) => {
     const res = await userAPI.delete(`/removeUser/${firebaseId}`);
     return res.data;
   } catch (error) {
-    console.error("Error adding user info:", error);
     throw error;
   }
 };
@@ -52,7 +49,6 @@ export const toggleUserHaptics = async () => {
     const res = await userAPI.post(`haptics/toggle`);
     return res.data;
   } catch (error) {
-    console.error("Error adding user info:", error);
     throw error;
   }
 };
@@ -61,7 +57,6 @@ export const getUserHaptics = async () => {
     const res = await userAPI.get(`haptics`);
     return res.data;
   } catch (error) {
-    console.error("Error adding user info:", error);
     throw error;
   }
 };

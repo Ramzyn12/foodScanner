@@ -9,7 +9,10 @@ import DraggableFlatList, {
   ScaleDecorator,
 } from "react-native-draggable-flatlist";
 import * as Haptics from "expo-haptics";
-import { updateGroceryOrder } from "../../redux/grocerySlice";
+import {
+  setCurrentGroceries,
+  updateGroceryOrder,
+} from "../../redux/grocerySlice";
 import { useFocusEffect } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 
@@ -23,11 +26,20 @@ const GroceryList = () => {
 
   const updateOrderMutation = useMutation({
     mutationFn: updateOrder,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["Groceries"] });
+    onMutate: async () => {
+
+      await queryClient.cancelQueries(["Groceries"]);
+
+      const previousGroceries = queryClient.getQueryData(["Groceries"]);
+
+      return { previousGroceries };
     },
-    onError: (err) => {
-      console.log("Update Order Failed: ", err);
+    onError: (err, variables, context) => {
+      dispatch(setCurrentGroceries(context.previousGroceries));
+      Toast.show({
+        type: "customErrorToast",
+        text1: "Failed to sort order, please try again later",
+      });
     },
   });
 
@@ -58,31 +70,21 @@ const GroceryList = () => {
     );
   }, []);
 
-  // Save grocery list order when leave page
   // maybe change this to throttle/debounce instead?
-  useFocusEffect(
-    useCallback(() => {
-      return () => {
-        if (newOrder.length > 0) {
-          updateOrderMutation.mutate({ itemOrder: newOrder });
-          setNewOrder([]); // Reset the temporary state
-        }
-      };
-    }, [newOrder, updateOrderMutation, dispatch])
-  );
-
-
-
   const handleDragEnd = ({ data }) => {
-    setNewOrder(data.map((item) => item.item._id));
-    dispatch(updateGroceryOrder(data));
+    const orderIds = data.map((item) => item.item._id);
+    if (JSON.stringify(orderIds) !== JSON.stringify(newOrder)) {
+      setNewOrder(orderIds);
+      dispatch(updateGroceryOrder(data));
+      updateOrderMutation.mutate({ itemOrder: orderIds });
+    }
   };
 
   const handleIndexChange = () => {
     if (hapticsEnabled) {
-      Haptics.selectionAsync()
+      Haptics.selectionAsync();
     }
-  }
+  };
 
   return (
     <View style={{ paddingBottom: 120, flex: 1 }}>

@@ -7,7 +7,6 @@ import Diary from "../screens/Diary";
 import DiaryIcon from "../svgs/DiaryIcon";
 import CreateAccount from "../components/onboarding/CreateAccount";
 import Health from "../screens/Health";
-import UnlockedDetails from "../screens/UnlockedDetails";
 import WeeklyOverview from "../screens/WeeklyOverview";
 import ArrowLeft from "../svgs/ArrowLeft";
 import { Pressable } from "react-native";
@@ -31,14 +30,7 @@ const HealthStack = () => {
           headerShadowVisible: false
         }}
       />
-      <Stack.Screen
-        name="UnlockedDetails"
-        component={UnlockedDetails}
-        options={{
-          presentation: "fullScreenModal",
-          headerShown: false,
-        }}
-      />
+
       <Stack.Screen
         name="WeeklyOverview"
         component={WeeklyOverview}

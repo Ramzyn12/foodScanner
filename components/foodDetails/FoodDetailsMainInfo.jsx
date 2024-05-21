@@ -23,7 +23,7 @@ import { useSubscriptionState } from "../../hooks/useSubscriptionState";
 const FoodDetailsMainInfo = () => {
   const currentFood = useSelector((state) => state.food.currentFood);
   // const { isSubscribed } = useSubscriptionState()
-  const isSubscribed = false;
+  const isSubscribed = true;
   const isUnknown = currentFood.processedState === "Unknown";
   const title =
     currentFood.processedState === "Processed"

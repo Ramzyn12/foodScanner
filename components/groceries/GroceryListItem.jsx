@@ -12,7 +12,11 @@ import FoodListItem from "../diary/FoodListItem";
 import { Swipeable } from "react-native-gesture-handler";
 import { TouchableOpacity } from "react-native";
 import TickIcon from "../../svgs/TickIcon";
-import { useFocusEffect, useIsFocused, useNavigation } from "@react-navigation/native";
+import {
+  useFocusEffect,
+  useIsFocused,
+  useNavigation,
+} from "@react-navigation/native";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   addFoodToGroceryList,
@@ -37,109 +41,109 @@ const GroceryListItem = ({ foodItem, id, onLongPress, isActive }) => {
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
   const deletionTimerRef = useRef(null);
-  const singleFoodId = foodItem?.barcode ? '' : foodItem?._id
-  const brand = singleFoodId ? 'Fresh' : foodItem?.brand
+  const singleFoodId = foodItem?.barcode ? "" : foodItem?._id;
+  const brand = singleFoodId ? "Fresh" : foodItem?.brand;
   const chosenDate =
     useSelector((state) => state.diary.chosenDate) || getCurrentDateLocal();
 
-    
   const removeFoodMutation = useMutation({
     mutationFn: removeFoodFromGroceryList,
     onMutate: async (variables) => {
       const queryKey = variables.singleFoodId
-      ? ["FoodDetailsIvy", variables.singleFoodId, chosenDate]
-      : ["FoodDetails", variables.barcode, chosenDate];
+        ? ["FoodDetailsIvy", variables.singleFoodId, chosenDate]
+        : ["FoodDetails", variables.barcode, chosenDate];
 
-    // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-    await queryClient.cancelQueries({queryKey: queryKey});
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({ queryKey: queryKey });
 
-    // Snapshot the previous value
-    const previousFoodDetails = queryClient.getQueryData(queryKey);
+      // Snapshot the previous value
+      const previousFoodDetails = queryClient.getQueryData(queryKey);
 
-    // Optimistically update to the new value
-    queryClient.setQueryData(queryKey, (old) => ({
-      ...old,
-      isInGroceryList: false,
-    }));
+      // Optimistically update to the new value
+      queryClient.setQueryData(queryKey, (old) => ({
+        ...old,
+        isInGroceryList: false,
+      }));
 
-    return { previousFoodDetails };
+      return { previousFoodDetails };
     },
     onSuccess: (data, variables) => {
-      dispatch(confirmDeletion(id))
-      queryClient.invalidateQueries({queryKey: ["Groceries"]});
-      // if (variables.barcode) {
-      //   queryClient.invalidateQueries({
-      //     queryKey: ["FoodDetails", variables.barcode],
-      //     refetchType: 'all',
-      //   });
-      // } else if (variables.singleFoodId) {
-      //   queryClient.invalidateQueries({
-      //     queryKey: ["FoodDetailsIvy", variables.singleFoodId],
-      //     refetchType: 'all',
-      //   });
-      // }
+      dispatch(confirmDeletion(id));
+      queryClient.invalidateQueries({ queryKey: ["Groceries"] });
     },
-    onError: (err) => {
+    onError: (err, variables, context) => {
       console.log(err);
       const queryKey = variables.singleFoodId
-      ? ["FoodDetailsIvy", variables.singleFoodId, chosenDate]
-      : ["FoodDetails", variables.barcode, chosenDate];
-    queryClient.setQueryData(queryKey, context.previousFoodDetails);    },
+        ? ["FoodDetailsIvy", variables.singleFoodId, chosenDate]
+        : ["FoodDetails", variables.barcode, chosenDate];
+      queryClient.setQueryData(queryKey, context.previousFoodDetails);
+      dispatch(addVirtualGroceryItem());
+      Toast.show({
+        type: "customErrorToast",
+        text1: "Failed to remove food, please try again later",
+      });
+    },
   });
 
   const addFoodToGroceryMutation = useMutation({
     mutationFn: addFoodToGroceryList,
     onMutate: async (variables) => {
       const queryKey = variables.singleFoodId
-      ? ["FoodDetailsIvy", variables.singleFoodId, chosenDate]
-      : ["FoodDetails", variables.barcode, chosenDate];
+        ? ["FoodDetailsIvy", variables.singleFoodId, chosenDate]
+        : ["FoodDetails", variables.barcode, chosenDate];
 
-    // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-    await queryClient.cancelQueries({queryKey: queryKey});
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({ queryKey: queryKey });
 
-    // Snapshot the previous value
-    const previousFoodDetails = queryClient.getQueryData(queryKey);
+      // Snapshot the previous value
+      const previousFoodDetails = queryClient.getQueryData(queryKey);
 
-    // Optimistically update to the new value
-    queryClient.setQueryData(queryKey, (old) => ({
-      ...old,
-      isInGroceryList: true,
-    }));
+      // Optimistically update to the new value
+      queryClient.setQueryData(queryKey, (old) => ({
+        ...old,
+        isInGroceryList: true,
+      }));
 
-    return { previousFoodDetails };
+      return { previousFoodDetails };
     },
     onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({queryKey: ["Groceries"]});
-      // if (variables.barcode) {
-      //   queryClient.invalidateQueries({
-      //     queryKey: ["FoodDetails", variables.barcode],
-      //     refetchType: 'all',
-      //   });
-      // } else if (variables.singleFoodId) {
-      //   queryClient.invalidateQueries({
-      //     queryKey: ["FoodDetailsIvy", variables.singleFoodId],
-      //     refetchType: 'all',
-      //   });
-      // }
+      queryClient.invalidateQueries({ queryKey: ["Groceries"] });
     },
-    onError: (err) => {
+    onError: (err, variables, context) => {
       console.log(err);
       const queryKey = variables.singleFoodId
-      ? ["FoodDetailsIvy", variables.singleFoodId, chosenDate]
-      : ["FoodDetails", variables.barcode, chosenDate];
-    queryClient.setQueryData(queryKey, context.previousFoodDetails);
-    },
-  })
-
-
-  const toggleMutation = useMutation({
-    mutationFn: toggleCheckedState,
-    onSuccess: () => {},
-    onError: (err) => {
-      console.log(err);
+        ? ["FoodDetailsIvy", variables.singleFoodId, chosenDate]
+        : ["FoodDetails", variables.barcode, chosenDate];
+      queryClient.setQueryData(queryKey, context.previousFoodDetails);
+      dispatch(removeVirtualGroceryItem(id));
+      Toast.show({
+        type: "customErrorToast",
+        text1: "Failed undo action, please find in recents",
+      });
     },
   });
 
+  const toggleMutation = useMutation({
+    mutationFn: toggleCheckedState,
+    onMutate: async (variables) => {
+      await queryClient.cancelQueries(["groceries"]);
+
+      const previousGroceries = queryClient.getQueryData(["groceries"]);
+
+      // Optimistically update to the new state
+      dispatch(checkGrocery(id));
+
+      return { previousGroceries };
+    },
+    onError: (error, variables, context) => {
+      dispatch(checkGrocery(id)); // Does the opposite to onMutate check
+      queryClient.setQueryData(["groceries"], context.previousGroceries);
+      Toast.show({
+        type: "customErrorToast",
+        text1: "Failed to check, please try again later",
+      });
+    },
+  });
 
   const foodItemSchema = {
     barcode: foodItem?.barcode,
@@ -162,13 +166,11 @@ const GroceryListItem = ({ foodItem, id, onLongPress, isActive }) => {
 
     // Add back temporarily removed item
     dispatch(addVirtualGroceryItem());
-    addFoodToGroceryMutation.mutate(foodItemSchema)
+    addFoodToGroceryMutation.mutate(foodItemSchema);
     Toast.hide();
   };
 
-
   const handleDeletePress = () => {
-
     dispatch(removeVirtualGroceryItem(id));
 
     // Clear any existing timer to ensure we don't have multiple timers running
@@ -178,7 +180,7 @@ const GroceryListItem = ({ foodItem, id, onLongPress, isActive }) => {
 
     removeFoodMutation.mutate({
       barcode: foodItem?.barcode,
-      singleFoodId
+      singleFoodId,
     });
 
     // // Start a new timer
@@ -199,20 +201,16 @@ const GroceryListItem = ({ foodItem, id, onLongPress, isActive }) => {
     });
   };
 
-
   const handleToggleCheck = () => {
     toggleMutation.mutate({ groceryItemId: id });
-    dispatch(checkGrocery(id));
   };
-
 
   const handleGoToFood = () => {
     navigation.navigate("FoodDetailsModal", {
       barcodeId: foodItem?.barcode,
-      singleFoodId
+      singleFoodId,
     });
   };
-
 
   // Need to use callback this one I think
   const renderRightActions = (progress, dragX) => {
@@ -244,7 +242,6 @@ const GroceryListItem = ({ foodItem, id, onLongPress, isActive }) => {
       <View
         style={[styles.listItemContainer, isActive && styles.isActiveStyles]}
       >
-
         {/* Check Box */}
         <Pressable onPress={handleToggleCheck}>
           <View
@@ -264,14 +261,15 @@ const GroceryListItem = ({ foodItem, id, onLongPress, isActive }) => {
           onPress={handleGoToFood}
           delayLongPress={200}
         >
-          <FoodListItem foodSelected={grocery?.checked} foodItem={{...foodItem, brand: brand}} />
+          <FoodListItem
+            foodSelected={grocery?.checked}
+            foodItem={{ ...foodItem, brand: brand }}
+          />
         </Pressable>
-
       </View>
     </Swipeable>
   );
 };
-
 
 export default GroceryListItem;
 

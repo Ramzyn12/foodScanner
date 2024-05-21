@@ -24,7 +24,6 @@ export const updateHealthMetric = async ({ metric, date, metricValue, unitOfMeas
     });
     return res.data;
   } catch (error) {
-    console.error("Error adding user info:", error);
     throw error;
   }
 };
@@ -43,7 +42,6 @@ export const getAllDataForMetric = async ({ metric, timeFrame }) => {
     const res = await healthMetricAPI.get(`/?metric=${metric}&timeFrame=${timeFrame}`);
     return res.data;
   } catch (error) {
-    console.error("Error adding user info:", error);
     throw error;
   }
 };

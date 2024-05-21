@@ -70,8 +70,10 @@ const HealthCard = ({ onLog, metricType, leftLable, rightLable }) => {
   const navigation = useNavigation();
   const isWeight = metricType === "Weight";
 
-  const { data } = useQuery({
+  const { data, isError, error } = useQuery({
+    // Better name would be getHealthMetric
     queryFn: () => getRecentMetric({ metric: metricType }),
+    retry: false,
     queryKey: ["RecentMetric", metricType], //Second param is the metric
   });
 
@@ -110,39 +112,54 @@ const HealthCard = ({ onLog, metricType, leftLable, rightLable }) => {
           </Text>
           <ArrowRight />
         </View>
-        {lastLoggedText && <View style={{ flexDirection: "row", gap: 2 }}>
-          <Text
-            style={{
-              fontFamily: "Mulish_400Regular",
-              color: "#636566",
-              fontSize: 14,
-            }}
-          >
-            Last Logged:
-          </Text>
-          <Text
-            style={{
-              fontFamily: "Mulish_700Bold",
-              color: "#636566",
-              fontSize: 14,
-            }}
-          >
-            {lastLoggedText}
-          </Text>
-        </View>}
+        {lastLoggedText && (
+          <View style={{ flexDirection: "row", gap: 2 }}>
+            <Text
+              style={{
+                fontFamily: "Mulish_400Regular",
+                color: "#636566",
+                fontSize: 14,
+              }}
+            >
+              Last Logged:
+            </Text>
+            <Text
+              style={{
+                fontFamily: "Mulish_700Bold",
+                color: "#636566",
+                fontSize: 14,
+              }}
+            >
+              {lastLoggedText}
+            </Text>
+          </View>
+        )}
       </View>
       {isWeight && (
         <View style={{ flexDirection: "row", gap: 20 }}>
           <View style={{ flexDirection: "row", alignItems: "baseline" }}>
-            <Text style={{ fontSize: 50, fontFamily: "700Mulish_Bold", color: COLOURS.nearBlack }}>
+            <Text
+              style={{
+                fontSize: 50,
+                fontFamily: "700Mulish_Bold",
+                color: COLOURS.nearBlack,
+              }}
+            >
               {data?.metricValue}
             </Text>
-            <Text style={{ fontSize: 11, fontFamily: "700Mulish_Bold", color: COLOURS.nearBlack }}>
+            <Text
+              style={{
+                fontSize: 11,
+                fontFamily: "700Mulish_Bold",
+                color: COLOURS.nearBlack,
+              }}
+            >
               {data?.unitOfMeasure}
             </Text>
           </View>
         </View>
       )}
+
       {!isWeight && (
         <View style={{ gap: 6 }}>
           <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
@@ -185,6 +202,13 @@ const HealthCard = ({ onLog, metricType, leftLable, rightLable }) => {
             </Text>
           </View>
         </View>
+      )}
+      {isError && (
+        <Text
+          style={{ fontSize: 12, fontFamily: "Mulish_700Bold", color: "red" }}
+        >
+          Error getting data
+        </Text>
       )}
       <Pressable
         onPress={() => onLog(metricType)}
