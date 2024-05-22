@@ -7,11 +7,12 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { getUserHaptics, toggleUserHaptics } from "../../axiosAPI/userAPI";
 import { useDispatch, useSelector } from "react-redux";
 import { setHapticSetting } from "../../redux/userSlice";
+import Toast from "react-native-toast-message";
 
 const SettingOption = ({ optionText, optionSvg, showArrow, onPress }) => {
   // const [isEnabled, setIsEnabled] = useState(false);
-  const isHapticsEnabled = useSelector(state => state.user.hapticsEnabled)
-  const dispatch = useDispatch()
+  const isHapticsEnabled = useSelector((state) => state.user.hapticsEnabled);
+  const dispatch = useDispatch();
 
   const toggleHaptics = useMutation({
     mutationFn: toggleUserHaptics,
@@ -22,23 +23,30 @@ const SettingOption = ({ optionText, optionSvg, showArrow, onPress }) => {
       dispatch(setHapticSetting(newSetting));
 
       return { previousValue };
-
     },
     onError: (err, newSetting, context) => {
       // Roll back to the previous setting if the mutation fails
+
       if (context?.previousValue !== undefined) {
         dispatch(setHapticSetting(context.previousValue));
       }
+      Toast.show({
+        type: "customErrorToast",
+        text1: "Failed to set haptics, please try again later",
+      });
     },
   });
 
-  const { data: hapticsEnabledData } = useQuery({
+  const { data: hapticsEnabledData, isError: isErrorFetchHaptics } = useQuery({
     queryFn: getUserHaptics,
     queryKey: ["HapticsEnabled"],
   });
 
   useEffect(() => {
-    if (hapticsEnabledData !== undefined && hapticsEnabledData !== isHapticsEnabled) {
+    if (
+      hapticsEnabledData !== undefined &&
+      hapticsEnabledData !== isHapticsEnabled
+    ) {
       dispatch(setHapticSetting(hapticsEnabledData));
     }
   }, [hapticsEnabledData]);

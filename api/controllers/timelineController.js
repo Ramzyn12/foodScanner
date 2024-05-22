@@ -32,7 +32,10 @@ const getTimelineWeek = async (req, res) => {
   const userId = req.user._id;
   const { week } = req.params;
 
-  const timelineWeekData = await timelineService.getTimelineWeek({userId, week})
+  const timelineWeekData = await timelineService.getTimelineWeek({
+    userId,
+    week,
+  });
 
   res.status(200).json(timelineWeekData);
 };

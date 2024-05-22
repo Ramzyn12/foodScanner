@@ -19,11 +19,16 @@ import { storage } from "../utils/MMKVStorage";
 import { useNavigation } from "@react-navigation/native";
 
 const handleErrorSigningIn = (err) => {
-  auth()
-    .signOut()
-    .catch((err) => {
-      console.log(err, "Unable to sign out from apple");
-    });
+  if (auth().currentUser) {
+    auth()
+      .signOut()
+      .catch((err) => {
+        console.log(err, "Unable to sign out from apple");
+      });
+  }
+  if (err.code === "1001") {
+    return
+  }
   Toast.show({
     type: "customErrorToast",
     bottomOffset: 45,
@@ -56,7 +61,7 @@ export const useAppleAuth = () => {
       console.log("successfully removed accounts");
     },
     onError: (err) => {
-      console.log(err, 'Error removing user mutation');
+      console.log(err, "Error removing user mutation");
       Toast.show({
         type: "customErrorToast",
         bottomOffset: 45,

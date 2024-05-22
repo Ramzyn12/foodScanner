@@ -1,11 +1,7 @@
 const DiaryDay = require("../models/DiaryDay");
 const TimelineWeek = require("../models/TimelineWeek");
 const HealthMetric = require("../models/HealthMetric");
-const {
-  differenceInCalendarDays,
-  addWeeks,
-  addDays,
-} = require("date-fns");
+const { differenceInCalendarDays, addWeeks, addDays } = require("date-fns");
 const { getCurrentDateLocal } = require("../utils/dateHelper");
 const Note = require("../models/Note");
 const { NotFoundError } = require("../utils/error");
@@ -16,15 +12,15 @@ async function getRecentTimelineWeek({ userId }) {
   });
 
   if (!recentDiaryDay) {
-    throw new NotFoundError('Error trying to fetch recent diary day')
+    throw new NotFoundError("Error trying to fetch recent diary day");
   }
-  
+
   const today = new Date(getCurrentDateLocal());
   const lastDiaryDate = new Date(recentDiaryDay?.date || today);
   const differenceInDays = differenceInCalendarDays(today, lastDiaryDate);
 
   let week = Math.ceil(differenceInDays / 7);
-  if (week === 0) week = 1
+  if (week === 0) week = 1;
   const currentDay = differenceInDays % 7;
 
   const latestTimelineWeek = await TimelineWeek.findOne({ week: week }).lean();
@@ -40,10 +36,10 @@ async function getAllTimelineWeeks({ userId }) {
   const recentDiaryDay = diaryDays[0];
 
   if (!recentDiaryDay) {
-    throw new NotFoundError('No diary day found for this user')
+    throw new NotFoundError("No diary day found for this user");
   }
 
-  const today = new Date(getCurrentDateLocal())
+  const today = new Date(getCurrentDateLocal());
   const lastDiaryDate = new Date(recentDiaryDay.date);
   const differenceInDays = differenceInCalendarDays(today, lastDiaryDate);
 
@@ -60,17 +56,17 @@ async function getTimelineWeek({ userId, week }) {
   });
 
   if (!recentDiaryDay) {
-    throw new NotFoundError('No diary day found for this user')
+    throw new NotFoundError("No diary day found for this user");
   }
 
   const lastDiaryDate = new Date(recentDiaryDay.date);
-  const today = new Date(getCurrentDateLocal())
+  const today = new Date(getCurrentDateLocal());
   const differenceInDays = differenceInCalendarDays(today, lastDiaryDate);
-  const firstDayOfWeek = addWeeks(lastDiaryDate, week - 1); 
-  
+  const firstDayOfWeek = addWeeks(lastDiaryDate, week - 1);
+
   const arrayOfDates = Array.from({ length: 7 }, (_, i) =>
     addDays(firstDayOfWeek, i)
-  ); 
+  );
   /* arrayOfDates [
   2024-05-21T00:00:00.000Z,
   2024-05-22T00:00:00.000Z,
@@ -109,11 +105,12 @@ async function getTimelineWeek({ userId, week }) {
       userId,
       date: { $in: arrayOfDates },
     })
-      .sort({ date: 1 }).select('note date')
+      .sort({ date: 1 })
+      .select("note date"),
   ]);
 
-  const metricTypes = ["Anxiety", "Sleep Quality", "Energy", "Weight"]
-  
+  const metricTypes = ["Anxiety", "Sleep Quality", "Energy", "Weight"];
+
   // Maybe optimise this if slow on server and defo put as own function
   let combinedDataByDate = arrayOfDates.map((date) => {
     const foundMetrics = healthMetrics.find(
@@ -147,7 +144,7 @@ async function getTimelineWeek({ userId, week }) {
           }
         : { fastedState: false, diaryDayState: "empty" },
       metrics: metrics,
-      note: foundNote,  // Add the notes array to each day's data
+      note: foundNote, // Add the notes array to each day's data
     };
   });
 

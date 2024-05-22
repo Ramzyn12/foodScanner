@@ -9,9 +9,9 @@ const OverviewHeader = ({ week, title, day, onSave, notes }) => {
 
   const handleGoback = () => {
     navigation.goBack()
-    if (onSave && notes) {
-      onSave()
-    }
+    // if (onSave && notes) {
+    //   onSave()
+    // }
   }
 
   return (

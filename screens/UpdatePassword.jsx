@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Header from "../components/settings/Header";
 import COLOURS from "../constants/colours";
 import auth from "@react-native-firebase/auth";
+import Toast from "react-native-toast-message";
 
 const UpdatePassword = ({ navigation }) => {
   const insets = useSafeAreaInsets();
@@ -19,25 +20,41 @@ const UpdatePassword = ({ navigation }) => {
       currentPassword
     );
 
-
     try {
       await user.reauthenticateWithCredential(credential);
+
+      if (newPassword.trim() === newPasswordRepeat.trim()) {
+        user.updatePassword(newPassword);
+        if (auth().currentUser) {
+          auth().signOut();
+        }
+        Toast.show({
+          type: "success",
+          text1: "Password updated, Login!",
+        });
+      } else {
+        Toast.show({
+          type: "customErrorToast",
+          text1: "Passwords not matching, try again",
+        });
+      }
     } catch (err) {
-      console.log(err);
+      if (err.code === "auth/invalid-credential") {
+        Toast.show({
+          type: "customErrorToast",
+          text1: "Incorrect password, try again",
+        });
+      } else {
+        Toast.show({
+          type: "customErrorToast",
+          text1: "Something went wrong, please try again later",
+        });
+      }
     }
-
-    if (newPassword.trim() === newPasswordRepeat.trim()) {
-      user.updatePassword(newPassword);
-      console.log('password updated');
-      auth().signOut()
-    } else {
-      console.log('Passwords not the same..');
-    }
-
   };
 
   return (
-    <View style={{ paddingTop: insets.top, flex: 1, backgroundColor: 'white' }}>
+    <View style={{ paddingTop: insets.top, flex: 1, backgroundColor: "white" }}>
       <Header
         onNavigate={() => navigation.goBack()}
         headerText={"Change Password"}
@@ -54,7 +71,7 @@ const UpdatePassword = ({ navigation }) => {
           Enter your new password to change your password
         </Text>
         <TextInput
-        secureTextEntry
+          secureTextEntry
           autoCorrect={false}
           value={currentPassword}
           onChangeText={setCurrentPassword}
@@ -62,7 +79,7 @@ const UpdatePassword = ({ navigation }) => {
           placeholder="Current password"
         />
         <TextInput
-        secureTextEntry
+          secureTextEntry
           autoCorrect={false}
           value={newPassword}
           onChangeText={setNewPassword}

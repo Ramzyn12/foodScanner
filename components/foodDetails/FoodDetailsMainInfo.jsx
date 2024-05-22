@@ -84,7 +84,7 @@ const FoodDetailsMainInfo = () => {
             />
             <FoodDetailReasonCard type={"Palm"} currentFood={currentFood} />
           </View>
-          {currentFood?.additives.map((el) => (
+          {currentFood.additives?.map((el) => (
             <FoodDetailsLesson key={el} additive={el} />
           ))}
         </View>

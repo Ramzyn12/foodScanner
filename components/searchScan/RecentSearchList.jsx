@@ -17,8 +17,12 @@ const RecentSearchList = () => {
   useFocusEffect(
     useCallback(() => {
       const fetchRecents = async () => {
-        const recents = await getRecentScans(); //From storage
-        setRecentList(recents);
+        try {
+          const recents = await getRecentScans(); //From storage
+          setRecentList(recents);
+        } catch (err) {
+          console.log(err);
+        }
       };
 
       fetchRecents();
@@ -41,13 +45,11 @@ const RecentSearchList = () => {
     });
   };
 
-  if (recentList.length === 0) return <NoRecentList />
+  if (recentList.length === 0) return <NoRecentList />;
 
   return (
     <>
-      <View
-        style={styles.container}
-      >
+      <View style={styles.container}>
         <Text style={styles.recentText}>Recent</Text>
         {/* <Pressable onPress={handleClearRecent}>
           <Text style={{fontFamily: 'Mulish_500Medium'}}>Clear</Text>

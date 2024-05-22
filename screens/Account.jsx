@@ -24,8 +24,9 @@ const Account = ({ navigation }) => {
   const firstNameInputRef = useRef(null);
   const lastNameInputRef = useRef(null);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryFn: getUserNames,
+    retry: false,
     queryKey: ["UserNames"],
   });
 
@@ -43,9 +44,12 @@ const Account = ({ navigation }) => {
 
       const user = auth().currentUser;
       if (user) {
-        user.updateProfile({ displayName: firstName || lastName }).then(() => {
-          console.log("Success updating display name");
-        });
+        user
+          .updateProfile({ displayName: firstName || lastName })
+          .then(() => {
+            console.log("Success updating display name");
+          })
+          .catch((err) => console.log(err));
       }
 
       if (firstNameInputRef.current) {
@@ -56,12 +60,24 @@ const Account = ({ navigation }) => {
       }
 
       Toast.show({
-        text1: "Names saved",
+        type: "foodDetailToast",
+        text1: "Names have been saved!",
       });
-      // Show toast saying welcome?
     },
     onError: (err) => {
-      console.log(err);
+      if (Array.isArray(err.response.data?.errors)) {
+        // If Validation error
+        Toast.show({
+          type: "foodDetailToast",
+          text1: err.response.data?.errors[0].msg,
+        });
+      } else {
+        // If any other error
+        Toast.show({
+          type: "foodDetailToast",
+          text1: "Failed to save names, please try again later",
+        });
+      }
     },
   });
 
@@ -86,12 +102,11 @@ const Account = ({ navigation }) => {
     auth()
       .signOut()
       .then(async () => {
-        // await AsyncStorage.removeItem("firebaseToken");
         storage.delete("firebaseToken");
         console.log("Signed out!");
       })
       .catch((error) => {
-        console.log(error);
+        console.log(error, 'Error signing out');
       });
   };
 
@@ -109,13 +124,14 @@ const Account = ({ navigation }) => {
         <NameInput
           ref={firstNameInputRef}
           name={firstName}
-          text={"First name"}
+          text={isError ? 'Failed to fetch first name' : "First name"}
           setName={setFirstName}
         />
         <NameInput
           ref={lastNameInputRef}
           name={lastName}
-          text={"Last name"}
+          // Change this error idea later maybe
+          text={isError ? 'Failed to fetch last name' : "First name"}
           setName={setLastName}
         />
         <InformationInput

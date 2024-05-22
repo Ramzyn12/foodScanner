@@ -4,7 +4,7 @@ import React from 'react'
 const AddLog = () => {
   return (
     <View>
-      <Text>AddLog</Text>
+      <Text>Placeholder, keep</Text>
     </View>
   )
 }

@@ -60,7 +60,7 @@ const ScanSearchBottomSheet = ({ setSheetIndex }) => {
   const [search, setSearch] = useState("");
   const [triggerSearch, setTriggerSearch] = useState("");
 
-  const { data: DataIvy, isLoading: isLoadingIvy } = useQuery({
+  const { data: DataIvy, isLoading: isLoadingIvy, isError: isErrorIvy, error: errorIvy } = useQuery({
     queryKey: ["SearchIvy", triggerSearch],
     queryFn: () => fetchFoodWithSearchIvy(triggerSearch),
     retry: false,
@@ -97,7 +97,6 @@ const ScanSearchBottomSheet = ({ setSheetIndex }) => {
   };
 
   const handleCancelPress = () => {
-
     inputRef.current.clear();
     setTriggerSearch("");
     setSearch("");
@@ -168,7 +167,7 @@ const ScanSearchBottomSheet = ({ setSheetIndex }) => {
       {!isLoading && (DataOFF?.length > 0 || DataIvy?.length > 0) && (
         <SearchResultsList DataOFF={DataOFF} DataIvy={DataIvy} />
       )}
-      {isErrorOFF && <Text>Error! Please try again later</Text>}
+      {isErrorOFF && isErrorIvy && <Text>Error! Please try again later</Text>}
       {noResults && <NoResultsSearch />}
     </BottomSheet>
   );

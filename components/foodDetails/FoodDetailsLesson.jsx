@@ -5,6 +5,7 @@ import COLOURS from "../../constants/colours";
 import DangerTriangle from "../../svgs/DangerTriangle";
 
 const FoodDetailsLesson = ({ additive }) => {
+  // NO LONGER ACTIVE COMPONENT
   const angle = 122;
   const angleRad = (Math.PI * angle) / 180;
   const start = {

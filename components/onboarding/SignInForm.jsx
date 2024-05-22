@@ -23,20 +23,22 @@ const SignInForm = () => {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [signInLoading, setSignInLoading] = useState(false);
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   const handleFirebaseError = (code) => {
+    console.log(code);
     let message;
 
     switch (code) {
       case "auth/invalid-email":
       case "auth/user-disabled":
-      case "auth/user-not-found":
       case "auth/wrong-password":
       case "auth/account-exists-with-different-credential":
       case "auth/invalid-credential":
-        
         message = "Invalid email or password. Please try again.";
+        break;
+      case "auth/user-not-found":
+        message = "No user found with these details";
         break;
       case "auth/too-many-requests":
         message = "Too many attempts. Please try again later.";
@@ -69,13 +71,12 @@ const SignInForm = () => {
   };
 
   const handleForgotPassword = () => {
-    navigation.navigate('ForgotPassword')
-  }
+    navigation.navigate("ForgotPassword");
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.formContainer}>
-        
         <EmailInput email={email} setEmail={setEmail} />
         <PasswordInput password={password} setPassword={setPassword} />
         <FormSubmissionButton
@@ -85,9 +86,29 @@ const SignInForm = () => {
           text={"Sign In"}
           onPress={handleSignIn}
         />
-        {errorMessage && <Text style={{fontSize: 14, fontFamily: 'Mulish_400Regular', color: '#DB1200'}}>{errorMessage}</Text>}
+        {errorMessage && (
+          <Text
+            style={{
+              fontSize: 14,
+              fontFamily: "Mulish_400Regular",
+              color: "#DB1200",
+            }}
+          >
+            {errorMessage}
+          </Text>
+        )}
         <Pressable onPress={handleForgotPassword}>
-          <Text style={{textAlign: 'center', marginTop: 14, fontSize: 14, fontFamily: 'Mulish_700Bold', color: COLOURS.nearBlack}}>Forgot Password</Text>
+          <Text
+            style={{
+              textAlign: "center",
+              marginTop: 14,
+              fontSize: 14,
+              fontFamily: "Mulish_700Bold",
+              color: COLOURS.nearBlack,
+            }}
+          >
+            Forgot Password
+          </Text>
         </Pressable>
       </View>
     </View>

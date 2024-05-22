@@ -57,12 +57,11 @@ import {
 import ContextMenu from "react-native-context-menu-view";
 import ChangeDateDropdown from "../components/me/ChangeDateDropdown";
 import { getCurrentDateLocal } from "../utils/dateHelpers";
+import Toast from "react-native-toast-message";
 
 const screenWidth = Dimensions.get("screen").width;
 
 const CustomTooltip = ({ x, y, datum, visible }) => {
-  // console.log(x, y, datum);
-
   if (!visible || datum.metricValue === null) {
     return null;
   }
@@ -103,6 +102,7 @@ const CustomTooltip = ({ x, y, datum, visible }) => {
 };
 
 const convertWeightValue = (value, fromUnit, toUnit) => {
+  if (value === 0) return 0;
   if (!value) return null; // Handle null, undefined, and zero to prevent NaN results
   if (fromUnit === toUnit) return value;
   const convertedValue =
@@ -146,18 +146,22 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
       ? "How is your anxiety today?"
       : "How well did you sleep last night?";
 
-  const { data, isLoading, isError, error } = useQuery({
+  const {
+    data,
+    isLoading,
+    isError: isErrorGraphData,
+  } = useQuery({
     // Should be called get graph data
     queryFn: () =>
       getAllDataForMetric({
         metric: route.params.metricType,
         timeFrame: selectedTimeFrame,
       }),
-    retry: 2,
+    retry: 1,
     queryKey: ["MetricGraphData", route.params.metricType, selectedTimeFrame],
   });
 
-  const noData = data?.every((item) => item.metricValue === null);
+  const emptyData = data?.every((item) => item.metricValue === null);
 
   const updateHealthMetricMutation = useMutation({
     mutationFn: updateHealthMetric,
@@ -175,7 +179,10 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
       });
     },
     onError: (err) => {
-      console.log(err);
+      Toast.show({
+        type: "customErrorToast",
+        text1: "Failed to update metric, please try again later",
+      });
     },
   });
 
@@ -231,7 +238,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
     }
   };
 
-  // Change Loading state?
+  // Change Loading state? Maybe test this with loadss of data
   // if (isLoading || adjustedData.length === 0) return <Text>Loading...</Text>;
 
   const handleBarRelease = () => {
@@ -332,7 +339,8 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
               // justifyContent: 'center'
             }}
           >
-            {/* {noData && <Text style={{position: 'absolute', left: '50%', top: '50%', zIndex: 3000, color: 'yellow', fontSize: 20}}>HELLLLLOOO</Text>} */}
+            {/* {emptyData && <Text style={{position: 'absolute', left: '50%', top: '50%', zIndex: 3000, color: 'yellow', fontSize: 20}}>HELLLLLOOO</Text>} */}
+            {isErrorGraphData && <Text style={{position: 'absolute', left: '50%', top: '50%', zIndex: 3000, color: 'yellow', fontSize: 20}}>Error</Text>}
             <ChangeDateDropdown
               selectedTimeFrame={selectedTimeFrame}
               onTimeFrameChange={handleTimeFrameChange}
@@ -372,7 +380,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                 },
               ]}
             >
-              {!noData && (
+              {!emptyData && !isErrorGraphData && (
                 <VictoryAxis
                   style={{
                     axis: { stroke: "transparent" }, // Hides the axis line
@@ -382,14 +390,13 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                       fontFamily: "Mulish_700Bold",
                     },
                   }}
-                  tickFormat={(t) => {
-                    return t;
-                  }}
+                  tickFormat={(t) => t}
                   tickValues={isWeight ? undefined : [0, 2, 4, 6, 8, 10]}
                   dependentAxis
                 />
               )}
-              {noData && (
+              {/* can do better than this with absoulte */}
+              {emptyData && (
                 <VictoryLabel
                   text="No Data"
                   x={screenWidth / 2 - 20} // Adjust x and y to center the label
@@ -430,6 +437,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                   />
                 } // Use the custom label component
                 tickFormat={(date) => {
+                  if (isErrorGraphData) return ''
                   const d = new Date(date);
                   return `${d.toLocaleDateString("en-US", {
                     weekday: "short",
@@ -441,6 +449,9 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                 x="date"
                 name="bar1"
                 y="metricValue"
+                // y={(datum) => {
+                //   return datum.metricValue || 0;
+                // }}
                 style={{
                   data: {
                     fill: ({ datum }) =>
@@ -448,11 +459,12 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                   },
                 }}
                 cornerRadius={{
-                  topLeft: ({ barWidth }) => {
-                    return barWidth / 2;
-                  },
-                  topRight: ({ barWidth }) => {
-                    return barWidth / 2;
+                  top: ({ barWidth, datum }) => {
+                    // if (datum.metricValue !== 0) {
+                    //   return barWidth / 2;
+                    // }
+                    // return 5;
+                    return Math.floor(barWidth / 2);
                   },
                 }}
               />

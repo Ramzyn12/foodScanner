@@ -49,12 +49,23 @@ const WeeklyOverview = ({ route }) => {
   const insets = useSafeAreaInsets();
   const week = route.params.week;
 
-  const { data: weekData, isLoading } = useQuery({
+  const {
+    data: weekData,
+    isLoading,
+    isError,
+  } = useQuery({
     queryFn: () => getTimelineWeek({ week }),
     queryKey: ["TimelineWeek", week],
+    retry: 1
   });
 
   if (isLoading) return <LoadingWeeklyOverview route={route} />;
+  if (isError)
+    return (
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <Text>Error loading weekly overview</Text>
+      </View>
+    );
 
   return (
     <View style={{ paddingTop: insets.top, flex: 1, backgroundColor: "white" }}>
@@ -98,7 +109,11 @@ const WeeklyOverview = ({ route }) => {
           {/* ACCORDIANS */}
           <View style={{ gap: 20 }}>
             {weekData?.weeksData?.map((dayData, index) => (
-              <DayAccordian key={dayData.date} day={(index + 1) +( 7 * (week - 1))} dayData={dayData}/>
+              <DayAccordian
+                key={dayData.date}
+                day={index + 1 + 7 * (week - 1)}
+                dayData={dayData}
+              />
             ))}
           </View>
         </View>

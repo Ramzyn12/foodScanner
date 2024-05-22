@@ -80,7 +80,11 @@ export const Scan = ({ navigation }) => {
   });
 
   if (!device || !format) {
-    return <Text>No device available</Text>;
+    return (
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <Text>No device available</Text>;
+      </View>
+    );
   }
 
   return (

@@ -2,7 +2,7 @@ const DiaryDay = require("../models/DiaryDay");
 const FoodItem = require("../models/FoodItem");
 const SingleFood = require("../models/SingleFood");
 const User = require("../models/User");
-const { NotFoundError } = require("../utils/error");
+const { NotFoundError, ValidationError } = require("../utils/error");
 const userService = require("../services/userService");
 const { validationResult } = require("express-validator");
 
@@ -12,7 +12,7 @@ const addUserNames = async (req, res) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    throw new ValidationError("Validation Error", errors.array());
   }
 
   //Note: Error bubbles up to next global error handler
@@ -52,15 +52,15 @@ const toggleUserHaptics = async (req, res) => {
   user.hapticsEnabled = !user.hapticsEnabled;
   await user.save();
 
-  res.json(user)
+  res.json(user);
 };
 
 const getUserHaptics = async (req, res) => {
   const userId = req.user._id;
 
-  const user = await User.findById(userId).lean()
+  const user = await User.findById(userId).lean();
 
-  res.json(user.hapticsEnabled)
+  res.json(user.hapticsEnabled);
 };
 
 module.exports = {
@@ -68,5 +68,5 @@ module.exports = {
   removeUser,
   getUserNames,
   toggleUserHaptics,
-  getUserHaptics
+  getUserHaptics,
 };

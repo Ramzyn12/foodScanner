@@ -32,7 +32,7 @@ const FoodDetailsScoreStrip = ({ processedScore }) => {
           <DangerTriangle />
           <Text style={styles.warningMessageText}>
             This product is processed. If you choose to eat this, it will reset
-            your streak.{" "}
+            your streak.
           </Text>
         </View>
       )}

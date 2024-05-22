@@ -6,7 +6,7 @@ const { NotFoundError } = require("../utils/error");
 
 // REMEMBER TO CHANGE TO ORG!
 const openFoodFactsAPI = axios.create({
-  baseURL: "https://world.openfoodfacts.org",
+  baseURL: "https://world.openfoodfacts.net",
 });
 
 const openFoodFactsSearchAPI = axios.create({

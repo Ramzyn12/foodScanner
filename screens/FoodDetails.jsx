@@ -37,25 +37,29 @@ const FoodDetails = ({ navigation, route }) => {
   const barcode = route?.params?.barcodeId;
   const singleFoodId = route?.params?.singleFoodId;
   const currentFood = useSelector((state) => state.food.currentFood);
-  const chosenDate = useSelector(state => state.diary.chosenDate) || getCurrentDateLocal()
+  const chosenDate =
+    useSelector((state) => state.diary.chosenDate) || getCurrentDateLocal();
 
   const {
     data: foodDetails,
-    isLoading: isLoadingFoodDetails, // isPending made it pend when not enabled? 
-    isError,
+    isLoading: isLoadingFoodDetails, // isPending made it pend when not enabled?
+    isError: isErrorOFF,
     isFetching,
-    error
+    error: errorOFF,
   } = useQuery({
     queryKey: ["FoodDetails", barcode, chosenDate],
     retry: false,
-    // gcTime: 0,
     enabled: !!barcode,
     queryFn: () => fetchFoodWithBarcode(barcode, chosenDate),
   });
 
-
   // Need to add loading states here ASWELL!!
-  const { data: singleFoodDetails, error: IvyError, isLoading: isLoadingSingleFood } = useQuery({
+  const {
+    data: singleFoodDetails,
+    isError: isErrorIvy,
+    error: errorIvy,
+    isLoading: isLoadingSingleFood,
+  } = useQuery({
     queryKey: ["FoodDetailsIvy", singleFoodId, chosenDate],
     retry: false,
     enabled: !!singleFoodId,
@@ -65,14 +69,12 @@ const FoodDetails = ({ navigation, route }) => {
   // handle the normalisation
   const readyToShow = useFoodDetails(foodDetails, singleFoodDetails);
 
-  if (isError || IvyError) {
+  if (isErrorOFF || isErrorIvy) {
     return <Text>Product doesnt exist...</Text>;
   }
 
   if (isLoadingFoodDetails || isLoadingSingleFood || !readyToShow) {
-    return (
-      <LoadingFoodDetails />
-    );
+    return <LoadingFoodDetails />;
   }
 
   const toastConfig = {
@@ -83,6 +85,40 @@ const FoodDetails = ({ navigation, route }) => {
       >
         <Text style={styles.toastTextOne}>{text1}</Text>
         <Text style={styles.toastTextTwo}>{text2}</Text>
+      </Pressable>
+    ),
+    customErrorToast: ({ text1, text2, onViewPress, props }) => (
+      <Pressable
+        onPress={onViewPress}
+        style={{
+          height: 44,
+          width: "90%",
+          backgroundColor: COLOURS.nearBlack,
+          borderRadius: 20,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          paddingHorizontal: 20,
+        }}
+      >
+        <Text
+          style={{
+            color: "white",
+            fontFamily: "Mulish_500Medium",
+            fontSize: 14,
+          }}
+        >
+          {text1}
+        </Text>
+        <Text
+          style={{
+            color: "white",
+            fontFamily: "Mulish_600SemiBold",
+            fontSize: 14,
+          }}
+        >
+          {text2}
+        </Text>
       </Pressable>
     ),
   };

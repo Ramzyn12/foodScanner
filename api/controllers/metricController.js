@@ -1,6 +1,7 @@
 const metricService = require("../services/metricService");
 
 const updateHealthMetric = async (req, res) => {
+
   const userId = req.user._id;
   const { metricValue, unitOfMeasure } = req.body;
   const { date, metric } = req.params;
@@ -17,6 +18,7 @@ const updateHealthMetric = async (req, res) => {
 };
 
 const getRecentMetric = async (req, res) => {
+
   const userId = req.user._id;
   const { metric } = req.query;
 

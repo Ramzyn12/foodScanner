@@ -10,7 +10,6 @@ import Health from "../screens/Health";
 import Settings from "../screens/SettingsOne";
 import COLOURS from "../constants/colours";
 import DiaryIcon from "../svgs/DiaryIcon";
-import AddLog from "../screens/AddLog";
 import List from "../screens/Groceries";
 import HeartIcon from "../svgs/HeartIcon";
 import SettingsIcon from "../svgs/SettingsIcon";
@@ -34,6 +33,7 @@ import {
 import ClearIcon from "../svgs/ClearIcon";
 import { Path, Svg } from "react-native-svg";
 import { useNavigation } from "@react-navigation/native";
+import AddLog from "../screens/AddLog";
 
 const Tab = createBottomTabNavigator();
 

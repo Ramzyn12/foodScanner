@@ -77,7 +77,7 @@ export const useFoodDetailsActions = (expectedId) => {
         : ["FoodDetails", variables.barcode, variables.date];
 
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries({queryKey: queryKey});
+      await queryClient.cancelQueries({ queryKey: queryKey });
 
       // Snapshot the previous value
       const previousFoodDetails = queryClient.getQueryData(queryKey);
@@ -96,7 +96,10 @@ export const useFoodDetailsActions = (expectedId) => {
       queryClient.invalidateQueries({ queryKey: ["DiaryDay", variables.date] });
     },
     onError: (err, variables, context) => {
-      console.log(err);
+      Toast.show({
+        type: "customErrorToast",
+        text1: `Failed to add food, Please try again later`,
+      });
       mutationCounterDiary.current = 0;
       const queryKey = variables.singleFoodId
         ? ["FoodDetailsIvy", variables.singleFoodId, variables.date]
@@ -113,7 +116,7 @@ export const useFoodDetailsActions = (expectedId) => {
         ? ["FoodDetailsIvy", variables.singleFoodId, variables.date]
         : ["FoodDetails", variables.barcode, variables.date];
 
-      await queryClient.cancelQueries({queryKey: queryKey});
+      await queryClient.cancelQueries({ queryKey: queryKey });
       const previousFoodDetails = queryClient.getQueryData(queryKey);
 
       queryClient.setQueryData(queryKey, (old) => ({
@@ -138,6 +141,10 @@ export const useFoodDetailsActions = (expectedId) => {
       // }
     },
     onError: (err, variables, context) => {
+      Toast.show({
+        type: "customErrorToast",
+        text1: `Failed to remove food, Please try again later`,
+      });
       mutationCounterDiary.current = 0;
       const queryKey = variables.singleFoodId
         ? ["FoodDetailsIvy", variables.singleFoodId, variables.date]
@@ -154,7 +161,7 @@ export const useFoodDetailsActions = (expectedId) => {
         ? ["FoodDetailsIvy", variables.singleFoodId, chosenDate]
         : ["FoodDetails", variables.barcode, chosenDate];
 
-      await queryClient.cancelQueries({queryKey: queryKey});
+      await queryClient.cancelQueries({ queryKey: queryKey });
       const previousFoodDetails = queryClient.getQueryData(queryKey);
 
       queryClient.setQueryData(queryKey, (old) => ({
@@ -162,7 +169,7 @@ export const useFoodDetailsActions = (expectedId) => {
         isInGroceryList: true,
       }));
 
-      return {previousFoodDetails}
+      return { previousFoodDetails };
     },
     onSettled: (data, error, variables) => {
       mutationCounterGrocery.current -= 1;
@@ -180,6 +187,10 @@ export const useFoodDetailsActions = (expectedId) => {
     },
     onError: (err, variables, context) => {
       console.log(err);
+      Toast.show({
+        type: "customErrorToast",
+        text1: `Failed to add to list, Please try again later`,
+      });
       mutationCounterGrocery.current = 0;
       const queryKey = variables.singleFoodId
         ? ["FoodDetailsIvy", variables.singleFoodId, chosenDate]
@@ -193,18 +204,18 @@ export const useFoodDetailsActions = (expectedId) => {
     onMutate: async (variables) => {
       mutationCounterGrocery.current += 1;
       const queryKey = variables.singleFoodId
-      ? ["FoodDetailsIvy", variables.singleFoodId, chosenDate]
-      : ["FoodDetails", variables.barcode, chosenDate];
+        ? ["FoodDetailsIvy", variables.singleFoodId, chosenDate]
+        : ["FoodDetails", variables.barcode, chosenDate];
 
-    await queryClient.cancelQueries({queryKey: queryKey});
-    const previousFoodDetails = queryClient.getQueryData(queryKey);
+      await queryClient.cancelQueries({ queryKey: queryKey });
+      const previousFoodDetails = queryClient.getQueryData(queryKey);
 
-    queryClient.setQueryData(queryKey, (old) => ({
-      ...old,
-      isInGroceryList: false,
-    }));
+      queryClient.setQueryData(queryKey, (old) => ({
+        ...old,
+        isInGroceryList: false,
+      }));
 
-    return {previousFoodDetails}
+      return { previousFoodDetails };
     },
     onSettled: (data, error, variables) => {
       mutationCounterGrocery.current -= 1;
@@ -221,7 +232,10 @@ export const useFoodDetailsActions = (expectedId) => {
       // }
     },
     onError: (err, variables, context) => {
-      console.log(err, "HERE");
+      Toast.show({
+        type: "customErrorToast",
+        text1: `Failed to remove from list, Please try again later`,
+      });
       mutationCounterGrocery.current = 0;
       const queryKey = variables.singleFoodId
         ? ["FoodDetailsIvy", variables.singleFoodId, chosenDate]
@@ -255,13 +269,6 @@ export const useFoodDetailsActions = (expectedId) => {
       });
     }
   };
-
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     return () => {
-  //       queryClient.invalidateQueries({queryKey: ['AllDiaryDays']})
-  //     };
-  //   }, []))
 
   // Either we debounce like 500 to save some calls or not? Ask farid
   const debouncedDiaryHandler = useCallback(debounce(diaryHandler, 0), []);

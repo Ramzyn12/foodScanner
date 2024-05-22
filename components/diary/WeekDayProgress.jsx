@@ -17,10 +17,8 @@ const WeekDayProgress = ({
   hasProcessed,
   earliestDate,
 }) => {
-  // This needs to be the local time, not setHours...
   const nowDateString = getCurrentDateLocal() // "YYYY-MM-DD"
-  const chosenDate =
-    useSelector((state) => state.diary.chosenDate) || nowDateString;
+  const chosenDate = useSelector((state) => state.diary.chosenDate) || nowDateString;
   const chosenDateObj = chosenDate ? new Date(chosenDate) : new Date(nowDateString);
   const thisDateObj = new Date(date);
   const [showUnderline, setShowUnderline] = useState(false);
@@ -37,8 +35,6 @@ const WeekDayProgress = ({
       setShowUnderline(false);
     }
   }, [chosenDate, thisDateObj]);
-
-  // console.log(date, dayType, beforeEarliest, isFasting);
 
   return (
     <View

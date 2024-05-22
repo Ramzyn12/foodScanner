@@ -102,7 +102,6 @@ async function createAppleUser(email, uid, idToken, userInformation) {
 }
 
 async function updateFirstLastName(firstName, lastName, userId) {
-  
   const user = await User.findByIdAndUpdate(
     userId,
     { firstName, lastName },
@@ -126,12 +125,14 @@ async function getUserNames(userId) {
 
 async function removeUser(firebaseId, userId) {
   const session = await startSession();
+  // throw new Error('error')
 
   // We do need try catch here becuase of the transaction by the way!
   try {
     session.startTransaction();
     // Maybe just need userId not firebaseId?
     const user = await User.findOneAndDelete({ firebaseId }, { session });
+
 
     if (!user) throw new NotFoundError("User was not found");
 

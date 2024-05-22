@@ -7,6 +7,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getNote, updateNote } from "../axiosAPI/noteAPI";
 import { getAnyDateLocal } from "../utils/dateHelpers";
+import Toast from "react-native-toast-message";
 
 const AddNotes = ({ route }) => {
   const insets = useSafeAreaInsets();
@@ -22,24 +23,33 @@ const AddNotes = ({ route }) => {
     retry: false,
   });
 
-
   const updateNoteMutation = useMutation({
     mutationFn: updateNote,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["Note", date] });
+      // keep this toast or change it?
+      Toast.show({
+        type: "success",
+        text1: "Note saved!",
+      });
     },
     onError: (err) => {
-      console.log(err);
+      Toast.show({
+        type: "customErrorToast",
+        text1: "Failed to save note, please try again later",
+      });
+      if (data.note) setNotes(data.note);
       // Need to show toast, and try go back to previous note?
       //or just say try again later
     },
   });
 
+  // Need to improve this massively, logic is a bit weird
   useEffect(() => {
     let timer;
     if (isSuccess && data && data.note) {
       setNotes(data.note); // If there's existing note data, fill it in
-    } else if ((isError && !data) || notes === "") {
+    } else if (notes === "") {
       // notesInputRef.current?.blur();
       timer = setTimeout(() => {
         notesInputRef.current?.focus();
@@ -55,9 +65,12 @@ const AddNotes = ({ route }) => {
   };
 
   if (isLoading) return <ActivityIndicator />;
-
-  // NEED to show cursor on focus straight away if no no tes
-  // Save when press save but also save when exit the page
+  if (isError)
+    return (
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <Text>Error loading notes, please try again later</Text>
+      </View>
+    );
 
   return (
     <View style={{ paddingTop: insets.top, flex: 1, backgroundColor: "white" }}>

@@ -186,8 +186,6 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
       );
     }
 
-    // console.log(weeks, "WEEKS");
-
     return weeks;
   };
 

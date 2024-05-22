@@ -34,15 +34,17 @@ const Groceries = ({ navigation }) => {
     (groceryItem) => groceryItem.checked === true
   );
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["Groceries"],
     queryFn: getGroceryList,
+    retry: 1,
   });
 
   const { handleAddFirstItem, handleSortPress, updateSortMutation } =
     useGrocerySortPreference(data);
 
   if (isLoading) return <LoadingGroceries />;
+  if (isError) return <Text>Couldnt fetch grocery list</Text>
 
   return (
     <SafeAreaView style={styles.container}>

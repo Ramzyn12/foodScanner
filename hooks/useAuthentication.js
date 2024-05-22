@@ -1,43 +1,53 @@
 import { useEffect, useState } from "react";
 import auth from "@react-native-firebase/auth";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch } from "react-redux";
 import { setToken } from "../redux/authSlice";
 import { storage } from "../utils/MMKVStorage";
 import { Log } from "victory-native";
+import Toast from "react-native-toast-message";
 
 export const useAuthentication = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [firebaseUid, setFirebaseUid] = useState(null);  // Add this line
+  const [firebaseUid, setFirebaseUid] = useState(null); // Add this line
   const dispatch = useDispatch();
-  // const storage = useMMKV()
+
+  const handleSignOut = (message) => {
+    storage.delete("firebaseToken");
+    setIsLoggedIn(false);
+    setFirebaseUid(null);
+    if (auth().currentUser) {
+      auth().signOut();
+    }
+    Toast.show({
+      type: "customErrorToast",
+      bottomOffset: 45,
+      text1: message,
+    });
+  };
 
   useEffect(() => {
     const unsubscribeAuthChange = auth().onAuthStateChanged(async (user) => {
       if (user) {
-        const token = await user.getIdToken();
-        // console.log(token, 'for testing');
-        dispatch(setToken(token));
-        if (token) storage.set("firebaseToken", token);
-        setFirebaseUid(user.uid);  // Set Firebase UID
-        setIsLoggedIn(true);
+        try {
+          const token = await user.getIdToken();
+          dispatch(setToken(token));
+          if (token) storage.set("firebaseToken", token);
+          setFirebaseUid(user.uid); // Set Firebase UID
+          setIsLoggedIn(true);
+        } catch (err) {
+          console.log(err, "Error getting user Id token");
+          handleSignOut("Failed to authenticate. Please log in again.");
+        }
       } else {
-        setFirebaseUid(null);  // Reset Firebase UID
         storage.delete("firebaseToken");
         setIsLoggedIn(false);
+        setFirebaseUid(null);
       }
       setIsLoading(false);
     });
 
     const tokenChanged = auth().onIdTokenChanged(async (user) => {
-      // const result = await user.getIdTokenResult();
-      // const expiresIn = result.expirationTime;
-      // const timeNow = new Date();
-      // const timeLeft = new Date(expiresIn) - timeNow;
-      // console.log(
-      //   `Time left until token expires: ${timeLeft / 1000 / 60} minutes`
-      // );
       if (user) {
         user
           .getIdToken(true)
@@ -46,8 +56,8 @@ export const useAuthentication = () => {
             storage.set("firebaseToken", token);
           })
           .catch((error) => {
-            console.error("Error refreshing token, will sign out now", error);
-            auth().signOut();
+            console.error("Error refreshing token:", error);
+            handleSignOut("Session expired. Please log in again.");
           });
       }
     });

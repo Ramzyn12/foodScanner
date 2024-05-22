@@ -15,6 +15,7 @@ export const useSubscriptionState = () => {
           setIsSubscribed(false);
         }
       } catch (e) {
+        // Need to handle error properly here!
         console.log(e);
         // setIsSubscribed(false);
       }

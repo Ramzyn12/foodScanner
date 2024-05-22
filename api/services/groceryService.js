@@ -54,7 +54,7 @@ async function getGroceryList({ userId }) {
 }
 
 async function removeFoodFromGroceryList({ userId, barcode, singleFoodId }) {
-  
+
   let itemId;
 
   if (barcode) {

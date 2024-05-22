@@ -5,6 +5,8 @@ import Purchases from "react-native-purchases";
 const Paywall = () => {
   const [offering, setOffering] = useState(null);
 
+  // Handle all errors well!
+
   const getOfferings = async () => {
     try {
       const offerings = await Purchases.getOfferings();

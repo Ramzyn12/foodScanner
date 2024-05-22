@@ -19,13 +19,6 @@ import { useFoodDetailsActions } from "../../hooks/useFoodDetailsActions";
 import PlusIcon from "../../svgs/PlusIcon";
 import XIcon from "../../svgs/XIcon";
 
-const handleErrorResponse = (errorResponse, actionType) => {
-  const {error} = errorResponse
-  Toast.show({
-    type: 'foodDetailToast',
-    text1: `Failed to ${actionType} food, Please try again later`,
-  })
-}
 
 const FoodDetailsButtons = ({ expectedId }) => {
   const {
@@ -33,30 +26,11 @@ const FoodDetailsButtons = ({ expectedId }) => {
     addedToGroceries,
     handleAddToDiary,
     handleRemoveFromDiary,
-    addFoodToDiaryMutation,
-    removeFoodFromDiaryMutation,
-    addToGroceryListMutation,
-    removeFromGroceryListMutation,
     handleAddToGroceryList,
     handleRemoveFromGroceryList,
     buttonsLoaded,
   } = useFoodDetailsActions(expectedId);
   
-  useEffect(() => {
-    if (addFoodToDiaryMutation.isError && addFoodToDiaryMutation.error?.response?.data) {
-      handleErrorResponse(addFoodToDiaryMutation.error.response.data, 'add');
-    }
-    if (removeFoodFromDiaryMutation.isError && removeFoodFromDiaryMutation.error?.response?.data) {
-      handleErrorResponse(removeFoodFromDiaryMutation.error.response.data, 'remove');
-    }
-    if (addToGroceryListMutation.isError && addToGroceryListMutation.error?.response?.data) {
-      handleErrorResponse(addToGroceryListMutation.error.response.data, 'add');
-    }
-    if (removeFromGroceryListMutation.isError && removeFromGroceryListMutation.error?.response?.data) {
-      handleErrorResponse(removeFromGroceryListMutation.error.response.data, 'remove');
-    }
-  }, [addFoodToDiaryMutation.isError, addFoodToDiaryMutation.error, removeFoodFromDiaryMutation.isError, removeFoodFromDiaryMutation.error, addToGroceryListMutation.isError, addToGroceryListMutation.error,removeFromGroceryListMutation.isError, removeFoodFromDiaryMutation.error,]);
-
 
   // Is thius doing anything?? 
   if (!buttonsLoaded) return;
