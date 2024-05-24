@@ -29,10 +29,14 @@ import { getCurrentDateLocal } from "../utils/dateHelpers";
 import { useFocusNotifyOnChangeProps } from "../hooks/useFocusNotifyOnChangeProps";
 import { useFocusEffect } from "@react-navigation/native";
 import LoadingDiary from "../components/diary/LoadingDiary";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useTheme } from "../hooks/useTheme";
+import { useColourTheme } from "../context/Themed";
 
 const Diary = ({ navigation }) => {
   const userCreated = useSelector((state) => state.auth.userCreated);
   // const token = useSelector((state) => state.auth.token);
+  const {theme} = useColourTheme()
   const token = storage.getString("firebaseToken");
   const firstTimeRef = useRef(true);
   const waitingForBackendApple = useSelector(
@@ -48,7 +52,7 @@ const Diary = ({ navigation }) => {
     data,
     refetch: refetchAllDiaryDays,
     isPending: isLoadingAllDiaryDays,
-    isError,
+    isError: isErrorAllDiaryDays,
     error,
   } = useQuery({
     queryKey: ["AllDiaryDays"],
@@ -57,31 +61,17 @@ const Diary = ({ navigation }) => {
     enabled: !!token,
   });
 
-  const { data: recentTimelineWeekData, isPending: isLoadingRecentTimeline, isError: isErrorRecentWeek } =
-    useQuery({
-      queryKey: ["RecentTimelineWeek"],
-      queryFn: getRecentTimelineWeek,
-      // gcTime: 1000 * 60 * 60 * 4,
-      staleTime: 1000 * 60 * 60 * 4, // 6 hours
-      enabled: !!token,
-      // refetchOnMount: false,
-      // retryOnMount: false,
-      // refetchOnWindowFocus: false,
-      // refetchOnReconnect: false,
-    });
-
-  // const {
-  //   data: diaryFoodItems,
-  //   // isError,
-  //   isPending: isLoadingDiaryDay,
-  //   // refetch,
-  //   // error,
-  // } = useQuery({
-  //   queryFn: () => getDiaryDay({ date: chosenDate }),
-  //   queryKey: ["DiaryDay", chosenDate],
-  //   enabled: !!token,
-  //   retry: false,
-  // });
+  const {
+    data: recentTimelineWeekData,
+    isPending: isLoadingRecentTimeline,
+    isError: isErrorRecentWeek,
+  } = useQuery({
+    queryKey: ["RecentTimelineWeek"],
+    queryFn: getRecentTimelineWeek,
+    // gcTime: 1000 * 60 * 60 * 4,
+    staleTime: 1000 * 60 * 60 * 4, // 6 hours
+    enabled: !!token,
+  });
 
   // see if can remove this? Try login apple
   useEffect(() => {
@@ -90,7 +80,7 @@ const Diary = ({ navigation }) => {
     }
   }, [userCreated]);
 
-  // Refetches on each mount
+  // Refetches all diary days on each mount
   useFocusEffect(
     useCallback(() => {
       if (firstTimeRef.current) {
@@ -103,8 +93,7 @@ const Diary = ({ navigation }) => {
 
   if (isLoadingAllDiaryDays || isLoadingRecentTimeline) return <LoadingDiary />;
 
-  if (isError) {
-    console.log(error);
+  if (isErrorAllDiaryDays) {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
         <Text>Server error, try again later</Text>
@@ -112,8 +101,14 @@ const Diary = ({ navigation }) => {
     );
   }
 
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        {backgroundColor: theme === 'dark' ? 'black' : 'white'}
+      ]}
+    >
       <WeekHeader
         daysFinished={recentTimelineWeekData?.currentDay}
         diaryData={data}
@@ -126,14 +121,16 @@ const Diary = ({ navigation }) => {
       >
         <StreakCard diaryData={data} />
         {/* <BenefitFactCard /> */}
-        {!isErrorRecentWeek && <Pressable style={{ marginTop: 25 }}>
-          <TimelineEventCard
-            destination={"HealthStack"}
-            unlocked={true}
-            data={recentTimelineWeekData}
-            daysFinished={recentTimelineWeekData?.currentDay}
-          />
-        </Pressable>}
+        {!isErrorRecentWeek && (
+          <Pressable style={{ marginTop: 25 }}>
+            <TimelineEventCard
+              destination={"HealthStack"}
+              unlocked={true}
+              data={recentTimelineWeekData}
+              daysFinished={recentTimelineWeekData?.currentDay}
+            />
+          </Pressable>
+        )}
         <FoodDiary />
       </ScrollView>
     </SafeAreaView>

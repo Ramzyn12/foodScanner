@@ -24,6 +24,7 @@ import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import Purchases from "react-native-purchases";
 import { Platform } from "react-native";
 import { useNotifications } from "./hooks/useNotifications";
+import { ThemeProvider } from "./context/Themed";
 
 SplashScreen.preventAutoHideAsync(); // Prevent auto-hide
 
@@ -31,6 +32,7 @@ SplashScreen.preventAutoHideAsync(); // Prevent auto-hide
 const queryClient = new QueryClient();
 
 const App = () => {
+
   return (
     <>
       <Provider store={store}>
@@ -85,18 +87,20 @@ const AppInitializer = () => {
 
   return (
     <>
-      <QueryClientProvider client={queryClient}>
-        <Provider store={store}>
-          <GestureHandlerRootView
-            onLayout={onLayoutRootView}
-            style={{ flex: 1 }}
-          >
-            <BottomSheetModalProvider>
-              <MainComponent loggedIn={isLoggedIn} />
-            </BottomSheetModalProvider>
-          </GestureHandlerRootView>
-        </Provider>
-      </QueryClientProvider>
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <Provider store={store}>
+            <GestureHandlerRootView
+              onLayout={onLayoutRootView}
+              style={{ flex: 1 }}
+            >
+              <BottomSheetModalProvider>
+                <MainComponent loggedIn={isLoggedIn} />
+              </BottomSheetModalProvider>
+            </GestureHandlerRootView>
+          </Provider>
+        </QueryClientProvider>
+      </ThemeProvider>
     </>
   );
 };

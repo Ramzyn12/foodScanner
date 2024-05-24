@@ -50,8 +50,10 @@ export const useAppleAuth = () => {
       dispatch(setWaitingForBackend(false));
     },
     onError: (err) => {
-      console.log(err.response.data, "Error in signUpAppleMutation"); //Can remove in prod
+      console.log('Error in signUpApple');
+      // console.log(err.response.data, "Error in signUpAppleMutation"); //Can remove in prod
       handleErrorSigningIn(err);
+      dispatch(setWaitingForBackend(false));
     },
   });
 

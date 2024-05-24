@@ -48,7 +48,7 @@ const SignUpForm = () => {
         setErrorMessage(err.response.data.errors[0].msg);
         // If firebase
       } else {
-        setErrorMessage(err.response.data.message);
+        setErrorMessage('Unknown error, please try again later');
       }
     },
   });

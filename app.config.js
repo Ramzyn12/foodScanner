@@ -12,7 +12,7 @@ module.exports = ({ config }) => {
       version: "1.0.0",
       orientation: "portrait",
       icon: "./assets/icon.png",
-      userInterfaceStyle: "light",
+      userInterfaceStyle: "automatic",
       splash: {
         image: "./assets/splash.png",
         resizeMode: "contain",
@@ -25,6 +25,7 @@ module.exports = ({ config }) => {
         googleServicesFile: "./GoogleService-Info.plist",
         buildNumber: "2",
         usesAppleSignIn: true,
+        userInterfaceStyle: "automatic",
         infoPlist: {
           NSCameraUsageDescription: "Ivy needs access to your Camera.",
           NSMicrophoneUsageDescription: "Ivy needs access to your Microphone.",
@@ -35,6 +36,7 @@ module.exports = ({ config }) => {
           foregroundImage: "./assets/adaptive-icon.png",
           backgroundColor: "#ffffff",
         },
+        userInterfaceStyle: "automatic",
         permissions: [
           "android.permission.CAMERA",
           "android.permission.RECORD_AUDIO",

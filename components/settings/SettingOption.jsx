@@ -8,11 +8,32 @@ import { getUserHaptics, toggleUserHaptics } from "../../axiosAPI/userAPI";
 import { useDispatch, useSelector } from "react-redux";
 import { setHapticSetting } from "../../redux/userSlice";
 import Toast from "react-native-toast-message";
+import ContextMenu from "react-native-context-menu-view";
+import ArrowDownShort from "../../svgs/ArrowDownShort";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useTheme } from "../../hooks/useTheme";
+import { useColourTheme } from "../../context/Themed";
 
-const SettingOption = ({ optionText, optionSvg, showArrow, onPress }) => {
+const storeDarkModePreference = async (preference) => {
+  try {
+    await AsyncStorage.setItem("darkModePreference", preference);
+  } catch (error) {
+    console.error("Failed to save the data to the storage", error);
+  }
+};
+
+const SettingOption = ({
+  optionText,
+  optionSvg,
+  showArrow,
+  onPress,
+  showDropdown,
+}) => {
   // const [isEnabled, setIsEnabled] = useState(false);
   const isHapticsEnabled = useSelector((state) => state.user.hapticsEnabled);
   const dispatch = useDispatch();
+
+  const { theme, setTheme, themePreference } = useColourTheme();
 
   const toggleHaptics = useMutation({
     mutationFn: toggleUserHaptics,
@@ -56,6 +77,19 @@ const SettingOption = ({ optionText, optionSvg, showArrow, onPress }) => {
     toggleHaptics.mutate(val);
   };
 
+  const handleMenuPress = (e) => {
+    if (e.nativeEvent.index === 0) {
+      setTheme("system");
+      // storeDarkModePreference("System");
+    } else if (e.nativeEvent.index === 1) {
+      setTheme("light");
+      // storeDarkModePreference("Light");
+    } else if (e.nativeEvent.index === 2) {
+      setTheme("dark");
+      // storeDarkModePreference("Dark");
+    }
+  };
+
   return (
     <Pressable
       onPress={onPress}
@@ -79,12 +113,36 @@ const SettingOption = ({ optionText, optionSvg, showArrow, onPress }) => {
         {optionText}
       </Text>
       {showArrow && <ArrowRight />}
-      {!showArrow && (
+      {!showArrow && !showDropdown && (
         <Switch
           trackColor={{ true: COLOURS.darkGreen }}
           value={isHapticsEnabled}
           onValueChange={toggleSwitch}
         />
+      )}
+      {!showArrow && showDropdown && (
+        <ContextMenu
+          actions={[
+            { title: "System", selected: themePreference === "system" },
+            { title: "Light", selected: themePreference === "light" },
+            { title: "Dark", selected: themePreference === "dark" },
+          ]}
+          dropdownMenuMode={true}
+          onPress={handleMenuPress}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
+            <Text
+              style={{
+                color: "#636566",
+                fontSize: 15,
+                fontFamily: "Mulish_500Medium",
+              }}
+            >
+              {themePreference}
+            </Text>
+            <ArrowDownShort color={"#636566"} width={11.5} height={5.5} />
+          </View>
+        </ContextMenu>
       )}
     </Pressable>
   );

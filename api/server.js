@@ -6,6 +6,13 @@ const morgan = require("morgan");
 const cors = require("cors");
 const app = express();
 
+//catching all synchronous errors not caught
+process.on("uncaughtException", (err) => {
+  console.log("uncaught exception shutting down...");
+  console.log(err.name, err.message);
+  process.exit(1);
+});
+
 // Import routes and middlewares
 const authRoutes = require("./routes/authRoutes");
 const openFoodFactsRoutes = require("./routes/openFoodFactsRoutes");
@@ -55,4 +62,18 @@ mongoose
 console.log(process.env.NODE_ENV);
 // Start the server
 const PORT = 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const server = app.listen(PORT, () =>
+  console.log(`Server running on port ${PORT}`)
+);
+
+// catching all asynchronous promise rejection not handled
+process.on("unhandledRejection", (err) => {
+  console.log("Unhandled rejection shutting down...");
+  console.log(err.name, err.message);
+  server.close(() => {
+    process.exit(1);
+  });
+  // Have some tool to restart the server!? many hosting services do this anyway
+});
+
+// console.log(x);

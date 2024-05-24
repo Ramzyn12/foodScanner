@@ -70,7 +70,8 @@ const Settings = ({ navigation }) => {
           <SettingOption
             optionText="Appearance"
             optionSvg={<Palette />}
-            showArrow={true}
+            showArrow={false}
+            showDropdown={true}
           />
           <SettingOption
             optionText="Haptic Feedback"
