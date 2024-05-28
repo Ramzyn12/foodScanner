@@ -32,11 +32,14 @@ import FoodDetailsMainInfo from "../components/foodDetails/FoodDetailsMainInfo";
 import FoodDetailsEnvironment from "../components/foodDetails/FoodDetailsEnvironment";
 import { getCurrentDateLocal } from "../utils/dateHelpers";
 import LoadingFoodDetails from "../components/foodDetails/LoadingFoodDetails";
+import { useColourTheme } from "../context/Themed";
+import { themedColours } from "../constants/themedColours";
 
 const FoodDetails = ({ navigation, route }) => {
   const barcode = route?.params?.barcodeId;
   const singleFoodId = route?.params?.singleFoodId;
   const currentFood = useSelector((state) => state.food.currentFood);
+  const {theme} = useColourTheme()
   const chosenDate =
     useSelector((state) => state.diary.chosenDate) || getCurrentDateLocal();
 
@@ -81,10 +84,10 @@ const FoodDetails = ({ navigation, route }) => {
     foodDetailToast: ({ text1, text2, props }) => (
       <Pressable
         onPress={() => navigation.navigate("GroceriesStack")}
-        style={styles.toastContainer}
+        style={[styles.toastContainer, {backgroundColor: themedColours.primaryText[theme]}]}
       >
-        <Text style={styles.toastTextOne}>{text1}</Text>
-        <Text style={styles.toastTextTwo}>{text2}</Text>
+        <Text style={[styles.toastTextOne, {color: themedColours.primaryBackground[theme]}]}>{text1}</Text>
+        <Text style={[styles.toastTextTwo, {color: themedColours.primaryBackground[theme]}]}>{text2}</Text>
       </Pressable>
     ),
     customErrorToast: ({ text1, text2, onViewPress, props }) => (
@@ -93,7 +96,7 @@ const FoodDetails = ({ navigation, route }) => {
         style={{
           height: 44,
           width: "90%",
-          backgroundColor: COLOURS.nearBlack,
+          backgroundColor: themedColours.primaryText[theme],
           borderRadius: 20,
           flexDirection: "row",
           alignItems: "center",
@@ -103,7 +106,7 @@ const FoodDetails = ({ navigation, route }) => {
       >
         <Text
           style={{
-            color: "white",
+            color: themedColours.primaryBackground[theme],
             fontFamily: "Mulish_500Medium",
             fontSize: 14,
           }}
@@ -112,7 +115,7 @@ const FoodDetails = ({ navigation, route }) => {
         </Text>
         <Text
           style={{
-            color: "white",
+            color: themedColours.primaryBackground[theme],
             fontFamily: "Mulish_600SemiBold",
             fontSize: 14,
           }}
@@ -124,7 +127,7 @@ const FoodDetails = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: themedColours.primaryBackground[theme] }}>
       <FoodDetailsSimpleInfo expectedId={singleFoodId || barcode} />
       <ScrollView showsVerticalScrollIndicator={false}>
         {currentFood?.processedScore && <FoodDetailsScoreStrip />}

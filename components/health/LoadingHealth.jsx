@@ -4,8 +4,12 @@ import { StyleSheet } from "react-native";
 import COLOURS from "../../constants/colours";
 import { ViewBase } from "react-native";
 import { Skeleton } from "moti/skeleton";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const FakeEventCard = ({ week }) => {
+  const { theme } = useColourTheme();
+
   return (
     <View style={styles.container}>
       <View style={{ alignItems: "center", marginRight: -1 }}>
@@ -13,7 +17,7 @@ const FakeEventCard = ({ week }) => {
           style={{
             fontSize: 11,
             fontFamily: "Mulish_800ExtraBold",
-            color: COLOURS.nearBlack,
+            color: themedColours.primaryText[theme],
           }}
         >
           week
@@ -22,7 +26,7 @@ const FakeEventCard = ({ week }) => {
           style={{
             fontSize: 16,
             fontFamily: "Mulish_700Bold",
-            color: COLOURS.nearBlack,
+            color: themedColours.primaryText[theme],
           }}
         >
           {week}
@@ -30,11 +34,15 @@ const FakeEventCard = ({ week }) => {
       </View>
 
       {/* Green Dot */}
-      <View style={styles.circle}></View>
+      <View style={[styles.circle, {backgroundColor: themedColours.primary[theme]}]}></View>
 
-      <View style={{flex: 1}}>
+      <View style={{ flex: 1 }}>
         <Skeleton
-          colors={["#F5F5F5", COLOURS.lightGray, "#F5F5F5"]} // Custom colors for the skeleton
+          colors={[
+            themedColours.secondaryBackground[theme],
+            themedColours.stroke[theme],
+            themedColours.secondaryBackground[theme],
+          ]}
           radius={20}
           height={150}
           width={"100%"}
@@ -45,12 +53,15 @@ const FakeEventCard = ({ week }) => {
 };
 
 const LoadingHealth = () => {
+  const { theme } = useColourTheme();
+
+
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
-      style={{ flex: 1, backgroundColor: "white" }}
+      style={{ flex: 1, backgroundColor: themedColours.primaryBackground[theme] }}
     >
-      <View style={styles.line}></View>
+      <View style={[styles.line, {backgroundColor: themedColours.stroke[theme]}]}></View>
       <FakeEventCard week={1} />
       <FakeEventCard week={2} />
       <FakeEventCard week={3} />

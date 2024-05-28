@@ -5,29 +5,49 @@ import ClearIcon from "../../svgs/ClearIcon";
 import { useNavigation } from "@react-navigation/native";
 import COLOURS from "../../constants/colours";
 import { Skeleton } from "moti/skeleton";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const LoadingFoodDetails = () => {
   const navigation = useNavigation();
-
+  const { theme } = useColourTheme();
   return (
-    <View style={{ flex: 1, padding: 20, backgroundColor: "white" }}>
+    <View
+      style={{
+        flex: 1,
+        padding: 20,
+        backgroundColor: themedColours.primaryBackground[theme],
+      }}
+    >
       <View style={{ flexDirection: "row", gap: 14 }}>
         <Skeleton
-          colors={["#F5F5F5", COLOURS.lightGray, "#F5F5F5"]} // Custom colors for the skeleton
+          colors={[
+            themedColours.secondaryBackground[theme],
+            themedColours.stroke[theme],
+            themedColours.secondaryBackground[theme],
+          ]}
           height={60}
           width={60}
           radius={20}
         />
         <View style={{ justifyContent: "space-between", flex: 1 }}>
           <Skeleton
-            colors={["#F5F5F5", COLOURS.lightGray, "#F5F5F5"]} // Custom colors for the skeleton
+            colors={[
+              themedColours.secondaryBackground[theme],
+              themedColours.stroke[theme],
+              themedColours.secondaryBackground[theme],
+            ]}
             height={16} // Approximate height of your list items
             radius={12}
             width={"100%"}
           />
 
           <Skeleton
-            colors={["#F5F5F5", COLOURS.lightGray, "#F5F5F5"]} // Custom colors for the skeleton
+            colors={[
+              themedColours.secondaryBackground[theme],
+              themedColours.stroke[theme],
+              themedColours.secondaryBackground[theme],
+            ]}
             height={36} // Approximate height of your list items
             radius={12}
             width={"100%"}
@@ -37,7 +57,11 @@ const LoadingFoodDetails = () => {
           style={{ alignSelf: "flex-start" }}
           onPress={() => navigation.goBack()}
         >
-          <ClearIcon size={28} />
+          <ClearIcon
+            crossColor={themedColours.secondaryText[theme]}
+            background={themedColours.secondaryBackground[theme]}
+            size={28}
+          />
         </Pressable>
       </View>
 
@@ -47,7 +71,11 @@ const LoadingFoodDetails = () => {
         }}
       >
         <Skeleton
-          colors={["#F5F5F5", COLOURS.lightGray, "#F5F5F5"]} // Custom colors for the skeleton
+          colors={[
+            themedColours.secondaryBackground[theme],
+            themedColours.stroke[theme],
+            themedColours.secondaryBackground[theme],
+          ]}
           height={135} // Approximate height of your list items
           radius={20}
           width={"100%"}
@@ -60,8 +88,11 @@ const LoadingFoodDetails = () => {
         }}
       >
         <Skeleton
-          colors={["#F5F5F5", COLOURS.lightGray, "#F5F5F5"]} // Custom colors for the skeleton
-          height={430} // Approximate height of your list items
+  colors={[
+    themedColours.secondaryBackground[theme],
+    themedColours.stroke[theme],
+    themedColours.secondaryBackground[theme],
+  ]}          height={430} // Approximate height of your list items
           radius={20}
           width={"100%"}
         />
@@ -74,8 +105,11 @@ const LoadingFoodDetails = () => {
         }}
       >
         <Skeleton
-          colors={["#F5F5F5", COLOURS.lightGray, "#F5F5F5"]} // Custom colors for the skeleton
-          radius={20}
+  colors={[
+    themedColours.secondaryBackground[theme],
+    themedColours.stroke[theme],
+    themedColours.secondaryBackground[theme],
+  ]}          radius={20}
           height={"100%"}
           width={"100%"}
         />

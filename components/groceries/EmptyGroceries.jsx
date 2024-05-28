@@ -3,16 +3,18 @@ import React from "react";
 import AddToBasketIcon from "../../svgs/AddToBasketIcon";
 import COLOURS from "../../constants/colours";
 import { StyleSheet } from "react-native";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const EmptyGroceries = ({ onPress }) => {
-  
+  const {theme} = useColourTheme()
   return (
     <Pressable onPress={onPress} style={styles.container}>
-      <Text style={styles.titleText}>Groceries</Text>
-      <View style={styles.boxContainer}>
-        <AddToBasketIcon />
-        <View style={styles.boxInnerContainer}>
-          <Text style={styles.boxText}>Add your first item</Text>
+      <Text style={[styles.titleText, {color: themedColours.primaryText[theme]}]}>Groceries</Text>
+      <View style={[styles.boxContainer, {backgroundColor: themedColours.tertiaryBackground[theme]}]}>
+        <AddToBasketIcon color={themedColours.primaryText[theme]} />
+        <View style={[styles.boxInnerContainer, {backgroundColor: themedColours.primaryBackground[theme], borderColor: themedColours.stroke[theme]}]}>
+          <Text style={[styles.boxText, {color: themedColours.primaryText[theme]}]}>Add your first item</Text>
         </View>
       </View>
     </Pressable>

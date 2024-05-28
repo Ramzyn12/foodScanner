@@ -32,6 +32,8 @@ import {
 } from "../../redux/grocerySlice";
 import Toast from "react-native-toast-message";
 import { getCurrentDateLocal } from "../../utils/dateHelpers";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const GroceryListItem = ({ foodItem, id, onLongPress, isActive }) => {
   // Could move this logic into a hook if needed
@@ -43,6 +45,8 @@ const GroceryListItem = ({ foodItem, id, onLongPress, isActive }) => {
   const deletionTimerRef = useRef(null);
   const singleFoodId = foodItem?.barcode ? "" : foodItem?._id;
   const brand = singleFoodId ? "Fresh" : foodItem?.brand;
+  const {theme} = useColourTheme()
+
   const chosenDate =
     useSelector((state) => state.diary.chosenDate) || getCurrentDateLocal();
 
@@ -240,24 +244,24 @@ const GroceryListItem = ({ foodItem, id, onLongPress, isActive }) => {
       renderRightActions={renderRightActions}
     >
       <View
-        style={[styles.listItemContainer, isActive && styles.isActiveStyles]}
+        style={[styles.listItemContainer, isActive && styles.isActiveStyles, {backgroundColor: themedColours.primaryBackground[theme]}]}
       >
         {/* Check Box */}
         <Pressable onPress={handleToggleCheck}>
           <View
             style={[
               styles.unChecked,
-              grocery?.checked && { backgroundColor: COLOURS.darkGreen },
+              grocery?.checked && { backgroundColor: themedColours.primary[theme] },
             ]}
           >
-            {grocery?.checked && <TickIcon />}
+            {grocery?.checked && <TickIcon color={themedColours.primaryBackground[theme]} />}
           </View>
         </Pressable>
 
         {/* Food Item */}
         <Pressable
           onLongPress={onLongPress}
-          style={styles.foodItemContainer}
+          style={[styles.foodItemContainer, {borderBottomColor: themedColours.stroke[theme]}]}
           onPress={handleGoToFood}
           delayLongPress={200}
         >
@@ -300,8 +304,6 @@ const styles = StyleSheet.create({
     height: 30,
     marginLeft: 15,
     backgroundColor: "#F5F5F5",
-    borderWidth: 1,
-    borderColor: COLOURS.lightGray,
     borderRadius: 6,
   },
   foodItemContainer: {

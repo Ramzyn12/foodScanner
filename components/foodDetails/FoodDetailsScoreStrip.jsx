@@ -5,10 +5,13 @@ import { useSelector } from "react-redux";
 import { color } from "@rneui/base";
 import { Path, Svg } from "react-native-svg";
 import DangerTriangle from "../../svgs/DangerTriangle";
+import { themedColours } from "../../constants/themedColours";
+import { useColourTheme } from "../../context/Themed";
 
 const FoodDetailsScoreStrip = ({ processedScore }) => {
   // const score = useSelector((state) => state.food.currentFood?.processedScore);
   const currentFood = useSelector((state) => state.food.currentFood);
+  const {theme} = useColourTheme()
   const processedState = currentFood?.processedState;
   const background =
     processedState === "Processed"
@@ -28,19 +31,19 @@ const FoodDetailsScoreStrip = ({ processedScore }) => {
   return (
     <View style={[styles.container]}>
       {processedState === "Processed" && (
-        <View style={styles.warningMessageContainer}>
-          <DangerTriangle />
-          <Text style={styles.warningMessageText}>
+        <View style={[styles.warningMessageContainer, {backgroundColor: themedColours.secondaryBackground[theme]}]}>
+          <DangerTriangle color={themedColours.primaryText[theme]} />
+          <Text style={[styles.warningMessageText, {color: themedColours.primaryText[theme]}]}>
             This product is processed. If you choose to eat this, it will reset
             your streak.
           </Text>
         </View>
       )}
       {isUnknown && (
-        <View style={styles.warningMessageContainer}>
-          <DangerTriangle />
+        <View style={[styles.warningMessageContainer, {backgroundColor: themedColours.secondaryBackground[theme]}]}>
+          <DangerTriangle color={themedColours.primaryText[theme]} />
           <View style={{ flex: 1 }}>
-            <Text style={styles.warningMessageText}>
+          <Text style={[styles.warningMessageText, {color: themedColours.primaryText[theme]}]}>
               We’re not sure if this item is processed or not as it does not
               exist in our database yet.
             </Text>
@@ -49,7 +52,7 @@ const FoodDetailsScoreStrip = ({ processedScore }) => {
                 style={{
                   marginTop: 10,
                   fontFamily: "Mulish_700Bold",
-                  color: COLOURS.darkGreen,
+                  color: themedColours.primary[theme],
                   fontSize: 14,
                 }}
               >
@@ -69,7 +72,7 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
     paddingVertical: 4,
-    backgroundColor: "white",
+    // backgroundColor: "white",
     gap: 14,
   },
   innerContainer: {

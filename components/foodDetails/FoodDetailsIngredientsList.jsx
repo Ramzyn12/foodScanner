@@ -3,16 +3,19 @@ import React from "react";
 import FoodListItem from "../diary/FoodListItem";
 import { useSelector } from "react-redux";
 import COLOURS from '../../constants/colours'
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const FoodDetailsIngredientsList = () => {
   const currentFood = useSelector((state) => state.food.currentFood);
   const filteredIngredients = currentFood.ingredients;
+  const {theme} = useColourTheme()
 
   return (
-    <View style={{ marginTop: 20, padding: 20, borderWidth: 1, borderColor: COLOURS.lightGray, borderRadius: 20 }}>
-      <Text style={styles.titleText}>Ingredients</Text>
-      <Text style={styles.subtitleText}>All ingredients found in this product.</Text>
-      <Text style={styles.ingredientsText}>{filteredIngredients}</Text>
+    <View style={{ marginTop: 20, padding: 20, borderWidth: 1, borderColor: themedColours.stroke[theme], borderRadius: 20 }}>
+      <Text style={[styles.titleText, {color: themedColours.primaryText[theme]}]}>Ingredients</Text>
+      <Text style={[styles.subtitleText, {color: themedColours.secondaryText[theme]}]}>All ingredients found in this product.</Text>
+      <Text style={[styles.ingredientsText, {color: themedColours.primaryText[theme]}]}>{filteredIngredients}</Text>
     </View>
   );
 };

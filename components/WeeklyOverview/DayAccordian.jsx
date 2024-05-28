@@ -22,6 +22,8 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const DayAccordian = ({ dayData, day }) => {
   const [accordianOpen, setAccordianOpen] = useState(false);
@@ -30,17 +32,19 @@ const DayAccordian = ({ dayData, day }) => {
   const navigation = useNavigation();
   const dateOfEntry = new Date(dayData?.date);
   const today = new Date(getCurrentDateLocal());
+  const { theme } = useColourTheme();
 
   const isPresent = today.toISOString() === dateOfEntry.toISOString();
   const isFuture = dateOfEntry > today;
 
-  const svgWithoutTime = isSuccess ? <GreenTickCircle /> : <GreyFail />;
-
-  const svg = isPresent ? <PendingClock /> : isFuture ? "" : svgWithoutTime;
 
   const isSuccess =
     dayData.diaryDetails.fastedState === true ||
     dayData.diaryDetails.diaryDayState === "unprocessed";
+
+  const svgWithoutTime = isSuccess ? <GreenTickCircle /> : <GreyFail color={themedColours.secondaryText[theme]} colorCross={themedColours.secondaryBackground[theme]} />;
+
+  const svg = isPresent ? <PendingClock /> : isFuture ? "" : svgWithoutTime;
 
   const messageWithoutTime = isSuccess
     ? "Success - no processed food"
@@ -89,7 +93,7 @@ const DayAccordian = ({ dayData, day }) => {
       style={{
         width: "100%",
         borderWidth: 1,
-        borderColor: COLOURS.lightGray,
+        borderColor: themedColours.stroke[theme],
         borderRadius: 20,
         paddingTop: 20,
         paddingBottom: 5,
@@ -108,14 +112,14 @@ const DayAccordian = ({ dayData, day }) => {
           style={{
             fontSize: 19,
             fontFamily: "Mulish_700Bold",
-            color: COLOURS.nearBlack,
+            color: themedColours.primaryText[theme],
           }}
         >
           Day {day}
         </Text>
         {!isFuture && (
           <Animated.View style={arrowStyle}>
-            <ArrowDownShort />
+            <ArrowDownShort color={themedColours.primaryText[theme]} />
           </Animated.View>
         )}
       </View>
@@ -133,7 +137,7 @@ const DayAccordian = ({ dayData, day }) => {
             style={{
               fontSize: 14,
               fontFamily: "Mulish_700Bold",
-              color: COLOURS.darkGreen,
+              color: (isSuccess || isPresent) ? themedColours.primary[theme] : themedColours.secondaryText[theme],
             }}
           >
             {message}
@@ -176,14 +180,27 @@ const DayAccordian = ({ dayData, day }) => {
                 style={{
                   fontSize: 16,
                   fontFamily: "Mulish_700Bold",
-                  color: COLOURS.nearBlack,
+                  color: themedColours.primaryText[theme],
                 }}
               >
                 Add notes
               </Text>
-              <ArrowRight />
+              <ArrowRight color={themedColours.secondaryText[theme]} />
             </View>
-            {dayData?.note?.note && <Text numberOfLines={3} ellipsizeMode='tail' style={{marginTop: 14, fontSize: 12, fontFamily: 'Mulish_500Medium', color: '#636566'}}>{dayData?.note?.note.trim().split('\n').join('.')}</Text>}
+            {dayData?.note?.note && (
+              <Text
+                numberOfLines={3}
+                ellipsizeMode="tail"
+                style={{
+                  marginTop: 14,
+                  fontSize: 12,
+                  fontFamily: "Mulish_500Medium",
+                  color: themedColours.secondaryText[theme],
+                }}
+              >
+                {dayData?.note?.note.trim().split("\n").join(". ")}
+              </Text>
+            )}
           </Pressable>
         </View>
       </Animated.View>

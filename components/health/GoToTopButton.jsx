@@ -3,6 +3,7 @@ import React from 'react'
 import ArrowDown from '../../svgs/ArrowDown'
 
 const GoToTopButton = ({handleScrollToStart}) => {
+  // NOT IN USE
   return (
     <Pressable
     onPress={handleScrollToStart}

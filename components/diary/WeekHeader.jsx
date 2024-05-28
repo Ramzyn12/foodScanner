@@ -34,6 +34,8 @@ import {
 } from "date-fns";
 import { formatInTimeZone, fromZonedTime, toZonedTime } from "date-fns-tz";
 import { getAnyDateLocal, getCurrentDateLocal } from "../../utils/dateHelpers";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -63,6 +65,7 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
   const [weeksData, setWeeksData] = useState([]);
   const carouselRef = useRef(null);
   const dispatch = useDispatch();
+  const {theme} = useColourTheme()
   const insets = useSafeAreaInsets();
   const nowDateString = getCurrentDateLocal();
   const chosenDateString = useSelector((state) => state.diary.chosenDate);
@@ -260,13 +263,14 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
     });
   }
 
+  const hideBlur = isReduceTransparencyEnabled || theme === 'dark'
+
   return (
     <BlurView
-      intensity={isReduceTransparencyEnabled ? 10 : 70}
-      tint={
-        isReduceTransparencyEnabled ? "systemThickMaterialLight" : "default"
-      }
-      style={{ position: "absolute", zIndex: 3000, paddingTop: insets.top + 5 }}
+      intensity={hideBlur ? 0 : 80}
+      key={theme + isReduceTransparencyEnabled} // Make sure this key doesnt cause performance problems 
+      tint={theme}
+      style={{ position: "absolute", zIndex: 3000, paddingTop: insets.top + 5, backgroundColor: hideBlur && themedColours.primaryBackground[theme]}}
     >
       <View
         style={{
@@ -280,7 +284,7 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
         <View style={{ gap: 6 }}>
           <Text
             style={{
-              color: COLOURS.nearBlack,
+              color: themedColours.primaryText[theme],
               fontSize: 19,
               fontFamily: "Mulish_700Bold",
             }}
@@ -291,7 +295,7 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
             {subHeaderInfo.svg}
             <Text
               style={{
-                color: "#636566",
+                color: themedColours.secondaryText[theme],
                 fontSize: 11,
                 fontFamily: "Mulish_700Bold",
               }}
@@ -305,7 +309,7 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
             style={{
               fontFamily: "Mulish_700Bold",
               fontSize: 14,
-              color: COLOURS.darkGreen,
+              color: themedColours.primary[theme],
             }}
           >
             Today

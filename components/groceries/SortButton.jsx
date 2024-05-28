@@ -6,10 +6,12 @@ import ContextMenu from "react-native-context-menu-view";
 import UpDownIcon from "../../svgs/UpDownIcon";
 import DropdownIcon from "../../svgs/DropdownIcon";
 import { useSelector } from "react-redux";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const SortButton = ({ onPress }) => {
   const sortPreference = useSelector(state => state.grocery.sortPreference)
-
+  const {theme} = useColourTheme()
   return (
     <ContextMenu
       actions={[
@@ -20,10 +22,10 @@ const SortButton = ({ onPress }) => {
       dropdownMenuMode={true}
       onPress={onPress}
     >
-      <Pressable style={styles.container}>
-        <UpDownIcon />
-        <Text style={styles.buttonText}>{sortPreference}</Text>
-        <DropdownIcon />
+    <Pressable style={[styles.container, {borderColor: themedColours.stroke[theme]}]}>
+        <UpDownIcon color={themedColours.primaryText[theme]}  />
+        <Text style={[styles.buttonText, {color: themedColours.primaryText[theme]}]}>{sortPreference}</Text>
+        <DropdownIcon color={themedColours.primaryText[theme]} />
       </Pressable>
     </ContextMenu>
   );

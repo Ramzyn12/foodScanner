@@ -18,11 +18,14 @@ import FakeBlurComponent from "./FakeBlurComponent";
 import { Image } from "react-native";
 import FoodDetailReasonCard from "./FoodDetailReasonCard";
 import { useSubscriptionState } from "../../hooks/useSubscriptionState";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 // import { BlurView } from "@react-native-community/blur";
 
 const FoodDetailsMainInfo = () => {
   const currentFood = useSelector((state) => state.food.currentFood);
   // const { isSubscribed } = useSubscriptionState()
+  const {theme} = useColourTheme()
   const isSubscribed = true;
   const isUnknown = currentFood.processedState === "Unknown";
   const title =
@@ -53,7 +56,7 @@ const FoodDetailsMainInfo = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {borderColor: themedColours.stroke[theme]}]}>
       {!isSubscribed && (
         <LinearGradient
           colors={["#0B5253", "#19999C"]}
@@ -64,14 +67,14 @@ const FoodDetailsMainInfo = () => {
           <Text style={styles.proFeatureText}>Pro</Text>
         </LinearGradient>
       )}
-      <Text style={styles.titleText}>{title}</Text>
+      <Text style={[styles.titleText, {color: themedColours.primaryText[theme]}]}>{title}</Text>
       {isSubscribed && (
         <View style={{ gap: 14 }}>
           <Text
             style={{
               fontSize: 14,
               fontFamily: "Mulish_400Regular",
-              color: "#636566",
+              color: themedColours.primaryText[theme],
             }}
           >
             {message}

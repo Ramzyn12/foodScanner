@@ -2,6 +2,8 @@ import { View, Text, Pressable, TextInput } from "react-native";
 import React, { useState } from "react";
 import COLOURS from "../../constants/colours";
 import BottomSheet, { BottomSheetTextInput } from "@gorhom/bottom-sheet";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const WeightInput = ({
   bottomSheetBehaviour,
@@ -12,6 +14,7 @@ const WeightInput = ({
 }) => {
   const isImperial = weightUnit === 'imperial'
   const isMetric = weightUnit === 'metric'
+  const {theme} = useColourTheme()
 
   return (
     <View style={{ gap: 14 }}>
@@ -24,16 +27,16 @@ const WeightInput = ({
             alignItems: "center",
             justifyContent: "center",
             borderRadius: 30,
-            backgroundColor: isImperial ? COLOURS.darkGreen : 'white',
+            backgroundColor: isImperial ? themedColours.primary[theme]: themedColours.primaryBackground[theme],
             borderWidth: 1,
-            borderColor: isImperial ? 'transparent' : COLOURS.lightGray,
+            borderColor: isImperial ? 'transparent' : themedColours.stroke[theme],
           }}
         >
           <Text
             style={{
               fontSize: 14,
               fontFamily: "Mulish_700Bold",
-              color: isImperial ? "white" : COLOURS.nearBlack,
+              color: isImperial ? themedColours.primaryBackground[theme] : themedColours.primaryText[theme],
             }}
           >
             Imperial
@@ -47,16 +50,16 @@ const WeightInput = ({
             alignItems: "center",
             justifyContent: "center",
             borderRadius: 30,
-            backgroundColor: isMetric ? COLOURS.darkGreen : 'white',
+            backgroundColor: isMetric ? themedColours.primary[theme]: themedColours.primaryBackground[theme],
             borderWidth: 1,
-            borderColor: isMetric ? 'transparent' : COLOURS.lightGray,
+            borderColor: isMetric ? 'transparent' : themedColours.stroke[theme],
           }}
         >
           <Text
             style={{
               fontSize: 14,
               fontFamily: "Mulish_700Bold",
-              color: isMetric ? "white" : COLOURS.nearBlack,
+              color: isMetric ? themedColours.primaryBackground[theme] : themedColours.primaryText[theme],
             }}
           >
             Metric
@@ -70,22 +73,22 @@ const WeightInput = ({
           value={value.toString()}
           inputMode="decimal"
           onChangeText={setValue}
-          placeholderTextColor={"#A4A4A4"}
+          placeholderTextColor={themedColours.secondaryText[theme]}
           style={{
             padding: 20,
             height: 58,
             borderRadius: 12,
             borderWidth: 1,
-            borderColor: COLOURS.lightGray,
+            borderColor: themedColours.stroke[theme],
             fontSize: 14,
             fontFamily: "Mulish_700Bold",
-            color: COLOURS.nearBlack,
+            color: themedColours.primaryText[theme],
           }}
         />
       ) : (
         <TextInput
           placeholder={`Weight (${isImperial ? 'KG' : 'lbs'})`}
-          placeholderTextColor={"#A4A4A4"}
+          placeholderTextColor={themedColours.secondaryText[theme]}
           value={value.toString()}
           inputMode="decimal"
           onChangeText={setValue}
@@ -94,10 +97,10 @@ const WeightInput = ({
             height: 58,
             borderRadius: 12,
             borderWidth: 1,
-            borderColor: COLOURS.lightGray,
+            borderColor: themedColours.stroke[theme],
             fontSize: 14,
             fontFamily: "Mulish_700Bold",
-            color: COLOURS.nearBlack,
+            color: themedColours.primaryText[theme],
           }}
         />
       )}

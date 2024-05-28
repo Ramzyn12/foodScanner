@@ -3,19 +3,26 @@ import React from "react";
 import { SafeAreaView } from "react-native";
 import COLOURS from "../../constants/colours";
 import { Skeleton } from "moti/skeleton";
+import { themedColours } from "../../constants/themedColours";
+import { useColourTheme } from "../../context/Themed";
 
 const LoadingDiary = () => {
+  const { theme } = useColourTheme();
   return (
     <SafeAreaView
       style={{
         flex: 1,
-        backgroundColor: "white",
+        backgroundColor: themedColours.primaryBackground[theme],
       }}
     >
       <View style={{ flex: 1, padding: 20 }}>
         <Skeleton
           // key={index}
-          colors={["#F5F5F5", COLOURS.lightGray, "#F5F5F5"]} // Custom colors for the skeleton
+          colors={[
+            themedColours.secondaryBackground[theme],
+            themedColours.stroke[theme],
+            themedColours.secondaryBackground[theme],
+          ]}
           height={42} // Approximate height of your list items
           width={140}
           radius={20}
@@ -24,7 +31,11 @@ const LoadingDiary = () => {
           {Array.from({ length: 7 }, (_, index) => (
             <View style={{ flex: 1 }} key={index}>
               <Skeleton
-                colors={["#F5F5F5", COLOURS.lightGray, "#F5F5F5"]} // Custom colors for the skeleton
+                colors={[
+                  themedColours.secondaryBackground[theme],
+                  themedColours.stroke[theme],
+                  themedColours.secondaryBackground[theme],
+                ]}
                 height={60} // Approximate height of your list items
                 radius={20}
                 width={"100%"}
@@ -38,7 +49,11 @@ const LoadingDiary = () => {
           }}
         >
           <Skeleton
-            colors={["#F5F5F5", COLOURS.lightGray, "#F5F5F5"]} // Custom colors for the skeleton
+            colors={[
+              themedColours.secondaryBackground[theme],
+              themedColours.stroke[theme],
+              themedColours.secondaryBackground[theme],
+            ]}
             height={130} // Approximate height of your list items
             radius={20}
             width={"100%"}
@@ -51,13 +66,16 @@ const LoadingDiary = () => {
           }}
         >
           <Skeleton
-            colors={["#F5F5F5", COLOURS.lightGray, "#F5F5F5"]} // Custom colors for the skeleton
+            colors={[
+              themedColours.secondaryBackground[theme],
+              themedColours.stroke[theme],
+              themedColours.secondaryBackground[theme],
+            ]}
             height={150} // Approximate height of your list items
             radius={20}
             width={"100%"}
           />
         </View>
-     
 
         <View
           style={{
@@ -66,7 +84,11 @@ const LoadingDiary = () => {
           }}
         >
           <Skeleton
-            colors={["#F5F5F5", COLOURS.lightGray, "#F5F5F5"]} // Custom colors for the skeleton
+            colors={[
+              themedColours.secondaryBackground[theme],
+              themedColours.stroke[theme],
+              themedColours.secondaryBackground[theme],
+            ]}
             height={"100%"} // Approximate height of your list items
             radius={20}
             width={"100%"}

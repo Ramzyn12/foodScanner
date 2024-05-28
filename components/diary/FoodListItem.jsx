@@ -2,19 +2,21 @@ import { View, Text, StyleSheet, Image } from "react-native";
 import React from "react";
 import COLOURS from "../../constants/colours";
 import unknown from "../../assets/unknown.webp";
+import { themedColours } from "../../constants/themedColours";
+import { useColourTheme } from "../../context/Themed";
 
 const FoodListItem = ({ foodSelected, foodItem }) => {
   // This should be shared component
-
+  const {theme} = useColourTheme()
   const processedState = foodItem?.processedState;
   const isUnknown = foodItem?.processedState === "Unknown";
   const background = isUnknown
-    ? "#F5F5F5"
+    ? themedColours.secondaryBackground[theme]
     : processedState === "Processed"
     ? COLOURS.badFoodBackground
     : COLOURS.greatFoodBackground;
   const textColour = isUnknown
-    ? "#636566"
+    ? themedColours.secondaryText[theme]
     : processedState === "Processed"
     ? COLOURS.badFoodText
     : COLOURS.greatFoodText;
@@ -30,13 +32,14 @@ const FoodListItem = ({ foodSelected, foodItem }) => {
         <Text
           style={[
             styles.foodNameText,
+            {color: themedColours.primaryText[theme]},
             foodSelected && { textDecorationLine: "line-through" },
           ]}
         >
           {foodItem?.name}
         </Text>
         {foodItem?.brand && (
-          <Text style={styles.foodSupplierText}>{foodItem?.brand}</Text>
+          <Text style={[styles.foodSupplierText, {color: themedColours.secondaryText[theme]}]}>{foodItem?.brand}</Text>
         )}
       </View>
       {/* Score */}

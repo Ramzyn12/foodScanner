@@ -4,8 +4,11 @@ import COLOURS from "../../constants/colours";
 import ContextMenu from "react-native-context-menu-view";
 import ArrowDownShort from "../../svgs/ArrowDownShort";
 import { Pressable } from "react-native";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const ChangeDateDropdown = ({selectedTimeFrame, onTimeFrameChange}) => {
+  const {theme} = useColourTheme()
 
   return (
     <ContextMenu
@@ -13,7 +16,7 @@ const ChangeDateDropdown = ({selectedTimeFrame, onTimeFrameChange}) => {
         position: "absolute",
         flexDirection: "row",
         borderWidth: 1,
-        borderColor: COLOURS.lightGray,
+        borderColor: themedColours.stroke[theme],
         borderRadius: 20,
         gap: 14,
         top: 14,
@@ -38,12 +41,12 @@ const ChangeDateDropdown = ({selectedTimeFrame, onTimeFrameChange}) => {
         style={{
           fontSize: 14,
           fontFamily: "Mulish_700Bold",
-          color: "#F7F6EF",
+          color: themedColours.tertiaryBackground[theme],
         }}
       >
         {selectedTimeFrame}
       </Text>
-      <ArrowDownShort color={"#F7F6EF"} width={9} height={4} />
+      <ArrowDownShort color={themedColours.tertiaryBackground[theme]} width={9} height={4} />
     </ContextMenu>
   );
 };

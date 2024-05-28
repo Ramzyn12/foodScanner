@@ -27,7 +27,7 @@ const getNote = async (req, res) => {
   const note = await Note.findOne({ userId, date });
 
   if (!note) {
-    throw new NotFoundError("Note not found", {note, date});
+    // throw new NotFoundError("Note not found", {note, date});
   }
 
   res.status(200).json(note);

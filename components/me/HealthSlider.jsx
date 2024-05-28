@@ -6,12 +6,15 @@ const padding = 20;
 const windowWidth = Dimensions.get("window").width;
 const sliderWidth = windowWidth - 2 * padding;
 import COLOURS from "../../constants/colours";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const HealthSlider = ({ value, setValue, metricType }) => {
   const [thumbSize, setThumbSize] = useState(24); //34
   const [valueBoxSize, setValueBoxSize] = useState(37); //54
   const [valueTextSize, setValueTextSize] = useState(14); //24
   const [extraLeft, setExtraLeft] = useState(0);
+  const {theme} = useColourTheme()
 
   const labels =
     metricType === "Energy"
@@ -47,16 +50,16 @@ const HealthSlider = ({ value, setValue, metricType }) => {
         trackStyle={{ height: 10, borderRadius: 12 }}
         thumbStyle={{ width: thumbSize, height: thumbSize }}
         thumbTouchSize={{ width: 60, height: 60 }}
-        thumbTintColor={COLOURS.darkGreen}
-        minimumTrackTintColor={COLOURS.darkGreen}
-        maximumTrackTintColor={"#F7F6EF"}
+        thumbTintColor={themedColours.primary[theme]}
+        minimumTrackTintColor={themedColours.primary[theme]}
+        maximumTrackTintColor={themedColours.tertiaryBackground[theme]}
       />
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <Text
           style={{
             fontFamily: "Mulish_700Bold",
             fontSize: 14,
-            color: "#636566",
+            color: themedColours.secondaryText[theme],
           }}
         >
           {labels[0]}
@@ -65,7 +68,7 @@ const HealthSlider = ({ value, setValue, metricType }) => {
           style={{
             fontFamily: "Mulish_700Bold",
             fontSize: 14,
-            color: "#636566",
+            color: themedColours.secondaryText[theme],
           }}
         >
            {labels[1]}
@@ -77,7 +80,7 @@ const HealthSlider = ({ value, setValue, metricType }) => {
           height: valueBoxSize,
           position: "absolute",
           borderWidth: 1,
-          borderColor: COLOURS.lightGray,
+          borderColor: themedColours.stroke[theme],
           borderRadius: 12,
           alignItems: "center",
           justifyContent: "center",
@@ -92,7 +95,7 @@ const HealthSlider = ({ value, setValue, metricType }) => {
         <Text
           style={{
             fontSize: valueTextSize,
-            color: "#636566",
+            color: themedColours.secondaryText[theme],
             fontFamily: "Mulish_700Bold",
           }}
         >

@@ -3,6 +3,7 @@ import React from "react";
 import Animated, { FadeIn, Easing } from "react-native-reanimated";
 
 const CurrentIndexLabel = ({ currentTipIndex, numItems }) => {
+  //  NOT IN USE
   return (
     <Animated.View
       entering={FadeIn.duration(1000).easing(Easing.out(Easing.exp))}

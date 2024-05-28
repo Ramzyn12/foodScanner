@@ -3,21 +3,23 @@ import React from "react";
 import COLOURS from "../../constants/colours";
 import { Path, Svg } from "react-native-svg";
 import TimelineEventCard from "./TimelineEventCard";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const TimelineEvent = ({ unlocked, data, daysFinished, remainingDaysToUnlock, isLoading }) => {
-
+  const {theme} = useColourTheme()
   return (
     <View style={styles.container}>
       
       <View style={{ alignItems: "center", marginRight: -1 }}>
-        <Text style={{ fontSize: 11, fontFamily: "Mulish_800ExtraBold", color: COLOURS.nearBlack }}>week</Text>
-        <Text style={{ fontSize: 16, fontFamily: "Mulish_700Bold", color: COLOURS.nearBlack }}>
+        <Text style={{ fontSize: 11, fontFamily: "Mulish_800ExtraBold", color: themedColours.primaryText[theme] }}>week</Text>
+        <Text style={{ fontSize: 16, fontFamily: "Mulish_700Bold", color: themedColours.primaryText[theme] }}>
           {data.week}
         </Text>
       </View>
 
       {/* Green Dot */}
-      <View style={styles.circle}></View>
+      <View style={[styles.circle, {backgroundColor: themedColours.primary[theme]}]}></View>
 
 
       <TimelineEventCard

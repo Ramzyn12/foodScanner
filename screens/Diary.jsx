@@ -32,6 +32,7 @@ import LoadingDiary from "../components/diary/LoadingDiary";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme } from "../hooks/useTheme";
 import { useColourTheme } from "../context/Themed";
+import { themedColours } from "../constants/themedColours";
 
 const Diary = ({ navigation }) => {
   const userCreated = useSelector((state) => state.auth.userCreated);
@@ -106,7 +107,7 @@ const Diary = ({ navigation }) => {
     <SafeAreaView
       style={[
         styles.container,
-        {backgroundColor: theme === 'dark' ? 'black' : 'white'}
+        {backgroundColor: themedColours.primaryBackground[theme]}
       ]}
     >
       <WeekHeader
@@ -142,7 +143,6 @@ export default Diary;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
   },
   weekHeaderContainer: {
     paddingHorizontal: 18,

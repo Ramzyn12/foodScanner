@@ -3,6 +3,8 @@ import React from "react";
 import ArrowLeft from "../../svgs/ArrowLeft";
 import COLOURS from "../../constants/colours";
 import { useNavigation } from "@react-navigation/native";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const OverviewHeader = ({ week, title, day, onSave, notes }) => {
   const navigation = useNavigation();
@@ -13,6 +15,7 @@ const OverviewHeader = ({ week, title, day, onSave, notes }) => {
     //   onSave()
     // }
   }
+  const {theme} = useColourTheme()
 
   return (
     <View
@@ -28,7 +31,7 @@ const OverviewHeader = ({ week, title, day, onSave, notes }) => {
         onPress={handleGoback}
         style={{ position: "absolute", left: 25, zIndex: 40000, top: 10 }}
       >
-        <ArrowLeft width={5.5} height={11.5} />
+        <ArrowLeft color={themedColours.primaryText[theme]} width={5.5} height={11.5} />
       </Pressable>
       <View style={{ flex: 1 }}>
         <Text
@@ -36,7 +39,7 @@ const OverviewHeader = ({ week, title, day, onSave, notes }) => {
             fontSize: 11,
             textAlign: "center",
             fontFamily: "Mulish_800ExtraBold",
-            color: COLOURS.darkGreen,
+            color: themedColours.primary[theme],
           }}
         >
           {week ? "WEEK" : "DAY"} {week ? week : day}
@@ -46,7 +49,7 @@ const OverviewHeader = ({ week, title, day, onSave, notes }) => {
             fontSize: 19,
             textAlign: "center",
             fontFamily: "Mulish_700Bold",
-            color: COLOURS.nearBlack,
+            color: themedColours.primaryText[theme],
           }}
         >
           {title}
@@ -61,7 +64,7 @@ const OverviewHeader = ({ week, title, day, onSave, notes }) => {
               fontSize: 16,
               textAlign: "center",
               fontFamily: "Mulish_700Bold",
-              color: COLOURS.darkGreen,
+              color: themedColours.primary[theme],
             }}
           >
             Save

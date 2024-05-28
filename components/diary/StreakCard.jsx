@@ -4,9 +4,13 @@ import Svg, { G, Path, ClipPath, Rect, Defs } from "react-native-svg";
 import COLOURS from "../../constants/colours";
 import { addDays, isSameDay } from "date-fns";
 import { eachDayOfInterval, parseISO, formatISO } from 'date-fns';
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
+import { color } from "@rneui/base";
 
 const StreakCard = ({ diaryData }) => {
   const [streak, setStreak] = useState(0);
+  const {theme} = useColourTheme()
 
   useEffect(() => {
     // Call the fillDiaryData function when diaryData changes
@@ -71,8 +75,8 @@ const StreakCard = ({ diaryData }) => {
         <Text
           key={i}
           style={[
-            styles.streakCardNumber,
-            streak === i && styles.streakCardNumberCurrent, // Apply special styling for the current streak
+            [styles.streakCardNumber, {color: themedColours.primaryBackground[theme]}],
+            streak === i && [styles.streakCardNumberCurrent, {color: themedColours.tertiaryBackground[theme]}], // Apply special styling for the current streak
           ]}
         >
           {i}
@@ -86,8 +90,8 @@ const StreakCard = ({ diaryData }) => {
   if (streak < 3) return null;
 
   return (
-    <View style={styles.streakCardContainer}>
-      <Text style={styles.streakCardText}>You're on a streak! Keep going.</Text>
+    <View style={[styles.streakCardContainer, {backgroundColor: themedColours.primary[theme]}]}>
+      <Text style={[styles.streakCardText, {color: themedColours.tertiaryBackground[theme]}]}>You're on a streak! Keep going.</Text>
       <View style={styles.streakCardNumbersContainer}>
         {generateStreakNumbers()}
       </View>
@@ -135,7 +139,7 @@ export default StreakCard;
 
 const styles = StyleSheet.create({
   streakCardContainer: {
-    backgroundColor: COLOURS.darkGreen,
+    // backgroundColor: COLOURS.darkGreen,
     width: "100%",
     paddingVertical: 18,
     paddingHorizontal: 25,

@@ -12,10 +12,14 @@ import ArrowLeft from "../svgs/ArrowLeft";
 import { Pressable } from "react-native";
 import COLOURS from "../constants/colours";
 import AddNotes from "../screens/AddNotes";
+import { useColourTheme } from "../context/Themed";
+import { themedColours } from "../constants/themedColours";
 
 const Stack = createNativeStackNavigator();
 
 const HealthStack = () => {
+  const {theme} = useColourTheme()
+
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -25,8 +29,9 @@ const HealthStack = () => {
           headerTitleStyle: {
             fontFamily: "Mulish_700Bold",
             fontSize: 19,
-            color: COLOURS.nearBlack,
+            color: themedColours.primaryText[theme],
           },
+          headerStyle: {backgroundColor : themedColours.primaryBackground[theme]},
           headerShadowVisible: false
         }}
       />

@@ -58,6 +58,8 @@ import ContextMenu from "react-native-context-menu-view";
 import ChangeDateDropdown from "../components/me/ChangeDateDropdown";
 import { getCurrentDateLocal } from "../utils/dateHelpers";
 import Toast from "react-native-toast-message";
+import { useColourTheme } from "../context/Themed";
+import { themedColours } from "../constants/themedColours";
 
 const screenWidth = Dimensions.get("screen").width;
 
@@ -127,6 +129,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const releaseTimeoutRef = useRef(null);
+  const { theme } = useColourTheme();
 
   const handleBarPress = (datum) => {
     setSelectedX(datum.date);
@@ -248,7 +251,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
   };
 
   return (
-    <View style={{ paddingTop: insets.top, flex: 1, backgroundColor: "white" }}>
+    <View style={{ paddingTop: insets.top, flex: 1, backgroundColor: themedColours.primaryBackground[theme]}}>
       <Header
         onNavigate={() => navigation.goBack()}
         headerText={route.params.metricType || "Weight"}
@@ -273,7 +276,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
             style={{
               fontSize: 34,
               fontFamily: "Mulish_700Bold",
-              color: COLOURS.nearBlack,
+              color: themedColours.primaryText[theme],
             }}
           >
             {route.params.metricType}
@@ -288,16 +291,16 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                   alignItems: "center",
                   justifyContent: "center",
                   borderRadius: 30,
-                  backgroundColor: isImperial ? COLOURS.darkGreen : "white",
+                  backgroundColor: isImperial ? themedColours.primary[theme] : themedColours.primaryBackground[theme],
                   borderWidth: 1,
-                  borderColor: isImperial ? "transparent" : COLOURS.lightGray,
+                  borderColor: isImperial ? "transparent" : themedColours.stroke[theme],
                 }}
               >
                 <Text
                   style={{
                     fontSize: 14,
                     fontFamily: "Mulish_700Bold",
-                    color: isImperial ? "white" : COLOURS.nearBlack,
+                    color: isImperial ? themedColours.primaryBackground[theme] : themedColours.primaryText[theme],
                   }}
                 >
                   Imperial
@@ -311,16 +314,16 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                   alignItems: "center",
                   justifyContent: "center",
                   borderRadius: 30,
-                  backgroundColor: isMetric ? COLOURS.darkGreen : "white",
+                  backgroundColor: isMetric ? themedColours.primary[theme] : themedColours.primaryBackground[theme],
                   borderWidth: 1,
-                  borderColor: isMetric ? "transparent" : COLOURS.lightGray,
+                  borderColor: isMetric ? "transparent" : themedColours.stroke[theme],
                 }}
               >
                 <Text
                   style={{
                     fontSize: 14,
                     fontFamily: "Mulish_700Bold",
-                    color: isMetric ? "white" : COLOURS.nearBlack,
+                    color: isMetric ? themedColours.primaryBackground[theme] : themedColours.primaryText[theme],
                   }}
                 >
                   Metric
@@ -330,7 +333,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
           )}
           <View
             style={{
-              backgroundColor: COLOURS.darkGreen,
+              backgroundColor: themedColours.primary[theme],
               height: 480,
               // flex: 1,
               borderRadius: 20,
@@ -340,7 +343,20 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
             }}
           >
             {/* {emptyData && <Text style={{position: 'absolute', left: '50%', top: '50%', zIndex: 3000, color: 'yellow', fontSize: 20}}>HELLLLLOOO</Text>} */}
-            {isErrorGraphData && <Text style={{position: 'absolute', left: '50%', top: '50%', zIndex: 3000, color: 'yellow', fontSize: 20}}>Error</Text>}
+            {isErrorGraphData && (
+              <Text
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  top: "50%",
+                  zIndex: 3000,
+                  color: "yellow",
+                  fontSize: 20,
+                }}
+              >
+                Error
+              </Text>
+            )}
             <ChangeDateDropdown
               selectedTimeFrame={selectedTimeFrame}
               onTimeFrameChange={handleTimeFrameChange}
@@ -437,7 +453,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                   />
                 } // Use the custom label component
                 tickFormat={(date) => {
-                  if (isErrorGraphData) return ''
+                  if (isErrorGraphData) return "";
                   const d = new Date(date);
                   return `${d.toLocaleDateString("en-US", {
                     weekday: "short",
@@ -530,7 +546,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                 style={{
                   fontSize: 14,
                   fontFamily: "Mulish_700Bold",
-                  color: isLastLoggedToday ? COLOURS.nearBlack : "white",
+                  color: isLastLoggedToday ? themedColours.primaryText[theme] : "white",
                 }}
               >
                 {isLastLoggedToday ? "Update" : "Log"}

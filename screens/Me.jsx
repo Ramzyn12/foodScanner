@@ -39,13 +39,15 @@ import {
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
+import { useColourTheme } from "../context/Themed";
+import { themedColours } from "../constants/themedColours";
 
 const Me = ({ navigation }) => {
   const font = useFont(Mulish_300Light_Italic, 12);
   const bottomSheetModalRef = useRef(null);
   const scrollY = useSharedValue(0); 
   const insets = useSafeAreaInsets();
-
+  const {theme} = useColourTheme()
   const [currentMetric, setCurrentMetric] = useState(null);
 
   const handlePresentModalPress = useCallback((metricType) => {
@@ -82,7 +84,7 @@ const Me = ({ navigation }) => {
     <View
       style={{
         flex: 1,
-        backgroundColor: "white",
+        backgroundColor: themedColours.primaryBackground[theme],
         paddingTop: insets.top,
         paddingHorizontal: 20,
       }}
@@ -96,14 +98,13 @@ const Me = ({ navigation }) => {
         }}
       >
         <View style={{ width: 28 }}></View>
-
         <Animated.Text
           style={[
             {
               fontSize: 19,
               fontFamily: "Mulish_700Bold",
               textAlign: "center",
-              color: COLOURS.nearBlack,
+              color: themedColours.primaryText[theme],
             },
             animatedTextStyle,
           ]}
@@ -116,7 +117,7 @@ const Me = ({ navigation }) => {
           hitSlop={40}
           style={{ alignItems: "flex-end", paddingVertical: 20 }}
         >
-          <SettingsIconNoFill />
+          <SettingsIconNoFill color={themedColours.primaryText[theme]} />
         </Pressable>
       </View>
       <Animated.ScrollView
@@ -129,7 +130,7 @@ const Me = ({ navigation }) => {
             style={{
               fontSize: 34,
               fontFamily: "Mulish_700Bold",
-              color: COLOURS.nearBlack,
+              color: themedColours.primaryText[theme],
             }}
           >
             Me

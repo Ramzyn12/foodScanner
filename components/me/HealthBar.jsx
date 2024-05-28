@@ -1,13 +1,16 @@
 import { View, Text } from "react-native";
 import React from "react";
 import COLOURS from "../../constants/colours";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const HealthBar = ({ barType, progress, isLastLoggedToday }) => {
-  const barColour = isLastLoggedToday ? COLOURS.darkGreen : COLOURS.lightGray
+  const {theme} = useColourTheme()
+  const barColour = isLastLoggedToday ? themedColours.primary[theme] : themedColours.stroke[theme]
   return (
     <View
       style={{
-        backgroundColor: "#F7F6EF",
+        backgroundColor: themedColours.secondaryBackground[theme],
         height: 20,
         flex: 1,
         borderTopLeftRadius: barType === 'left' ? 12 : 6,

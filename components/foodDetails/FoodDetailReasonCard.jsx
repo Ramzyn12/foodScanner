@@ -4,8 +4,11 @@ import COLOURS from "../../constants/colours";
 import Flask from "../../svgs/Flask";
 import RainDrops from "../../svgs/RainDrops";
 import PalmTree from "../../svgs/PalmTree";
+import { themedColours } from "../../constants/themedColours";
+import { useColourTheme } from "../../context/Themed";
 
 const FoodDetailReasonCard = ({ type, currentFood }) => {
+  const {theme} = useColourTheme()
   let backgroundColor;
   let svg;
   let message;
@@ -47,7 +50,7 @@ const FoodDetailReasonCard = ({ type, currentFood }) => {
         style={{
           fontFamily: "Mulish_400Regular",
           fontSize: 14,
-          color: COLOURS.nearBlack,
+          color: themedColours.primaryText[theme],
         }}
       >
         {message}

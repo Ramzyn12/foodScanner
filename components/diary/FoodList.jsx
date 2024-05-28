@@ -24,6 +24,9 @@ import { useSelector } from "react-redux";
 import { Skeleton } from "moti/skeleton";
 import { getCurrentDateLocal } from "../../utils/dateHelpers";
 import Toast from "react-native-toast-message";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
+import { color } from "@rneui/base";
 
 const FoodList = ({
   diaryFoodItems,
@@ -37,6 +40,7 @@ const FoodList = ({
     useSelector((state) => state.diary.chosenDate) || getCurrentDateLocal();
   const [isFasting, setIsFasting] = useState(false);
   const [isLoadingFasted, setIsLoadingFasted] = useState(false);
+  const { theme } = useColourTheme();
 
   const numberOfItems =
     diaryFoodItems?.consumedFoods?.length +
@@ -75,9 +79,9 @@ const FoodList = ({
     },
     onError: (err) => {
       Toast.show({
-        type: 'customErrorToast',
-        text1: 'Failed to delete food, please try again later'
-      })
+        type: "customErrorToast",
+        text1: "Failed to delete food, please try again later",
+      });
     },
   });
 
@@ -95,9 +99,9 @@ const FoodList = ({
     onError: (err, variables, context) => {
       setIsFasting(context?.previousState?.fastedState); // Rollback to previous state
       Toast.show({
-        type: 'customErrorToast',
-        text1: 'Failed to set fasted state, please try again later'
-      })
+        type: "customErrorToast",
+        text1: "Failed to set fasted state, please try again later",
+      });
     },
   });
 
@@ -151,7 +155,11 @@ const FoodList = ({
           {Array.from({ length: 3 }, (_, index) => (
             <Skeleton
               key={index}
-              colors={["#F5F5F5", COLOURS.lightGray, "#F5F5F5"]} // Custom colors for the skeleton
+              colors={[
+                themedColours.secondaryBackground[theme],
+                themedColours.stroke[theme],
+                themedColours.secondaryBackground[theme],
+              ]} // Custom colors for the skeleton
               height={65} // Approximate height of your list items
               width="100%"
               radius={20}
@@ -167,7 +175,12 @@ const FoodList = ({
     <View
       style={[
         styles.foodListContainer,
-        { borderTopLeftRadius: 20, borderTopRightRadius: 20 },
+        {
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+          backgroundColor: themedColours.primaryBackground[theme],
+          borderColor: themedColours.stroke[theme],
+        },
       ]}
     >
       {numberOfItems > 0 && (
@@ -178,7 +191,7 @@ const FoodList = ({
             paddingTop: 5,
             fontFamily: "Mulish_700Bold",
             fontSize: 14,
-            color: COLOURS.nearBlack,
+            color: themedColours.primaryText[theme],
           }}
         >
           {itemsString}
@@ -241,8 +254,15 @@ const FoodList = ({
 
       {emptyFoodList && !isFasting && (
         <View style={styles.emptyListContainer}>
-          <FruitBowlIcon />
-          <Text style={styles.emptyListText}>Add food to get started</Text>
+          <FruitBowlIcon color={themedColours.secondaryText[theme]} />
+          <Text
+            style={[
+              styles.emptyListText,
+              { color: themedColours.secondaryText[theme] },
+            ]}
+          >
+            Add food to get started
+          </Text>
         </View>
       )}
       {/* More food button */}
@@ -260,13 +280,19 @@ const FoodList = ({
           <Text
             style={{
               fontSize: 14,
-              color: COLOURS.nearBlack,
+              color: themedColours.primaryText[theme],
               fontFamily: "Mulish_700Bold",
             }}
           >
             I'm fasting today
           </Text>
-          <Switch value={isFasting} onValueChange={handleValueChange} />
+          <Switch
+            thumbColor={themedColours.primaryBackground[theme]}
+            ios_backgroundColor={themedColours.fillSecondary[theme]}
+            trackColor={{ true: themedColours.primary[theme] }}
+            value={isFasting}
+            onValueChange={handleValueChange}
+          />
         </View>
       )}
     </View>

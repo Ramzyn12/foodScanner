@@ -4,10 +4,12 @@ import COLOURS from "../../constants/colours";
 import { useSelector } from "react-redux";
 import PalmTree from "../../svgs/PalmTree";
 import CarIcon from "../../svgs/CarIcon";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const FoodDetailsEnvironment = () => {
   const currentFood = useSelector((state) => state.food.currentFood);
-  
+  const {theme} = useColourTheme()
   if (!currentFood.co2Footprint) return null
 
   return (
@@ -16,7 +18,7 @@ const FoodDetailsEnvironment = () => {
         marginTop: 20,
         padding: 20,
         borderWidth: 1,
-        borderColor: COLOURS.lightGray,
+        borderColor: themedColours.stroke[theme],
         borderRadius: 20,
         gap: 20,
       }}
@@ -29,7 +31,7 @@ const FoodDetailsEnvironment = () => {
             alignItems: "flex-start",
           }}
         >
-          <Text style={{ fontSize: 19, fontFamily: "Mulish_700Bold" }}>
+          <Text style={{ fontSize: 19, fontFamily: "Mulish_700Bold", color: themedColours.primaryText[theme] }}>
             Environment
           </Text>
           {currentFood.ecoscore && <View
@@ -56,7 +58,7 @@ const FoodDetailsEnvironment = () => {
           style={{
             fontSize: 14,
             fontFamily: "Mulish_700Bold",
-            color: "#636566",
+            color: themedColours.secondaryText[theme],
           }}
         >
           How this affects the environment
@@ -65,13 +67,13 @@ const FoodDetailsEnvironment = () => {
       {currentFood.hasPalmOil &&<View
         style={{ flexDirection: "row", gap: 14, alignContent: "flex-start" }}
       >
-        <PalmTree />
+        <PalmTree color={themedColours.primaryText[theme]} />
         <View style={{ gap: 8, flex: 1 }}>
           <Text
             style={{
               fontSize: 16,
               fontFamily: "Mulish_700Bold",
-              color: COLOURS.nearBlack,
+              color: themedColours.primaryText[theme],
             }}
           >
             Contains Palm Oil
@@ -80,7 +82,7 @@ const FoodDetailsEnvironment = () => {
             style={{
               fontSize: 14,
               fontFamily: "Mulish_400Regular",
-              color: "#636566",
+              color: themedColours.secondaryText[theme],
             }}
           >
             Tropical forests in Asia, Africa and Latin America are destroyed to
@@ -93,13 +95,13 @@ const FoodDetailsEnvironment = () => {
       {currentFood.co2Footprint[0] && <View
         style={{ flexDirection: "row", gap: 14, alignContent: "flex-start" }}
       >
-        <CarIcon />
+        <CarIcon color={themedColours.primaryText[theme]} />
         <View style={{ gap: 8, flex: 1 }}>
           <Text
             style={{
               fontSize: 16,
               fontFamily: "Mulish_700Bold",
-              color: COLOURS.nearBlack,
+              color: themedColours.primaryText[theme],
             }}
           >
             Carbon Footprint
@@ -108,7 +110,7 @@ const FoodDetailsEnvironment = () => {
             style={{
               fontSize: 14,
               fontFamily: "Mulish_400Regular",
-              color: "#636566",
+              color: themedColours.secondaryText[theme],
             }}
           >
             {`Producing this product generates ${currentFood.co2Footprint[0]} which is equivalent ${currentFood.co2Footprint[1].slice(6)}`}

@@ -13,12 +13,15 @@ import { updateHealthMetric } from "../../axiosAPI/healthMetricAPI";
 import WeightInput from "./WeightInput";
 import { getAnyDateLocal, getCurrentDateLocal } from "../../utils/dateHelpers";
 import Toast from "react-native-toast-message";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const LogModal = forwardRef(({ onClose, metricType, date }, ref) => {
   const isWeight = metricType === "Weight";
   const [value, setValue] = useState(0);
   const [weightValue, setWeightValue] = useState("");
   const [weightUnit, setWeightUnit] = useState("imperial");
+  const {theme} = useColourTheme()
   const question =
     metricType === "Weight"
       ? `What's your weight today?`
@@ -31,7 +34,7 @@ const LogModal = forwardRef(({ onClose, metricType, date }, ref) => {
   const renderBackdrop = useCallback((props) => {
     return (
       <BottomSheetBackdrop
-        {...props}
+      {...props}
         appearsOnIndex={0}
         disappearsOnIndex={-1}
       />
@@ -67,6 +70,7 @@ const LogModal = forwardRef(({ onClose, metricType, date }, ref) => {
   return (
     <BottomSheetModal
       ref={ref}
+      backgroundStyle={{backgroundColor: themedColours.primaryBackground[theme]}}
       backdropComponent={renderBackdrop}
       enablePanDownToClose={true}
       snapPoints={[390]}
@@ -74,19 +78,19 @@ const LogModal = forwardRef(({ onClose, metricType, date }, ref) => {
       // enableDynamicSizing={true}
       handleStyle={{ display: "none" }}
     >
-      <BottomSheetView>
+      <BottomSheetView >
         <Pressable
           onPress={onClose}
           style={{ position: "absolute", top: 14, right: 14, zIndex: 3000 }}
         >
-          <ClearIcon size={28} />
+          <ClearIcon crossColor={themedColours.secondaryText[theme]} background={themedColours.secondaryBackground[theme]} size={28} />
         </Pressable>
         <BottomSheetView style={{ padding: 20, gap: 10 }}>
           <Text
             style={{
               fontSize: 34,
               fontFamily: "Mulish_700Bold",
-              color: COLOURS.nearBlack,
+              color: themedColours.primaryText[theme],
             }}
           >
             {metricType}
@@ -95,7 +99,7 @@ const LogModal = forwardRef(({ onClose, metricType, date }, ref) => {
             style={{
               fontSize: 14,
               fontFamily: "Mulish_700Bold",
-              color: "#636566",
+              color: themedColours.secondaryText[theme],
             }}
           >
             {question}
@@ -133,7 +137,7 @@ const LogModal = forwardRef(({ onClose, metricType, date }, ref) => {
               alignItems: "center",
               justifyContent: "center",
               borderRadius: 12,
-              backgroundColor: COLOURS.darkGreen,
+              backgroundColor: themedColours.primary[theme],
             }}
           >
             <Text

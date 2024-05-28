@@ -16,6 +16,8 @@ import DayAccordian from "../components/WeeklyOverview/DayAccordian";
 import { useQuery } from "@tanstack/react-query";
 import { getTimelineWeek } from "../axiosAPI/timelineAPI";
 import LoadingWeeklyOverview from "../components/WeeklyOverview/LoadingWeeklyOverview";
+import { useColourTheme } from "../context/Themed";
+import { themedColours } from "../constants/themedColours";
 
 const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
 <g clip-path="url(#clip0_1126_4878)">
@@ -48,7 +50,7 @@ const data = {
 const WeeklyOverview = ({ route }) => {
   const insets = useSafeAreaInsets();
   const week = route.params.week;
-
+  const {theme} = useColourTheme()
   const {
     data: weekData,
     isLoading,
@@ -68,7 +70,7 @@ const WeeklyOverview = ({ route }) => {
     );
 
   return (
-    <View style={{ paddingTop: insets.top, flex: 1, backgroundColor: "white" }}>
+    <View style={{ paddingTop: insets.top, flex: 1, backgroundColor: themedColours.primaryBackground[theme] }}>
       <OverviewHeader week={week} title={route.params.title} />
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* UPPER */}
@@ -79,7 +81,7 @@ const WeeklyOverview = ({ route }) => {
                 marginBottom: 2,
                 fontSize: 11,
                 fontFamily: "Mulish_800ExtraBold",
-                color: COLOURS.darkGreen,
+                color: themedColours.primary[theme],
               }}
             >
               WEEK {week}
@@ -89,22 +91,14 @@ const WeeklyOverview = ({ route }) => {
                 marginBottom: 14,
                 fontSize: 34,
                 fontFamily: "Mulish_700Bold",
-                color: COLOURS.nearBlack,
+                color: themedColours.primaryText[theme],
               }}
             >
               {weekData?.timelineWeek?.title}
             </Text>
-            <DaysLeftCard week={week} daysPassed={weekData?.daysPassed} />
+            <DaysLeftCard week={week} description={weekData?.timelineWeek?.description} daysPassed={weekData?.daysPassed} />
             {/* Description */}
-            <Text
-              style={{
-                fontSize: 14,
-                fontFamily: "Mulish_400Regular",
-                color: COLOURS.nearBlack,
-              }}
-            >
-              {weekData?.timelineWeek?.description}
-            </Text>
+            
           </View>
           {/* ACCORDIANS */}
           <View style={{ gap: 20 }}>

@@ -12,11 +12,13 @@ import {
 } from "../../redux/grocerySlice";
 import UnmarkIcon from "../../svgs/UnmarkIcon";
 import Toast from "react-native-toast-message";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const UnmarkButton = () => {
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
-
+  const {theme} = useColourTheme()
   const unMarkMutation = useMutation({
     mutationFn: uncheckAllItems,
     onSettled: () => {
@@ -49,9 +51,9 @@ const UnmarkButton = () => {
   };
 
   return (
-    <Pressable onPress={handleUnselectAll} style={styles.container}>
-      <UnmarkIcon />
-      <Text style={styles.buttonText}>Unmark all</Text>
+    <Pressable onPress={handleUnselectAll} style={[styles.container, {borderColor: themedColours.stroke[theme]}]}>
+      <UnmarkIcon color={themedColours.primaryText[theme]} />
+      <Text style={[styles.buttonText, {color: themedColours.primaryText[theme]}]}>Unmark all</Text>
     </Pressable>
   );
 };

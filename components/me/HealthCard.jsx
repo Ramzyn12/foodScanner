@@ -17,6 +17,8 @@ import {
   subDays,
 } from "date-fns";
 import { getCurrentDateLocal } from "../../utils/dateHelpers";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const DATA = Array.from({ length: 31 }, (_, i) => ({
   day: i,
@@ -69,6 +71,7 @@ const getLastLoggedText = (isoDateString) => {
 const HealthCard = ({ onLog, metricType, leftLable, rightLable }) => {
   const navigation = useNavigation();
   const isWeight = metricType === "Weight";
+  const {theme} = useColourTheme()
 
   const { data, isError, error } = useQuery({
     // Better name would be getHealthMetric
@@ -87,7 +90,7 @@ const HealthCard = ({ onLog, metricType, leftLable, rightLable }) => {
       onPress={() => navigation.navigate("HealthStatInfo", { metricType })}
       style={{
         borderWidth: 1,
-        borderColor: COLOURS.lightGray,
+        borderColor: themedColours.stroke[theme],
         borderRadius: 20,
         padding: 14,
         gap: 20,
@@ -104,7 +107,7 @@ const HealthCard = ({ onLog, metricType, leftLable, rightLable }) => {
           <Text
             style={{
               fontFamily: "Mulish_700Bold",
-              color: COLOURS.nearBlack,
+              color: themedColours.primaryText[theme],
               fontSize: 16,
             }}
           >
@@ -117,7 +120,7 @@ const HealthCard = ({ onLog, metricType, leftLable, rightLable }) => {
             <Text
               style={{
                 fontFamily: "Mulish_400Regular",
-                color: "#636566",
+                color: themedColours.secondaryText[theme],
                 fontSize: 14,
               }}
             >
@@ -126,7 +129,7 @@ const HealthCard = ({ onLog, metricType, leftLable, rightLable }) => {
             <Text
               style={{
                 fontFamily: "Mulish_700Bold",
-                color: "#636566",
+                color: themedColours.secondaryText[theme],
                 fontSize: 14,
               }}
             >
@@ -142,7 +145,7 @@ const HealthCard = ({ onLog, metricType, leftLable, rightLable }) => {
               style={{
                 fontSize: 50,
                 fontFamily: "700Mulish_Bold",
-                color: COLOURS.nearBlack,
+                color: themedColours.primaryText[theme],
               }}
             >
               {data?.metricValue}
@@ -151,7 +154,7 @@ const HealthCard = ({ onLog, metricType, leftLable, rightLable }) => {
               style={{
                 fontSize: 11,
                 fontFamily: "700Mulish_Bold",
-                color: COLOURS.nearBlack,
+                color: themedColours.primaryText[theme],
               }}
             >
               {data?.unitOfMeasure}
@@ -186,7 +189,7 @@ const HealthCard = ({ onLog, metricType, leftLable, rightLable }) => {
               style={{
                 fontSize: 11,
                 fontFamily: "Mulish_700Bold",
-                color: "#636566",
+                color: themedColours.secondaryText[theme],
               }}
             >
               {leftLable}
@@ -195,7 +198,7 @@ const HealthCard = ({ onLog, metricType, leftLable, rightLable }) => {
               style={{
                 fontSize: 11,
                 fontFamily: "Mulish_700Bold",
-                color: "#636566",
+                color: themedColours.secondaryText[theme],
               }}
             >
               {rightLable}
@@ -214,10 +217,10 @@ const HealthCard = ({ onLog, metricType, leftLable, rightLable }) => {
         onPress={() => onLog(metricType)}
         style={{
           borderWidth: 1,
-          borderColor: isLastLoggedToday ? COLOURS.lightGray : "transparent",
+          borderColor: isLastLoggedToday ? themedColours.stroke[theme] : "transparent",
           backgroundColor: isLastLoggedToday
             ? "transparent"
-            : COLOURS.darkGreen,
+            : themedColours.primary[theme],
           height: 44,
           alignItems: "center",
           justifyContent: "center",
@@ -228,7 +231,7 @@ const HealthCard = ({ onLog, metricType, leftLable, rightLable }) => {
           style={{
             fontSize: 14,
             fontFamily: "Mulish_700Bold",
-            color: isLastLoggedToday ? COLOURS.nearBlack : "white",
+            color: isLastLoggedToday ? themedColours.primaryText[theme] : "white",
           }}
         >
           {isLastLoggedToday ? "Update" : "Log"}
@@ -266,7 +269,7 @@ export const StockChart = ({
           path={linePath}
           style="stroke"
           strokeWidth={4}
-          color={lineColour || COLOURS.darkGreen}
+          color={lineColour || themedColours.primary[theme]}
         />
       </Group>
     </>

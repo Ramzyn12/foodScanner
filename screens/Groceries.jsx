@@ -25,8 +25,11 @@ import TopActions from "../components/groceries/TopActions";
 import FoodDetails from "./FoodDetails";
 import { useGrocerySortPreference } from "../hooks/useGrocerySortPreference";
 import LoadingGroceries from "../components/groceries/LoadingGroceries";
+import { useColourTheme } from "../context/Themed";
+import { themedColours } from "../constants/themedColours";
 
 const Groceries = ({ navigation }) => {
+  const {theme} = useColourTheme()
   const currentGroceries = useSelector(
     (state) => state.grocery.currentGroceries
   );
@@ -47,7 +50,7 @@ const Groceries = ({ navigation }) => {
   if (isError) return <Text>Couldnt fetch grocery list</Text>
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, {backgroundColor: themedColours.primaryBackground[theme]}]}>
       {(data?.groceries?.length == 0 || !data) && (
         <EmptyGroceries onPress={handleAddFirstItem} />
       )}
@@ -60,7 +63,7 @@ const Groceries = ({ navigation }) => {
               horizontal={true}
               scrollEnabled={anyChecked}
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.buttonsContainer}
+              contentContainerStyle={[styles.buttonsContainer, {borderBottomColor: themedColours.stroke[theme]}]}
             >
               <SortButton onPress={handleSortPress} />
               {anyChecked && <UnmarkButton />}

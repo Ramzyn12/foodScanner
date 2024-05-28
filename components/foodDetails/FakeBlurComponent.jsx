@@ -8,6 +8,7 @@ import COLOURS from "../../constants/colours";
 import Flask from "../../svgs/Flask";
 
 const FakeBlurComponent = ({ processedState }) => {
+  // not in use anymore
   const background = processedState === "Processed" ? "#FAD8D5" : "#CAE2C3";
   const [isReduceTransparencyEnabled, setIsReduceTransparencyEnabled] =
     useState(false);

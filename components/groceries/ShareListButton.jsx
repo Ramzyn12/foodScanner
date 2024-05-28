@@ -6,11 +6,14 @@ import ShareIcon from "../../svgs/ShareIcon";
 import { useSelector } from "react-redux";
 import Share from "react-native-share"; // Step 1: Import Share from react-native-share
 import Toast from "react-native-toast-message";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const ShareList = () => {
   const currentGroceries = useSelector(
     (state) => state.grocery.currentGroceries
   );
+  const {theme} = useColourTheme()
 
   const shareGroceries = async () => {
     const bulletPoint = "\u2022"; // Unicode character for a bullet point
@@ -39,9 +42,9 @@ const ShareList = () => {
   };
 
   return (
-    <Pressable style={styles.container} onPress={shareGroceries}>
-      <ShareIcon />
-      <Text style={styles.buttonText}>Share List</Text>
+    <Pressable style={[styles.container, {borderColor: themedColours.stroke[theme]}]} onPress={shareGroceries}>
+      <ShareIcon colour={themedColours.primaryText[theme]} />
+      <Text style={[styles.buttonText, {color: themedColours.primaryText[theme]}]}>Share List</Text>
     </Pressable>
   );
 };
@@ -54,7 +57,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     gap: 8,
     borderWidth: 1,
-    borderColor: COLOURS.lightGray,
     borderRadius: 30,
     flexDirection: "row",
     alignItems: "center",

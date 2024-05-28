@@ -1,8 +1,10 @@
 import { View, Text } from "react-native";
 import React from "react";
 import WeekOverviewLines from "./WeekOverviewLines";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
-const DaysLeftCard = ({ week, daysPassed }) => {
+const DaysLeftCard = ({ week, daysPassed, description }) => {
   const getdaysPassedForWeek = (week, daysSinceStart) => {
     const daysPassed = daysSinceStart - (week - 1) * 7;
 
@@ -15,7 +17,8 @@ const DaysLeftCard = ({ week, daysPassed }) => {
     }
   };
 
-  const day = getdaysPassedForWeek(week, daysPassed) 
+  const day = getdaysPassedForWeek(week, daysPassed);
+  const { theme } = useColourTheme();
 
   return (
     <View
@@ -23,7 +26,7 @@ const DaysLeftCard = ({ week, daysPassed }) => {
         padding: 20,
         marginBottom: 14,
         gap: 14,
-        backgroundColor: "#F7F6EF",
+        backgroundColor: themedColours.tertiaryBackground[theme],
         borderRadius: 20,
       }}
     >
@@ -32,7 +35,7 @@ const DaysLeftCard = ({ week, daysPassed }) => {
           style={{
             fontSize: 11,
             fontFamily: "Mulish_800ExtraBold",
-            color: "#636566",
+            color: themedColours.secondaryText[theme],
           }}
         >
           DAY {daysPassed < week * 7 ? daysPassed + 1 : week * 7}
@@ -41,13 +44,22 @@ const DaysLeftCard = ({ week, daysPassed }) => {
           style={{
             fontSize: 11,
             fontFamily: "Mulish_800ExtraBold",
-            color: "#636566",
+            color: themedColours.secondaryText[theme],
           }}
         >
-          {7 - day > 0 ? `${7 - day} days remaining` : 'Completed'}
+          {7 - day > 0 ? `${7 - day} days remaining` : "Completed"}
         </Text>
       </View>
       <WeekOverviewLines daysFinished={day + 1} />
+      <Text
+        style={{
+          fontSize: 14,
+          fontFamily: "Mulish_400Regular",
+          color: themedColours.primaryText[theme],
+        }}
+      >
+        {description}
+      </Text>
     </View>
   );
 };

@@ -17,21 +17,23 @@ import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import ClearIcon from "../../svgs/ClearIcon";
 import unknown from "../../assets/unknown.webp";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const FoodDetailsSimpleInfo = ({ foodItem, expectedId }) => {
   const navigation = useNavigation();
-
+  const {theme} = useColourTheme()
   const currentFood = useSelector((state) => state.food.currentFood);
   const processedState = currentFood?.processedState;
   const isUnknown = processedState === 'Unknown'
   const [modalVisible, setModalVisible] = useState(false);
   const background =
-  isUnknown ? '#F5F5F5' : 
+  isUnknown ? themedColours.secondaryBackground[theme] : 
     processedState === "Processed"
       ? COLOURS.badFoodBackground
       : COLOURS.greatFoodBackground;
   const textColour =
-  isUnknown ? '#636566' :
+  isUnknown ? themedColours.secondaryText[theme] :
     processedState === "Processed"
       ? COLOURS.badFoodText
       : COLOURS.greatFoodText;
@@ -48,8 +50,8 @@ const FoodDetailsSimpleInfo = ({ foodItem, expectedId }) => {
           />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
-          <Text style={styles.foodSupplierText}>{currentFood?.brand}</Text>
-          <Text style={styles.foodNameText}>{currentFood?.name}</Text>
+          <Text style={[styles.foodSupplierText, {color: themedColours.secondaryText[theme]}]}>{currentFood?.brand}</Text>
+          <Text style={[styles.foodNameText, {color: themedColours.primaryText[theme]}]}>{currentFood?.name}</Text>
           <View
             style={[styles.scoreBackground, { backgroundColor: background }]}
           >
@@ -63,7 +65,7 @@ const FoodDetailsSimpleInfo = ({ foodItem, expectedId }) => {
           style={{ alignSelf: "flex-start" }}
           onPress={() => navigation.goBack()}
         >
-          <ClearIcon size={28} />
+          <ClearIcon background={themedColours.secondaryBackground[theme]} crossColor={themedColours.secondaryText[theme]} size={28} />
         </Pressable>
       </View>
       <FoodDetailsButtons expectedId={expectedId} />

@@ -7,6 +7,8 @@ import GreenIvyTwo from "../../svgs/GreenIvyTwo";
 import GreenIvyThree from "../../svgs/GreenIvyThree";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 
 const angle = 109;
@@ -23,6 +25,8 @@ const end = {
 
 const ProBanner = () => {
   const navigation = useNavigation();
+  const {theme} = useColourTheme()
+
   return (
     <Pressable
       onPress={() => navigation.navigate("Paywall")}
@@ -31,7 +35,7 @@ const ProBanner = () => {
         height: 93,
         flexDirection: "row",
         gap: 16,
-        backgroundColor: COLOURS.lightGreen,
+        backgroundColor: themedColours.tertiaryBackground[theme],
         borderRadius: 12,
         alignItems: "center",
         paddingHorizontal: 40,
@@ -62,7 +66,7 @@ const ProBanner = () => {
           style={{
             fontSize: 19,
             fontFamily: "Mulish_700Bold",
-            color: COLOURS.nearBlack,
+            color: themedColours.primaryText[theme],
           }}
         >
           Ivy
@@ -77,11 +81,11 @@ const ProBanner = () => {
         </LinearGradient>
         </View>
         
-        <Text style={{ fontSize: 14, fontFamily: "Mulish_400Regular" }}>
+        <Text style={{ fontSize: 14, fontFamily: "Mulish_400Regular", color: themedColours.primaryText[theme] }}>
           Plans and benefits of going Pro
         </Text>
       </View>
-      <ArrowRight />
+      <ArrowRight color={themedColours.primaryText[theme]} />
       <GreenIvyOne />
       <GreenIvyTwo />
       <GreenIvyThree />
