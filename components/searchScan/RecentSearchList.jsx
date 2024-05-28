@@ -9,9 +9,12 @@ import {
 } from "../../utils/RecentsStorageHelper";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import NoRecentList from "./NoRecentList";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const RecentSearchList = () => {
   const [recentList, setRecentList] = useState([]);
+  const {theme} = useColourTheme()
   const navigation = useNavigation();
 
   useFocusEffect(
@@ -50,7 +53,7 @@ const RecentSearchList = () => {
   return (
     <>
       <View style={styles.container}>
-        <Text style={styles.recentText}>Recent</Text>
+        <Text style={[styles.recentText, {color: themedColours.primaryText[theme]}]}>Recent</Text>
         {/* <Pressable onPress={handleClearRecent}>
           <Text style={{fontFamily: 'Mulish_500Medium'}}>Clear</Text>
         </Pressable> */}
@@ -61,14 +64,13 @@ const RecentSearchList = () => {
         keyboardShouldPersistTaps={"always"}
       >
         <BottomSheetView style={styles.foodListContainer}>
-          {recentList.length === 0 && <Text>Need to add recents...</Text>}
           {recentList.length > 0 &&
             recentList.map((item) => (
               <Pressable
                 onPress={() => handleListItemPress(item)}
                 key={item.image_url + item.name}
               >
-                <View style={styles.foodListItemContainer}>
+                <View style={[styles.foodListItemContainer, {borderBottomColor: themedColours.stroke[theme]}]}>
                   <FoodListItem foodItem={item} />
                 </View>
               </Pressable>
@@ -89,8 +91,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   foodListContainer: {
-    borderTopWidth: 2,
-    borderTopColor: "white",
+    // borderTopWidth: 2,
+    // borderTopColor: "white",
     marginBottom: 80,
   },
   foodListItemContainer: {

@@ -3,14 +3,17 @@ import React from "react";
 import COLOURS from "../../constants/colours";
 import ArrowRight from "../../svgs/ArrowRight";
 import SingleSource from "./SingleSource";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const Sources = () => {
+  const {theme} = useColourTheme()
   return (
     <View
       style={{
         padding: 20,
         gap: 20,
-        backgroundColor: "#F5F5F5",
+        backgroundColor: themedColours.secondaryBackground[theme],
         borderRadius: 20,
       }}
     >
@@ -18,7 +21,7 @@ const Sources = () => {
         style={{
           fontSize: 19,
           fontFamily: "Mulish_700Bold",
-          color: COLOURS.nearBlack,
+          color: themedColours.primaryText[theme],
         }}
       >
         Sources

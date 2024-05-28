@@ -251,7 +251,13 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
   };
 
   return (
-    <View style={{ paddingTop: insets.top, flex: 1, backgroundColor: themedColours.primaryBackground[theme]}}>
+    <View
+      style={{
+        paddingTop: insets.top,
+        flex: 1,
+        backgroundColor: themedColours.primaryBackground[theme],
+      }}
+    >
       <Header
         onNavigate={() => navigation.goBack()}
         headerText={route.params.metricType || "Weight"}
@@ -291,16 +297,22 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                   alignItems: "center",
                   justifyContent: "center",
                   borderRadius: 30,
-                  backgroundColor: isImperial ? themedColours.primary[theme] : themedColours.primaryBackground[theme],
+                  backgroundColor: isImperial
+                    ? themedColours.primary[theme]
+                    : themedColours.primaryBackground[theme],
                   borderWidth: 1,
-                  borderColor: isImperial ? "transparent" : themedColours.stroke[theme],
+                  borderColor: isImperial
+                    ? "transparent"
+                    : themedColours.stroke[theme],
                 }}
               >
                 <Text
                   style={{
                     fontSize: 14,
                     fontFamily: "Mulish_700Bold",
-                    color: isImperial ? themedColours.primaryBackground[theme] : themedColours.primaryText[theme],
+                    color: isImperial
+                      ? themedColours.primaryBackground[theme]
+                      : themedColours.primaryText[theme],
                   }}
                 >
                   Imperial
@@ -314,16 +326,22 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                   alignItems: "center",
                   justifyContent: "center",
                   borderRadius: 30,
-                  backgroundColor: isMetric ? themedColours.primary[theme] : themedColours.primaryBackground[theme],
+                  backgroundColor: isMetric
+                    ? themedColours.primary[theme]
+                    : themedColours.primaryBackground[theme],
                   borderWidth: 1,
-                  borderColor: isMetric ? "transparent" : themedColours.stroke[theme],
+                  borderColor: isMetric
+                    ? "transparent"
+                    : themedColours.stroke[theme],
                 }}
               >
                 <Text
                   style={{
                     fontSize: 14,
                     fontFamily: "Mulish_700Bold",
-                    color: isMetric ? themedColours.primaryBackground[theme] : themedColours.primaryText[theme],
+                    color: isMetric
+                      ? themedColours.primaryBackground[theme]
+                      : themedColours.primaryText[theme],
                   }}
                 >
                   Metric
@@ -335,11 +353,8 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
             style={{
               backgroundColor: themedColours.primary[theme],
               height: 480,
-              // flex: 1,
               borderRadius: 20,
               paddingVertical: 10,
-              // alignItems: 'center',
-              // justifyContent: 'center'
             }}
           >
             {/* {emptyData && <Text style={{position: 'absolute', left: '50%', top: '50%', zIndex: 3000, color: 'yellow', fontSize: 20}}>HELLLLLOOO</Text>} */}
@@ -401,7 +416,8 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                   style={{
                     axis: { stroke: "transparent" }, // Hides the axis line
                     tickLabels: {
-                      fill: "rgba(255, 255, 255, 0.40)",
+                      fill: themedColours.primaryBackground[theme],
+                      opacity: 0.4,
                       fontSize: 11,
                       fontFamily: "Mulish_700Bold",
                     },
@@ -419,7 +435,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                   y={225}
                   textAnchor="middle"
                   style={{
-                    fill: "#ffffff", // Assuming a dark chart background
+                    fill: themedColours.primaryBackground[theme], // Assuming a dark chart background
                     fontSize: 20,
                     fontFamily: "Mulish_700Bold",
                   }}
@@ -440,12 +456,14 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                     lineHeight={1.4} // Adjust the line height to control spacing
                     style={[
                       {
-                        fill: "rgba(255, 255, 255, 0.80)",
+                        fill: themedColours.primaryBackground[theme],
+                        opacity: 0.8,
                         fontSize: 11,
                         fontFamily: "Mulish_700Bold",
                       },
                       {
-                        fill: "rgba(255, 255, 255, 0.60)",
+                        fill: themedColours.primaryBackground[theme],
+                        opacity: 0.6,
                         fontSize: 10,
                         fontFamily: "Mulish_500Medium",
                       },
@@ -465,50 +483,25 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                 x="date"
                 name="bar1"
                 y="metricValue"
-                // y={(datum) => {
-                //   return datum.metricValue || 0;
-                // }}
                 style={{
                   data: {
-                    fill: ({ datum }) =>
-                      datum.date === selectedX ? "#FFFFFF" : "#FFFFFF14",
+                    opacity: ({ datum }) =>
+                      datum.date === selectedX ? 1 : 0.2,
+                    fill: themedColours.primaryBackground[theme],
                   },
                 }}
                 cornerRadius={{
                   top: ({ barWidth, datum }) => {
-                    // if (datum.metricValue !== 0) {
-                    //   return barWidth / 2;
-                    // }
-                    // return 5;
                     return Math.floor(barWidth / 2);
                   },
                 }}
               />
-              {/* {selectedX && (
-                <VictoryLine
-                  style={{
-                    data: {
-                      stroke: "#FFFFFF80",
-                      strokeWidth: 2,
-                      strokeDasharray: "5,5",
-                    },
-                  }}
-                  data={[
-                    { x: selectedX, y: 0 },
-                    {
-                      x: selectedX,
-                      y: Math.max(...adjustedData.map((d) => d.metricValue)),
-                    },
-                  ]}
-                />
-              )} */}
             </VictoryChart>
           </View>
           <View style={{ gap: 14 }}>
-            <Text style={{ fontSize: 17, fontFamily: "Mulish_600SemiBold" }}>
+            <Text style={{ fontSize: 17, fontFamily: "Mulish_600SemiBold", color: themedColours.primaryText[theme] }}>
               {question}
             </Text>
-
             {route.params.metricType === "Weight" && (
               <WeightInput
                 weightUnit={weightUnit}
@@ -531,11 +524,11 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
               style={{
                 borderWidth: 1,
                 borderColor: isLastLoggedToday
-                  ? COLOURS.lightGray
+                  ? themedColours.stroke[theme]
                   : "transparent",
                 backgroundColor: isLastLoggedToday
                   ? "transparent"
-                  : COLOURS.darkGreen,
+                  : themedColours.primary[theme],
                 height: 44,
                 alignItems: "center",
                 justifyContent: "center",
@@ -546,7 +539,9 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                 style={{
                   fontSize: 14,
                   fontFamily: "Mulish_700Bold",
-                  color: isLastLoggedToday ? themedColours.primaryText[theme] : "white",
+                  color: isLastLoggedToday
+                    ? themedColours.primaryText[theme]
+                    : "white",
                 }}
               >
                 {isLastLoggedToday ? "Update" : "Log"}

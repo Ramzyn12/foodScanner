@@ -79,9 +79,10 @@ const HealthSlider = ({ value, setValue, metricType }) => {
           width: valueBoxSize,
           height: valueBoxSize,
           position: "absolute",
-          borderWidth: 1,
-          borderColor: themedColours.stroke[theme],
+          // borderWidth: 1,
+          // borderColor: themedColours.stroke[theme],
           borderRadius: 12,
+          backgroundColor: themedColours.primary[theme],
           alignItems: "center",
           justifyContent: "center",
           bottom: 80,
@@ -95,7 +96,7 @@ const HealthSlider = ({ value, setValue, metricType }) => {
         <Text
           style={{
             fontSize: valueTextSize,
-            color: themedColours.secondaryText[theme],
+            color: 'white',
             fontFamily: "Mulish_700Bold",
           }}
         >

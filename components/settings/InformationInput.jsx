@@ -2,8 +2,11 @@ import { View, Text } from "react-native";
 import React from "react";
 import { TextInput } from "react-native";
 import COLOURS from "../../constants/colours";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const InformationInput = ({ inputText, defaultValue }) => {
+  const {theme} = useColourTheme()
   return (
     <View
       style={{
@@ -11,7 +14,7 @@ const InformationInput = ({ inputText, defaultValue }) => {
         height: 58,
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: COLOURS.lightGray,
+        borderColor: themedColours.stroke[theme],
         padding: 18,
         gap: 6,
         justifyContent: "center",
@@ -21,14 +24,14 @@ const InformationInput = ({ inputText, defaultValue }) => {
         style={{
           fontSize: 11,
           fontFamily: "Mulish_700Bold",
-          color: COLOURS.nearBlack,
+          color: themedColours.primaryText[theme],
         }}
       >
         {inputText}
       </Text>
       <TextInput
         readOnly
-        style={{ fontFamily: "Mulish_400Regular", fontSize: 14, color: '#636566' }}
+        style={{ fontFamily: "Mulish_400Regular", fontSize: 14, color: themedColours.secondaryText[theme] }}
         defaultValue={defaultValue}
       />
     </View>

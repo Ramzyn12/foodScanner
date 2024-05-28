@@ -13,6 +13,7 @@ import ArrowDownShort from "../../svgs/ArrowDownShort";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme } from "../../hooks/useTheme";
 import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const storeDarkModePreference = async (preference) => {
   try {
@@ -107,15 +108,18 @@ const SettingOption = ({
           fontSize: 16,
           flex: 1,
           fontFamily: "Mulish_500Medium",
-          color: COLOURS.nearBlack,
+          color: themedColours.primaryText[theme],
         }}
       >
         {optionText}
       </Text>
-      {showArrow && <ArrowRight />}
+      {showArrow && <ArrowRight color={themedColours.primaryText[theme]} />}
       {!showArrow && !showDropdown && (
         <Switch
-          trackColor={{ true: COLOURS.darkGreen }}
+          thumbColor={themedColours.primaryBackground[theme]}
+          ios_backgroundColor={themedColours.fillSecondary[theme]}
+          trackColor={{ true: themedColours.primary[theme] }}
+          
           value={isHapticsEnabled}
           onValueChange={toggleSwitch}
         />
@@ -133,14 +137,14 @@ const SettingOption = ({
           <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
             <Text
               style={{
-                color: "#636566",
+                color: themedColours.secondaryText[theme],
                 fontSize: 15,
                 fontFamily: "Mulish_500Medium",
               }}
             >
               {themePreference}
             </Text>
-            <ArrowDownShort color={"#636566"} width={11.5} height={5.5} />
+            <ArrowDownShort color={themedColours.secondaryText[theme]} width={11.5} height={5.5} />
           </View>
         </ContextMenu>
       )}

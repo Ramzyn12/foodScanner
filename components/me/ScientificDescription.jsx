@@ -1,6 +1,8 @@
 import { View, Text } from "react-native";
 import React from "react";
 import COLOURS from "../../constants/colours";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const weightDesc = `Processed foods are engineered to be addictive, often causing you to eat more than intended. \n
 These foods quickly elevate blood sugar, leading to inevitable crashes that trigger further hunger pangs, propelling a cycle of overeating.\n 
@@ -30,6 +32,7 @@ Processed foods typically lack micro-nutrients, which are crucial for sustained 
 The absence of these nutrients and the presence of additives and preservatives in processed foods can further strain your body's energy processes.`;
 
 const ScientificDescription = ({ metricType }) => {
+  const {theme} = useColourTheme()
   const description =
     metricType === "Weight"
       ? weightDesc
@@ -44,7 +47,7 @@ const ScientificDescription = ({ metricType }) => {
       style={{
         padding: 20,
         gap: 20,
-        backgroundColor: "#F7F6EF",
+        backgroundColor: themedColours.tertiaryBackground[theme],
         borderRadius: 20,
       }}
     >
@@ -52,7 +55,7 @@ const ScientificDescription = ({ metricType }) => {
         style={{
           fontSize: 19,
           fontFamily: "Mulish_700Bold",
-          color: COLOURS.nearBlack,
+          color: themedColours.primaryText[theme],
         }}
       >
         {metricType} and processed food
@@ -61,7 +64,7 @@ const ScientificDescription = ({ metricType }) => {
         style={{
           fontSize: 16,
           fontFamily: "Mulish_500Medium",
-          color: "#636566",
+          color: themedColours.secondaryText[theme],
         }}
       >
         {description}

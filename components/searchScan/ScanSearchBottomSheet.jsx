@@ -48,6 +48,8 @@ import { fetchFoodWithSearch } from "../../axiosAPI/openFoodFactsAPI";
 import NativeSearchBar from "./NativeSearchBar";
 import LoadingSearchList from "./LoadingSearchList";
 import NoResultsSearch from "./NoResultsSearch";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const ScanSearchBottomSheet = ({ setSheetIndex }) => {
   const navigation = useNavigation();
@@ -58,6 +60,7 @@ const ScanSearchBottomSheet = ({ setSheetIndex }) => {
   const cancelButtonWidth = 55;
   const cancelBtnX = useSharedValue(-1 * cancelButtonWidth); // Start off-screen to the right
   const [search, setSearch] = useState("");
+  const {theme} = useColourTheme()
   const [triggerSearch, setTriggerSearch] = useState("");
 
   const { data: DataIvy, isLoading: isLoadingIvy, isError: isErrorIvy, error: errorIvy } = useQuery({
@@ -129,22 +132,23 @@ const ScanSearchBottomSheet = ({ setSheetIndex }) => {
       onChange={(ind) => setSheetIndex(ind)}
       animateOnMount={!reducedMotion}
       snapPoints={snapPoints}
+      backgroundStyle={{backgroundColor: themedColours.primaryBackground[theme]}}
       keyboardBehavior="extend"
       handleStyle={{ display: "none" }}
       style={styles.contentContainer}
     >
       {/* Top title and action */}
       <BottomSheetView style={styles.containerHeader}>
-        <Text style={styles.searchText}>Search</Text>
+        <Text style={[styles.searchText, {color: themedColours.primaryText[theme]}]}>Search</Text>
         <Pressable
           onPress={() => navigation.navigate("MainTabsStack")} //Or go back
-          style={styles.exitButtonContainer}
+          style={[styles.exitButtonContainer, {backgroundColor: themedColours.secondaryBackground[theme]}]}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Svg width="14" height="14" viewBox="0 0 8 8" fill="none">
+          <Svg width="12" height="12" viewBox="0 0 8 8" fill="none">
             <Path
               d="M7.52985 0.967342C7.66715 0.830049 7.66715 0.607451 7.52985 0.470158C7.39256 0.332864 7.16996 0.332864 7.03267 0.470158L4.00001 3.50282L0.967342 0.470159C0.830049 0.332865 0.607451 0.332865 0.470158 0.470159C0.332864 0.607453 0.332864 0.83005 0.470158 0.967344L3.50282 4.00001L0.47017 7.03266C0.332877 7.16995 0.332877 7.39255 0.47017 7.52984C0.607464 7.66714 0.830061 7.66714 0.967355 7.52984L4.00001 4.49719L7.03266 7.52984C7.16995 7.66714 7.39255 7.66714 7.52984 7.52984C7.66714 7.39255 7.66714 7.16995 7.52984 7.03266L4.49719 4.00001L7.52985 0.967342Z"
-              fill={COLOURS.tabUnselected}
+              fill={themedColours.secondaryText[theme]}
             />
           </Svg>
         </Pressable>

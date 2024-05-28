@@ -6,6 +6,8 @@ import SearchIcon from "../../svgs/SearchIcon";
 import { TextInput } from "react-native";
 import ClearIcon from "../../svgs/ClearIcon";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const NativeSearchBar = forwardRef(
   (
@@ -19,23 +21,24 @@ const NativeSearchBar = forwardRef(
     },
     ref // This is the ref forwarded from the parent component
   ) => {
+    const {theme} = useColourTheme()
     return (
       <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
-        <View style={[styles.inputContainer]}>
-          <SearchIcon />
+        <View style={[styles.inputContainer, {backgroundColor: themedColours.secondaryBackground[theme]}]}>
+          <SearchIcon color={themedColours.secondaryText[theme]} />
           <BottomSheetTextInput
             autoCorrect={false}
             ref={ref} // Use the forwarded ref here
-            placeholderTextColor={"#606060"}
+            placeholderTextColor={themedColours.secondaryText[theme]}
             placeholder="Search food and drink"
             onFocus={onFocus}
             // value={search} If wanna do this, need to use memo search results
             onChangeText={updateSearch}
-            style={{ flex: 1, fontSize: 17, fontFamily: "Mulish_400Regular" }}
+            style={{ flex: 1, fontSize: 17, fontFamily: "Mulish_400Regular", color: themedColours.primaryText[theme] }}
           />
           {search.length > 0 && (
             <Pressable onPress={onClearInput}>
-              <ClearIcon />
+              <ClearIcon background={themedColours.stroke[theme]} crossColor={themedColours.secondaryText[theme]} />
             </Pressable>
           )}
         </View>
@@ -45,7 +48,7 @@ const NativeSearchBar = forwardRef(
             hitSlop={{ top: 20, bottom: 20, left: 13, right: 13 }}
             onPress={onCancel}
           >
-            <Text style={styles.cancelText}>Cancel</Text>
+            <Text style={[styles.cancelText, {color: themedColours.primary[theme]}]}>Cancel</Text>
           </Pressable>
         </Animated.View>
       </View>

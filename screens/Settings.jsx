@@ -20,14 +20,16 @@ import Mail from "../svgs/Mail";
 import LoveHearts from "../svgs/LoveHearts";
 import HeartIcon from "../svgs/HeartIcon";
 import Header from "../components/settings/Header";
+import { useColourTheme } from "../context/Themed";
+import { themedColours } from "../constants/themedColours";
 const Settings = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-
+  const {theme} = useColourTheme()
   return (
     <View
       style={{
         flex: 1,
-        backgroundColor: "white",
+        backgroundColor: themedColours.primaryBackground[theme],
         paddingTop: insets.top,
         paddingBottom: insets.bottom,
       }}
@@ -36,7 +38,7 @@ const Settings = ({ navigation }) => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={{ paddingHorizontal: 20, paddingBottom: 15, gap: 13 }}>
           {/* Title */}
-          <Text style={{ fontSize: 34, fontFamily: "Mulish_700Bold" }}>
+          <Text style={{ fontSize: 34, fontFamily: "Mulish_700Bold", color: themedColours.primaryText[theme] }}>
             Settings
           </Text>
           <ProBanner />
@@ -44,7 +46,7 @@ const Settings = ({ navigation }) => {
             style={{
               fontSize: 14,
               fontFamily: "Mulish_700Bold",
-              color: COLOURS.darkGreen,
+              color: themedColours.primary[theme],
               padding: 10,
               textAlign: "center",
             }}
@@ -57,25 +59,25 @@ const Settings = ({ navigation }) => {
         <View style={{ paddingVertical: 14 }}>
           <SettingOption
             optionText="Account"
-            optionSvg={<ProfileCircle />}
+            optionSvg={<ProfileCircle color={themedColours.primaryText[theme]} />}
             showArrow={true}
             onPress={() => navigation.navigate('Account')}
           />
           <SettingOption
             optionText="Notifications"
-            optionSvg={<NotificationBell />}
+            optionSvg={<NotificationBell color={themedColours.primaryText[theme]} />}
             onPress={() => navigation.navigate('Notifications')}
             showArrow={true}
           />
           <SettingOption
             optionText="Appearance"
-            optionSvg={<Palette />}
+            optionSvg={<Palette color={themedColours.primaryText[theme]} />}
             showArrow={false}
             showDropdown={true}
           />
           <SettingOption
             optionText="Haptic Feedback"
-            optionSvg={<Vibrate />}
+            optionSvg={<Vibrate color={themedColours.primaryText[theme]} />}
             showArrow={false}
           />
         </View>
@@ -84,27 +86,27 @@ const Settings = ({ navigation }) => {
         <View style={{ paddingVertical: 14 }}>
           <SettingOption
             optionText="Invite friends & family"
-            optionSvg={<PaperPlane />}
+            optionSvg={<PaperPlane color={themedColours.primaryText[theme]} />}
             showArrow={true}
           />
           <SettingOption
             optionText="Loving Ivy? Rate us."
-            optionSvg={<Star />}
+            optionSvg={<Star color={themedColours.primaryText[theme]} />}
             showArrow={true}
           />
           <SettingOption
             optionText="Follow us on Instagram"
-            optionSvg={<Instagram />}
+            optionSvg={<Instagram color={themedColours.primaryText[theme]} />}
             showArrow={true}
           />
           <SettingOption
             optionText="Follow us on Twitter"
-            optionSvg={<Twitter />}
+            optionSvg={<Twitter color={themedColours.primaryText[theme]} />}
             showArrow={true}
           />
           <SettingOption
             optionText="Need help? Got a feature request?"
-            optionSvg={<Mail />}
+            optionSvg={<Mail color={themedColours.primaryText[theme]} />}
             showArrow={true}
           />
         </View>
@@ -116,7 +118,7 @@ const Settings = ({ navigation }) => {
             gap: 18,
           }}
         >
-          <LoveHearts />
+          <LoveHearts color={themedColours.secondaryText[theme]} />
           <View
             style={{
               flexDirection: "row",
@@ -129,17 +131,17 @@ const Settings = ({ navigation }) => {
               style={{
                 fontSize: 17,
                 fontFamily: "Mulish_600SemiBold",
-                color: "#607A8C",
+                color: themedColours.secondaryText[theme],
               }}
             >
               Made with
             </Text>
-            <HeartIcon color={"#607A8C"} width={17} height={14} />
+            <HeartIcon color={themedColours.secondaryText[theme]} width={17} height={14} />
             <Text
               style={{
                 fontSize: 17,
                 fontFamily: "Mulish_600SemiBold",
-                color: "#607A8C",
+                color: themedColours.secondaryText[theme],
               }}
             >
               in England

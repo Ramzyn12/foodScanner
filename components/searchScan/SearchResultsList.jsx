@@ -5,10 +5,12 @@ import FoodListItem from "../diary/FoodListItem";
 import COLOURS from "../../constants/colours";
 import { useNavigation } from "@react-navigation/native";
 import { useMutation } from "@tanstack/react-query";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const SearchResultsList = ({ DataOFF, DataIvy }) => {
   const navigation = useNavigation();
-
+  const {theme} = useColourTheme()
   return (
     <BottomSheetScrollView
       showsVerticalScrollIndicator={false}
@@ -36,7 +38,7 @@ const SearchResultsList = ({ DataOFF, DataIvy }) => {
               Keyboard.dismiss();
               navigation.navigate("FoodDetails", { barcodeId: item.barcode });
             }}
-            style={styles.foodListItemContainer}
+            style={[styles.foodListItemContainer, {borderBottomColor: themedColours.stroke[theme]}]}
           >
             <FoodListItem foodItem={item} />
           </Pressable>
@@ -50,8 +52,8 @@ export default SearchResultsList;
 
 const styles = StyleSheet.create({
   foodListContainer: {
-    borderTopWidth: 2,
-    borderTopColor: "white",
+    // borderTopWidth: 2,
+    // borderTopColor: "white",
     marginBottom: 80,
   },
   foodListItemContainer: {

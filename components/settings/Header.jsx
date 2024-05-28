@@ -2,8 +2,11 @@ import { View, Text, Pressable } from "react-native";
 import React from "react";
 import ArrowLeft from "../../svgs/ArrowLeft";
 import COLOURS from "../../constants/colours";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const Header = ({headerText, onNavigate}) => {
+  const {theme} = useColourTheme()
   return (
     <View
       style={{
@@ -21,13 +24,13 @@ const Header = ({headerText, onNavigate}) => {
         onPress={onNavigate}
         style={{ position: "absolute", left: 25, top: 5 }}
       >
-        <ArrowLeft width={5.5} height={11.5} />
+        <ArrowLeft color={themedColours.primaryText[theme]} width={5.5} height={11.5} />
       </Pressable>
       <Text
         style={{
           fontSize: 19,
           fontFamily: "Mulish_600SemiBold",
-          color: COLOURS.nearBlack,
+          color: themedColours.primaryText[theme],
           textAlign: "center",
           position: "relative",
         }}

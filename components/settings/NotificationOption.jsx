@@ -5,12 +5,14 @@ import ArrowDownShort from "../../svgs/ArrowDownShort";
 import COLOURS from "../../constants/colours";
 import * as Notifications from "expo-notifications";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { themedColours } from "../../constants/themedColours";
+import { useColourTheme } from "../../context/Themed";
 
 const NotificationOption = ({ title, description, time }) => {
   const [timeSet, setTimeSet] = useState(new Date(2020, 0, 1, 9, 0)); // initial time set to 09:00
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [shouldNotify, setShouldNotify] = useState(false);
-
+  const { theme } = useColourTheme();
   const handlePress = () => {
     Notifications.scheduleNotificationAsync({
       content: {
@@ -82,7 +84,9 @@ const NotificationOption = ({ title, description, time }) => {
           </Text>
         </View>
         <Switch
-          trackColor={{ true: COLOURS.darkGreen }}
+          thumbColor={themedColours.primaryBackground[theme]}
+          ios_backgroundColor={themedColours.fillSecondary[theme]}
+          trackColor={{ true: themedColours.primary[theme] }}
           value={shouldNotify}
           onValueChange={setShouldNotify}
         />
