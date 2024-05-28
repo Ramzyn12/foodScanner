@@ -5,12 +5,15 @@ import Header from "../components/settings/Header";
 import COLOURS from "../constants/colours";
 import auth from "@react-native-firebase/auth";
 import Toast from "react-native-toast-message";
+import { useColourTheme } from "../context/Themed";
+import { themedColours } from "../constants/themedColours";
 
 const UpdatePassword = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordRepeat, setNewPasswordRepeat] = useState("");
+  const {theme} = useColourTheme()
 
   const handleChangePassword = async () => {
     const user = auth().currentUser;
@@ -54,7 +57,7 @@ const UpdatePassword = ({ navigation }) => {
   };
 
   return (
-    <View style={{ paddingTop: insets.top, flex: 1, backgroundColor: "white" }}>
+    <View style={{ paddingTop: insets.top, flex: 1, backgroundColor: themedColours.primaryBackground[theme] }}>
       <Header
         onNavigate={() => navigation.goBack()}
         headerText={"Change Password"}
@@ -64,7 +67,7 @@ const UpdatePassword = ({ navigation }) => {
           style={{
             fontSize: 16,
             fontFamily: "Mulish_500Medium",
-            color: COLOURS.nearBlack,
+            color: themedColours.primaryText[theme],
             marginBottom: 8,
           }}
         >
@@ -74,16 +77,19 @@ const UpdatePassword = ({ navigation }) => {
           secureTextEntry
           autoCorrect={false}
           value={currentPassword}
+          placeholderTextColor={themedColours.secondaryText[theme]}
           onChangeText={setCurrentPassword}
-          style={styles.input}
+          style={[styles.input, {color: themedColours.primaryText[theme], borderColor: themedColours.stroke[theme]}]}
           placeholder="Current password"
         />
         <TextInput
           secureTextEntry
           autoCorrect={false}
           value={newPassword}
+          placeholderTextColor={themedColours.secondaryText[theme]}
+
           onChangeText={setNewPassword}
-          style={styles.input}
+          style={[styles.input, {color: themedColours.primaryText[theme], borderColor: themedColours.stroke[theme]}]}
           placeholder="New password"
         />
         <TextInput
@@ -91,13 +97,14 @@ const UpdatePassword = ({ navigation }) => {
           secureTextEntry
           value={newPasswordRepeat}
           onChangeText={setNewPasswordRepeat}
-          style={styles.input}
+          placeholderTextColor={themedColours.secondaryText[theme]}
+          style={[styles.input, {color: themedColours.primaryText[theme], borderColor: themedColours.stroke[theme]}]}
           placeholder="Re-enter your new Password"
         />
         <Pressable
           onPress={handleChangePassword}
           style={{
-            backgroundColor: COLOURS.darkGreen,
+            backgroundColor: themedColours.primary[theme],
             height: 44,
             justifyContent: "center",
             alignItems: "center",

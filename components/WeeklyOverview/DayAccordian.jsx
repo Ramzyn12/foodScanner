@@ -44,7 +44,7 @@ const DayAccordian = ({ dayData, day }) => {
 
   const svgWithoutTime = isSuccess ? <GreenTickCircle /> : <GreyFail color={themedColours.secondaryText[theme]} colorCross={themedColours.secondaryBackground[theme]} />;
 
-  const svg = isPresent ? <PendingClock /> : isFuture ? "" : svgWithoutTime;
+  const svg = isPresent ? <PendingClock color={themedColours.primary[theme]} /> : isFuture ? "" : svgWithoutTime;
 
   const messageWithoutTime = isSuccess
     ? "Success - no processed food"

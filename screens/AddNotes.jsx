@@ -8,6 +8,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getNote, updateNote } from "../axiosAPI/noteAPI";
 import { getAnyDateLocal } from "../utils/dateHelpers";
 import Toast from "react-native-toast-message";
+import { useColourTheme } from "../context/Themed";
+import { themedColours } from "../constants/themedColours";
 
 const AddNotes = ({ route }) => {
   const insets = useSafeAreaInsets();
@@ -16,6 +18,7 @@ const AddNotes = ({ route }) => {
   const day = route.params.day;
   const notesInputRef = useRef(null); // Create a ref for the TextInput
   const queryClient = useQueryClient();
+  const {theme} = useColourTheme()
 
   const { data, isLoading, isError, isSuccess, error } = useQuery({
     queryKey: ["Note", date],
@@ -64,7 +67,7 @@ const AddNotes = ({ route }) => {
     notesInputRef.current?.blur();
   };
 
-  if (isLoading) return <ActivityIndicator />;
+  if (isLoading) return <ActivityIndicator />; // NEED BETTER LOADING HERE?
   if (isError)
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
@@ -73,7 +76,7 @@ const AddNotes = ({ route }) => {
     );
 
   return (
-    <View style={{ paddingTop: insets.top, flex: 1, backgroundColor: "white" }}>
+    <View style={{ paddingTop: insets.top, flex: 1, backgroundColor: themedColours.primaryBackground[theme] }}>
       <OverviewHeader
         notes={notes}
         day={day}
@@ -94,11 +97,14 @@ const AddNotes = ({ route }) => {
             paddingTop: 20,
             borderRadius: 5,
             fontSize: 16,
+            color: themedColours.primaryText[theme]
           }}
           multiline
           scrollEnabled={false}
           placeholder="Enter your notes here..."
+          hitSlop={200}
           value={notes}
+          placeholderTextColor={themedColours.secondaryText[theme]}
           onChangeText={setNotes}
           textAlignVertical="top" // For better text alignment in multiline mode
         />

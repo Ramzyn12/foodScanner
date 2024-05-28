@@ -5,15 +5,18 @@ import Header from "../components/settings/Header";
 import COLOURS from "../constants/colours";
 import auth from "@react-native-firebase/auth";
 import { useEmailAuth } from "../hooks/useEmailAuth";
+import { useColourTheme } from "../context/Themed";
+import { themedColours } from "../constants/themedColours";
 
 const DeleteAccount = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const [currentPassword, setCurrentPassword] = useState("");
+  const {theme} = useColourTheme()
 
   const { handleEmailAccountDeletion } = useEmailAuth(currentPassword);
 
   return (
-    <View style={{ paddingTop: insets.top, flex: 1, backgroundColor: 'white' }}>
+    <View style={{ paddingTop: insets.top, flex: 1, backgroundColor: themedColours.primaryBackground[theme] }}>
       <Header
         onNavigate={() => navigation.goBack()}
         headerText={"Delete Account"}
@@ -23,7 +26,7 @@ const DeleteAccount = ({ navigation }) => {
           style={{
             fontSize: 16,
             fontFamily: "Mulish_500Medium",
-            color: COLOURS.nearBlack,
+            color: themedColours.primaryText[theme],
             marginBottom: 8,
           }}
         >
@@ -34,13 +37,14 @@ const DeleteAccount = ({ navigation }) => {
           autoCorrect={false}
           value={currentPassword}
           onChangeText={setCurrentPassword}
-          style={styles.input}
+          placeholderTextColor={themedColours.secondaryText[theme]}
+          style={[styles.input, {color: themedColours.primaryText[theme], borderColor: themedColours.stroke[theme]}]}
           placeholder="Current password"
         />
         <Pressable
           onPress={handleEmailAccountDeletion}
           style={{
-            backgroundColor: COLOURS.darkGreen,
+            backgroundColor: themedColours.primary[theme],
             height: 44,
             justifyContent: "center",
             alignItems: "center",

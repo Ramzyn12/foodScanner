@@ -4,7 +4,7 @@ import Svg, { G, Path, ClipPath, Rect, Defs } from "react-native-svg";
 import COLOURS from '../../constants/colours'
 
 const BenefitFactCard = () => {
-
+ // NOT IN USE
   return (
     <View style={styles.container}>
       {/* "Image" */}

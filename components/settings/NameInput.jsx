@@ -3,18 +3,20 @@ import React, { forwardRef, useState } from "react";
 import ClearIcon from "../../svgs/ClearIcon";
 import COLOURS from "../../constants/colours";
 import { TextInput } from "react-native";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const NameInput = forwardRef(({ name, setName, text }, ref) => {
   const [isNameFocused, setIsNameFocused] = useState(false);
-
+  const {theme} = useColourTheme()
   const FocusedOrNonEmptyText = isNameFocused || name;
 
   return (
     <View
       style={[
-        styles.input,
+        [styles.input, {borderColor: themedColours.stroke[theme]}],
         isNameFocused && {
-          borderColor: "black",
+          borderColor: themedColours.primaryText[theme],
         },
       ]}
     >
@@ -25,7 +27,7 @@ const NameInput = forwardRef(({ name, setName, text }, ref) => {
         }}
       >
         {FocusedOrNonEmptyText && (
-          <Text style={{ fontSize: 11, fontFamily: "Mulish_700Bold" }}>
+          <Text style={{ fontSize: 11, fontFamily: "Mulish_700Bold" , color: themedColours.primaryText[theme] }}>
             {text}
           </Text>
         )}
@@ -33,6 +35,7 @@ const NameInput = forwardRef(({ name, setName, text }, ref) => {
           onFocus={() => setIsNameFocused(true)}
           onBlur={() => setIsNameFocused(false)}
           ref={ref}
+          placeholderTextColor={themedColours.secondaryText[theme]}
           onChangeText={setName}
           value={name}
           keyboardType="ascii-capable"
@@ -47,13 +50,13 @@ const NameInput = forwardRef(({ name, setName, text }, ref) => {
               FocusedOrNonEmptyText || name.length > 0
                 ? "Mulish_500Medium"
                 : "Mulish_700Bold",
-            color: COLOURS.nearBlack,
+            color: themedColours.primaryText[theme],
           }}
         />
       </View>
       {isNameFocused && name && (
         <Pressable onPress={() => setName("")} style={{ alignSelf: "center" }}>
-          <ClearIcon />
+          <ClearIcon background={themedColours.secondaryBackground[theme]} crossColor={themedColours.secondaryText[theme]} />
         </Pressable>
       )}
     </View>

@@ -250,7 +250,7 @@ const GroceryListItem = ({ foodItem, id, onLongPress, isActive }) => {
         <Pressable onPress={handleToggleCheck}>
           <View
             style={[
-              styles.unChecked,
+              [styles.unChecked, {backgroundColor: themedColours.secondaryBackground[theme]}],
               grocery?.checked && { backgroundColor: themedColours.primary[theme] },
             ]}
           >

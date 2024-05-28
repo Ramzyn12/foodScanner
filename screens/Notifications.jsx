@@ -3,14 +3,18 @@ import React from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Header from '../components/settings/Header'
 import NotificationOption from '../components/settings/NotificationOption'
+import { useColourTheme } from '../context/Themed'
+import { themedColours } from '../constants/themedColours'
 
 const Notifications = ({navigation}) => {
   const insets = useSafeAreaInsets()
+  const {theme} = useColourTheme()
+
   return (
     <View
       style={{
         flex: 1,
-        backgroundColor: "white",
+        backgroundColor: themedColours.primaryBackground[theme],
         paddingTop: insets.top,
         paddingBottom: insets.bottom,
       }}

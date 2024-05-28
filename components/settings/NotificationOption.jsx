@@ -53,7 +53,7 @@ const NotificationOption = ({ title, description, time }) => {
   return (
     <Pressable
       onPress={handlePress}
-      style={{ backgroundColor: "#F5F5F5", borderRadius: 20 }}
+      style={{ backgroundColor: themedColours.secondaryBackground[theme], borderRadius: 20 }}
     >
       <View
         style={{
@@ -68,14 +68,14 @@ const NotificationOption = ({ title, description, time }) => {
             style={{
               fontSize: 16,
               fontFamily: "Mulish_500Medium",
-              color: COLOURS.nearBlack,
+              color: themedColours.primaryText[theme],
             }}
           >
             {title}
           </Text>
           <Text
             style={{
-              color: "#636566",
+              color: themedColours.secondaryText[theme],
               fontSize: 11,
               fontFamily: "Mulish_700Bold",
             }}
@@ -102,18 +102,18 @@ const NotificationOption = ({ title, description, time }) => {
             paddingVertical: 14,
           }}
         >
-          <Clock />
+          <Clock color={themedColours.primaryText[theme]} />
           <Text
             style={{
               flex: 1,
               fontSize: 16,
               fontFamily: "Mulish_500Medium",
-              color: COLOURS.nearBlack,
+              color: themedColours.primaryText[theme],
             }}
           >
             {formattedTime}
           </Text>
-          <ArrowDownShort />
+          <ArrowDownShort color={themedColours.primaryText[theme]} />
         </Pressable>
       )}
       {showTimePicker && (
@@ -122,6 +122,7 @@ const NotificationOption = ({ title, description, time }) => {
             value={timeSet}
             mode="time"
             display="spinner"
+            textColor={themedColours.primaryText[theme]}
             onChange={handleTimeChange}
             style={{ alignItems: "flex-start" }}
           />
@@ -129,10 +130,10 @@ const NotificationOption = ({ title, description, time }) => {
             onPress={handleSaveTime}
             style={{
               height: 44,
-              backgroundColor: COLOURS.darkGreen,
+              backgroundColor: themedColours.primary[theme],
               justifyContent: "center",
               alignItems: "center",
-              borderRadius: 20,
+              borderRadius: 10,
             }}
           >
             <Text

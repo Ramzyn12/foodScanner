@@ -14,6 +14,8 @@ import { useAppleAuth } from "../hooks/useAppleAuth";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addUserNames, getUserNames } from "../axiosAPI/userAPI";
 import Toast from "react-native-toast-message";
+import { useColourTheme } from "../context/Themed";
+import { themedColours } from "../constants/themedColours";
 
 const Account = ({ navigation }) => {
   const insets = useSafeAreaInsets();
@@ -23,6 +25,7 @@ const Account = ({ navigation }) => {
   const queryClient = useQueryClient();
   const firstNameInputRef = useRef(null);
   const lastNameInputRef = useRef(null);
+  const {theme} = useColourTheme()
 
   const { data, isLoading, isError, error } = useQuery({
     queryFn: getUserNames,
@@ -114,7 +117,7 @@ const Account = ({ navigation }) => {
     <View
       style={{
         flex: 1,
-        backgroundColor: "white",
+        backgroundColor: themedColours.primaryBackground[theme],
         paddingTop: insets.top,
         paddingBottom: insets.bottom,
       }}
@@ -131,7 +134,7 @@ const Account = ({ navigation }) => {
           ref={lastNameInputRef}
           name={lastName}
           // Change this error idea later maybe
-          text={isError ? 'Failed to fetch last name' : "First name"}
+          text={isError ? 'Failed to fetch last name' : "Last name"}
           setName={setLastName}
         />
         <InformationInput
@@ -141,7 +144,7 @@ const Account = ({ navigation }) => {
         <Pressable
           onPress={handleSaveNames}
           style={{
-            backgroundColor: COLOURS.darkGreen,
+            backgroundColor: themedColours.primary[theme],
             height: 44,
             justifyContent: "center",
             alignItems: "center",
@@ -151,7 +154,7 @@ const Account = ({ navigation }) => {
         >
           <Text
             style={{
-              color: "#F7F6EF",
+              color: 'white',
               fontSize: 14,
               fontFamily: "Mulish_700Bold",
             }}
@@ -168,7 +171,7 @@ const Account = ({ navigation }) => {
         />
       )}
       <SettingOption
-        optionSvg={<LogoutIcon />}
+        optionSvg={<LogoutIcon color={themedColours.primaryText[theme]} />}
         onPress={handleLogout}
         optionText={"Sign out"}
         showArrow={true}
@@ -179,7 +182,7 @@ const Account = ({ navigation }) => {
       >
         <Text
           style={{
-            color: COLOURS.badFoodText,
+            color: themedColours.danger[theme],
             fontSize: 16,
             fontFamily: "Mulish_500Medium",
           }}
