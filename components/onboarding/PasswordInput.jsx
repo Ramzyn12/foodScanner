@@ -3,15 +3,17 @@ import React, { useState } from "react";
 import ClearIcon from "../../svgs/ClearIcon";
 import COLOURS from '../../constants/colours'
 import { TextInput } from "react-native";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 const PasswordInput = ({password, setPassword}) => {
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
-
+  const {theme} = useColourTheme()
   return (
     <View
       style={[
-        styles.input,
+        [styles.input, {borderColor: themedColours.stroke[theme]}],
         isPasswordFocused && {
-          borderColor: "black",
+          borderColor: themedColours.primary[theme],
         },
       ]}
     >
@@ -22,7 +24,7 @@ const PasswordInput = ({password, setPassword}) => {
         }}
       >
         {isPasswordFocused && (
-          <Text style={{ fontSize: 11, fontFamily: "Mulish_700Bold" }}>
+          <Text style={{ fontSize: 11, fontFamily: "Mulish_700Bold", color: themedColours.primaryText[theme] }}>
             Password
           </Text>
         )}
@@ -37,6 +39,7 @@ const PasswordInput = ({password, setPassword}) => {
           keyboardType='ascii-capable'
           autoComplete={"off"}
           secureTextEntry={true}
+          placeholderTextColor={themedColours.secondaryText[theme]}
           placeholder={isPasswordFocused ? "" : "Create Password"}
           style={{
             fontSize: 14,
@@ -46,13 +49,13 @@ const PasswordInput = ({password, setPassword}) => {
               isPasswordFocused || password.length > 0
                 ? "Mulish_500Medium"
                 : "Mulish_700Bold",
-            color: COLOURS.nearBlack,
+            color: themedColours.primaryText[theme],
           }}
         />
       </View>
       {isPasswordFocused && (
         <Pressable onPress={() => setPassword("")} style={{ alignSelf: "center" }}>
-          <ClearIcon />
+          <ClearIcon background={themedColours.secondaryBackground[theme]} crossColor={themedColours.secondaryText[theme]} />
         </Pressable>
       )}
     </View>

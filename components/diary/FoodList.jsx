@@ -148,7 +148,7 @@ const FoodList = ({
       <View
         style={[
           styles.foodListContainer,
-          { borderTopLeftRadius: 20, borderTopRightRadius: 20 },
+          { borderTopLeftRadius: 20, borderTopRightRadius: 20, borderColor: themedColours.stroke[theme] },
         ]}
       >
         <View style={{ width: "100%", gap: 14 }}>

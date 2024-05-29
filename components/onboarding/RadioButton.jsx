@@ -2,21 +2,25 @@ import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import COLOURS from "../../constants/colours";
 import { Pressable } from "react-native";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 const RadioButton = ({ value, selectedValue, onSelect }) => {
+  const {theme} = useColourTheme()
+
   return (
     <Pressable
       style={[
-        styles.radioButtonContainer,
-        selectedValue === value && styles.radioButtonContainerSelected,
+        [styles.radioButtonContainer, {borderColor: themedColours.stroke[theme]}],
+        selectedValue === value && [styles.radioButtonContainerSelected, {borderColor: themedColours.primary[theme]}],
       ]}
       onPress={() => onSelect(value)}
     >
-      <View style={styles.radioButton}>
+      <View style={[styles.radioButton, {backgroundColor: themedColours.tertiaryBackground[theme]}]}>
         {selectedValue === value && (
-          <View style={styles.radioButtonSelected}></View>
+          <View style={[styles.radioButtonSelected, {backgroundColor: themedColours.primary[theme]}]}></View>
         )}
       </View>
-      <Text style={styles.radioButtonText}>{value}</Text>
+      <Text style={[styles.radioButtonText, {color: themedColours.primaryText[theme]}]}>{value}</Text>
     </Pressable>
   );
 };

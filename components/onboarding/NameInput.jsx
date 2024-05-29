@@ -3,15 +3,17 @@ import React, { useState } from "react";
 import ClearIcon from "../../svgs/ClearIcon";
 import COLOURS from '../../constants/colours'
 import { TextInput } from "react-native";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 const NameInput = ({name, setName, text}) => {
   const [isNameFocused, setIsNameFocused] = useState(false);
-
+  const {theme} = useColourTheme()
   return (
     <View
       style={[
-        styles.input,
+        [styles.input, {borderColor: themedColours.stroke[theme]}],
         isNameFocused && {
-          borderColor: "black",
+          borderColor: themedColours.primary[theme],
         },
       ]}
     >
@@ -22,7 +24,7 @@ const NameInput = ({name, setName, text}) => {
         }}
       >
         {isNameFocused && (
-          <Text style={{ fontSize: 11, fontFamily: "Mulish_700Bold" }}>
+          <Text style={{ fontSize: 11, fontFamily: "Mulish_700Bold", color: themedColours.primaryText[theme] }}>
             {text}
           </Text>
         )}
@@ -34,6 +36,7 @@ const NameInput = ({name, setName, text}) => {
           keyboardType='ascii-capable'
           autoCorrect={false}
           autoComplete={"off"}
+          placeholderTextColor={themedColours.secondaryText[theme]}
           placeholder={isNameFocused ? "" : text}
           style={{
             fontSize: 14,
@@ -43,13 +46,13 @@ const NameInput = ({name, setName, text}) => {
               isNameFocused || name.length > 0
                 ? "Mulish_500Medium"
                 : "Mulish_700Bold",
-            color: COLOURS.nearBlack,
+            color: themedColours.primaryText[theme],
           }}
         />
       </View>
       {isNameFocused && (
         <Pressable onPress={() => setName("")} style={{ alignSelf: "center" }}>
-          <ClearIcon />
+          <ClearIcon background={themedColours.secondaryBackground[theme]} crossColor={themedColours.secondaryText[theme]} />
         </Pressable>
       )}
     </View>

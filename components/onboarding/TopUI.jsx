@@ -4,6 +4,8 @@ import PhotoPhrame from "../../svgs/PhotoPhrame";
 import Calender from "../../svgs/Calender";
 import AuthDesign from "./AuthDesign";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const AuthState = {
   SIGN_IN: "signIn",
@@ -13,6 +15,7 @@ const AuthState = {
 
 const TopUI = ({ authState, keyboardVisible }) => {
   const translateY = useSharedValue(0);
+  const {theme} = useColourTheme()
 
   useEffect(() => {
     translateY.value = withTiming(keyboardVisible ? -350 : 0, {
@@ -28,12 +31,12 @@ const TopUI = ({ authState, keyboardVisible }) => {
 
   return (
     <Animated.View style={[{ flex: 1, marginBottom: -15  }, animatedStyle]}>
-      <View style={styles.topSquare}>
+      <View style={[styles.topSquare, {backgroundColor: themedColours.tertiaryBackground[theme]}]}>
         {/* If not signIn or signUp then show */}
         {authState === AuthState.SIGN_UP_FORM_HIDDEN && (
           <>
-            <PhotoPhrame />
-            <Calender />
+            <PhotoPhrame color={themedColours.primaryText[theme]} />
+            <Calender color={themedColours.primaryText[theme]} />
           </>
         )}
       </View>

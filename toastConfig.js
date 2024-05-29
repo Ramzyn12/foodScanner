@@ -9,7 +9,7 @@ export const toastConfig = {
       style={{
         height: 44,
         width: '90%',
-        backgroundColor: COLOURS.nearBlack,
+        backgroundColor: props.backgroundColor || COLOURS.nearBlack,
         borderRadius: 20,
         flexDirection: 'row',
         alignItems: 'center',
@@ -19,7 +19,7 @@ export const toastConfig = {
     >
       <Text
         style={{
-          color: 'white',
+          color: props.textColor || 'white',
           fontFamily: 'Mulish_500Medium',
           fontSize: 14,
         }}
@@ -28,7 +28,7 @@ export const toastConfig = {
       </Text>
       <Text
         style={{
-          color: 'white',
+          color: props.textColor || 'white',
           fontFamily: 'Mulish_600SemiBold',
           fontSize: 14,
         }}

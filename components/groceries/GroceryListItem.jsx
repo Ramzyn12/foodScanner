@@ -201,6 +201,8 @@ const GroceryListItem = ({ foodItem, id, onLongPress, isActive }) => {
       text2: "Undo",
       props: {
         onUndo: handleUndo,
+        backgroundColor: themedColours.primaryText[theme],
+        textColor: themedColours.primaryBackground[theme]
       },
     });
   };

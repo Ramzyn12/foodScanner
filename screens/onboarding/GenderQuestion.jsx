@@ -5,10 +5,13 @@ import COLOURS from "../../constants/colours";
 import RadioButton from "../../components/onboarding/RadioButton";
 import { useDispatch } from "react-redux";
 import { setGender } from "../../redux/onboardingSlice";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const GenderQuestion = ({ navigation }) => {
   const [selectedGender, setSelectedGender] = useState(null);
   const dispatch = useDispatch();
+  const {theme} = useColourTheme()
 
   const handleGenderSelect = (value) => {
     setSelectedGender(value);
@@ -19,9 +22,9 @@ const GenderQuestion = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {backgroundColor: themedColours.primaryBackground[theme]}]}>
       <ProgressBar percent={36} />
-      <Text style={styles.titleText}>What is your gender?</Text>
+      <Text style={[styles.titleText, {color: themedColours.primaryText[theme]}]}>What is your gender?</Text>
       {/* Radio Buttons */}
       <View style={{ gap: 12 }}>
         <RadioButton

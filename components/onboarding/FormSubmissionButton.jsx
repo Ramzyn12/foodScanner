@@ -7,6 +7,8 @@ import {
 } from "react-native";
 import React from "react";
 import COLOURS from "../../constants/colours";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const FormSubmissionButton = ({
   onPress,
@@ -19,14 +21,14 @@ const FormSubmissionButton = ({
 }) => {
   const isEnabled =
     (email && password && password.length > 6) || (firstName && lastName);
-
+const {theme} = useColourTheme()
   return (
     <Pressable
       onPress={isEnabled && !isLoading ? onPress : undefined} // Directly apply condition within onPress prop
       disabled={!isEnabled || isLoading} // Disable the button if not enabled or if loading
-      style={[styles.buttonContainer, { opacity: isEnabled ? 1 : 0.4 }]}
+      style={[styles.buttonContainer, { opacity: isEnabled ? 1 : 0.4 , backgroundColor: themedColours.primary[theme]}]}
     >
-      <Text style={styles.buttonText}>
+      <Text style={[styles.buttonText]}>
         {isLoading ? <ActivityIndicator /> : text || "Create an account"}
       </Text>
     </Pressable>

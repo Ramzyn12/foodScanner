@@ -113,7 +113,7 @@ const HealthCard = ({ onLog, metricType, leftLable, rightLable }) => {
           >
             {metricType}
           </Text>
-          <ArrowRight />
+          <ArrowRight color={themedColours.primaryText[theme]} />
         </View>
         {lastLoggedText && (
           <View style={{ flexDirection: "row", gap: 2 }}>

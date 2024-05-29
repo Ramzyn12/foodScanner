@@ -18,11 +18,13 @@ import { useMutation } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { addUserInformation } from "../../axiosAPI/userAPI";
 import auth from "@react-native-firebase/auth";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 const SignUpForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-
+  const {theme} = useColourTheme()
   const navigation = useNavigation();
   const userInformation = useSelector(
     (state) => state.onboarding.userInformation
@@ -58,7 +60,7 @@ const SignUpForm = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {borderTopColor: themedColours.stroke[theme]}]}>
       <View style={styles.formContainer}>
         <EmailInput email={email} setEmail={setEmail} />
         <PasswordInput password={password} setPassword={setPassword} />
@@ -74,7 +76,7 @@ const SignUpForm = () => {
             style={{
               fontSize: 14,
               fontFamily: "Mulish_400Regular",
-              color: "#DB1200",
+              color: themedColours.danger[theme],
             }}
           >
             {errorMessage}

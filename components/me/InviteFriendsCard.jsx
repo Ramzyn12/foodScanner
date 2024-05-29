@@ -16,7 +16,7 @@ const InviteFriendsCard = () => {
         <Text style={{fontFamily: 'Mulish_400Regular', textAlign: 'center', color: themedColours.secondaryText[theme], fontSize: 14}}>Invite friends and family to join you on your clean eating journey.</Text>
       </View>
       <Pressable style={{height: 44, borderRadius: 12, width: '100%', backgroundColor: themedColours.primary[theme], alignItems: 'center', justifyContent: 'center'}}>
-        <Text style={{fontFamily: 'Mulish_700Bold', color: themedColours.primaryText[theme], fontSize: 14}}>Invite friends</Text>
+        <Text style={{fontFamily: 'Mulish_700Bold', color: 'white', fontSize: 14}}>Invite friends</Text>
       </Pressable>
     </View>
   )

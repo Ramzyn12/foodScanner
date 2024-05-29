@@ -9,6 +9,8 @@ import Animated, {
   runOnJS,
   withDelay,
 } from "react-native-reanimated";
+import { themedColours } from "../../constants/themedColours";
+import { useColourTheme } from "../../context/Themed";
 
 const HeartAnimation = ({ navigation }) => {
   // Shared values for the animation
@@ -44,6 +46,8 @@ const HeartAnimation = ({ navigation }) => {
     }, 400);
   };
 
+  const {theme} = useColourTheme()
+
   useEffect(() => {
     leftHeartPosition.value = withTiming(27, { duration: 800 }); // Example: Move left heart closer
     rightHeartPosition.value = withTiming(-30, { duration: 800 }); // Example: Move right heart closer
@@ -73,12 +77,12 @@ const HeartAnimation = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {backgroundColor: themedColours.primaryBackground[theme]}]}>
       <Animated.View style={[leftHeartStyle]}>
-        <LeftHalfHeart />
+        <LeftHalfHeart  color={themedColours.primaryText[theme]} />
       </Animated.View>
       <Animated.View style={[rightHeartStyle]}>
-        <RightHalfHeart />
+        <RightHalfHeart color={themedColours.primaryText[theme]} />
       </Animated.View>
       {/* <Animated.Image
         style={[leftHeartStyle]}

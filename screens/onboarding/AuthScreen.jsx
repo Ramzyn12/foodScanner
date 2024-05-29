@@ -25,6 +25,8 @@ import TopUI from "../../components/onboarding/TopUI";
 import BottomAuthText from "../../components/onboarding/BottomAuthText";
 import { useSelector } from "react-redux";
 import { useKeyboardVisible } from "../../hooks/useKeyboardVisible";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const AuthState = {
   SIGN_IN: "signIn",
@@ -39,6 +41,7 @@ const AuthScreen = ({ route, navigation }) => {
   const userInformation = useSelector(
     (state) => state.onboarding.userInformation
   );
+  const {theme} = useColourTheme()
 
   useLayoutEffect(() => {
     if (authType === "Log In") setAuthState(AuthState.SIGN_IN);
@@ -58,7 +61,7 @@ const AuthScreen = ({ route, navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {backgroundColor: themedColours.primaryBackground[theme]}]}>
 
       {/* Design at top of page */}
       <TopUI authState={authState} keyboardVisible={keyboardVisible} />
@@ -70,7 +73,7 @@ const AuthScreen = ({ route, navigation }) => {
 
         {/* Main Title */}
         <View style={styles.writingContainer}>
-          <Text style={styles.titleText}>
+          <Text style={[styles.titleText, {color: themedColours.primaryText[theme]}]}>
             {authState === AuthState.SIGN_IN
               ? "Welcome back. Sign in to Ivy."
               : "Sign up to begin changing your life."}

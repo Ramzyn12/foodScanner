@@ -19,6 +19,8 @@ import Purchases from "react-native-purchases";
 import LoadingDiary from "./components/diary/LoadingDiary";
 import Toast from "react-native-toast-message";
 import { toastConfig } from "./toastConfig";
+import { themedColours } from "./constants/themedColours";
+import { useColourTheme } from "./context/Themed";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -29,6 +31,7 @@ function MainComponent({ loggedIn }) {
   const waitingForBackendApple = useSelector(
     (state) => state.auth.waitingForBackend
   );
+  const {theme} = useColourTheme()
 
   const { data: hapticsEnabledData } = useQuery({
     queryFn: getUserHaptics,
@@ -57,7 +60,9 @@ function MainComponent({ loggedIn }) {
   }, []);
 
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={{colors: {
+      background: themedColours.primaryBackground[theme]
+    }}}>
       {loggedIn && !waitingForBackendApple && (
         <Stack.Navigator initialRouteName="MainTabsStack">
           <Stack.Screen

@@ -16,11 +16,14 @@ import { addFirstLastName } from "../../axiosAPI/authAPI";
 import { addUserNames } from "../../axiosAPI/userAPI";
 import auth from "@react-native-firebase/auth";
 import Toast from "react-native-toast-message";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 
 const CreateAccount = ({ navigation, route }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const {theme} = useColourTheme()
   // const token = route?.params?.token;
   // const firebaseId = route?.params?.firebaseId;
 
@@ -50,12 +53,12 @@ const CreateAccount = ({ navigation, route }) => {
   };
 
   return (
-    <KeyboardAvoidingView behavior="height" style={styles.container}>
+    <KeyboardAvoidingView behavior="height" style={[styles.container, {backgroundColor: themedColours.primaryBackground[theme]}]}>
       <View style={{ gap: 12 }}>
         <View style={styles.topContainer}>
-          <Text style={styles.titleText}>Finish creating your account</Text>
+          <Text style={[styles.titleText, {color: themedColours.primaryText[theme]}]}>Finish creating your account</Text>
           <Pressable onPress={() => navigation.goBack()}>
-            <ClearIcon size={28} />
+            <ClearIcon background={themedColours.secondaryBackground[theme]} crossColor={themedColours.secondaryText[theme]} size={28} />
           </Pressable>
         </View>
         <NameInput

@@ -15,12 +15,15 @@ import { Path, Svg } from "react-native-svg";
 import RadioButton from "../../components/onboarding/RadioButton";
 import { useDispatch } from "react-redux";
 import { setProcessedFoodConsumption } from "../../redux/onboardingSlice";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const options = ["1", "2", "3", "4", "5", "6", "7"];
 
 const ConsumptionQuestion = ({ navigation }) => {
   const [selectedDays, setSelectedDays] = useState(null);
   const dispatch = useDispatch();
+  const {theme} = useColourTheme()
 
   const handleDaySelect = (value) => {
     setSelectedDays(value); // Set the selected gender
@@ -31,9 +34,9 @@ const ConsumptionQuestion = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {backgroundColor: themedColours.primaryBackground[theme]}]}>
       <ProgressBar percent={48} />
-      <Text style={styles.titleText}>
+      <Text style={[styles.titleText, {color: themedColours.primaryText[theme]}]}>
         On average, how many days per week do you consume processed food?
       </Text>
       {/* Radio Buttons */}

@@ -17,6 +17,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import auth from "@react-native-firebase/auth";
 import { storage } from "../../utils/MMKVStorage";
 import { useNavigation } from "@react-navigation/native";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 
 const SignInForm = () => {
   const [email, setEmail] = useState("");
@@ -24,6 +26,7 @@ const SignInForm = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [signInLoading, setSignInLoading] = useState(false);
   const navigation = useNavigation();
+  const {theme} = useColourTheme()
 
   const handleFirebaseError = (code) => {
     console.log(code);
@@ -75,7 +78,7 @@ const SignInForm = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {borderTopColor: themedColours.stroke[theme]}]}>
       <View style={styles.formContainer}>
         <EmailInput email={email} setEmail={setEmail} />
         <PasswordInput password={password} setPassword={setPassword} />
@@ -91,7 +94,7 @@ const SignInForm = () => {
             style={{
               fontSize: 14,
               fontFamily: "Mulish_400Regular",
-              color: "#DB1200",
+              color: themedColours.danger[theme],
             }}
           >
             {errorMessage}
@@ -101,10 +104,10 @@ const SignInForm = () => {
           <Text
             style={{
               textAlign: "center",
-              marginTop: 14,
+              marginTop: 12,
               fontSize: 14,
               fontFamily: "Mulish_700Bold",
-              color: COLOURS.nearBlack,
+              color: themedColours.primaryText[theme],
             }}
           >
             Forgot Password

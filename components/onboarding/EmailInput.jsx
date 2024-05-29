@@ -9,18 +9,20 @@ import React, { useState } from "react";
 import ClearIcon from "../../svgs/ClearIcon";
 import COLOURS from "../../constants/colours";
 import { TextInput } from "react-native";
+import { useColourTheme } from "../../context/Themed";
+import { themedColours } from "../../constants/themedColours";
 const EmailInput = ({ email, setEmail, message }) => {
   //Maybe add some animations here so nicer focus
   const [isEmailFocused, setIsEmailFocused] = useState(false);
-
+  const {theme} = useColourTheme()
   const text = message || 'Email Address'
 
   return (
     <View
       style={[
-        styles.input,
+        [styles.input, {borderColor: themedColours.stroke[theme]}],
         isEmailFocused && {
-          borderColor: "black",
+          borderColor: themedColours.primary[theme],
         },
       ]}
     >
@@ -31,7 +33,7 @@ const EmailInput = ({ email, setEmail, message }) => {
         }}
       >
         {isEmailFocused && (
-          <Text style={{ fontSize: 11, fontFamily: "Mulish_700Bold" }}>
+          <Text style={{ fontSize: 11, fontFamily: "Mulish_700Bold", color: themedColours.primaryText[theme] }}>
             {text}
           </Text>
         )}
@@ -45,6 +47,7 @@ const EmailInput = ({ email, setEmail, message }) => {
           autoCorrect={false}
           keyboardType="email-address"
           autoComplete="email"
+          placeholderTextColor={themedColours.secondaryText[theme]}
           placeholder={isEmailFocused ? "" : text}
           style={{
             fontSize: 14,
@@ -54,14 +57,14 @@ const EmailInput = ({ email, setEmail, message }) => {
               isEmailFocused || email.length > 0
                 ? "Mulish_500Medium"
                 : "Mulish_700Bold",
-            color: COLOURS.nearBlack,
+            color: themedColours.primaryText[theme],
           }}
         />
       </View>
 
       {isEmailFocused && (
         <Pressable onPress={() => setEmail("")} style={{ alignSelf: "center" }}>
-          <ClearIcon />
+          <ClearIcon background={themedColours.secondaryBackground[theme]} crossColor={themedColours.secondaryText[theme]} />
         </Pressable>
       )}
     </View>

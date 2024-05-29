@@ -112,7 +112,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: 14,
   },
-
   unChecked: {
     width: 30,
     height: 30,
