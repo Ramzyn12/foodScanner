@@ -71,7 +71,7 @@ const AppInitializer = () => {
     }
   }, [firebaseUid, RC_API_KEY]);
 
-  const { notification, expoPushToken } = useNotifications();
+  useNotifications();
 
   // console.log(notification, 'Notification', expoPushToken);
 

@@ -1,14 +1,55 @@
-import { View, Text } from 'react-native'
-import React from 'react'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import Header from '../components/settings/Header'
-import NotificationOption from '../components/settings/NotificationOption'
-import { useColourTheme } from '../context/Themed'
-import { themedColours } from '../constants/themedColours'
+import { View, Text, AppState, Alert, Linking, ScrollView } from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Header from "../components/settings/Header";
+import NotificationOption from "../components/settings/NotificationOption";
+import { useColourTheme } from "../context/Themed";
+import { themedColours } from "../constants/themedColours";
+import * as Device from "expo-device";
+import * as NotificationsObj from "expo-notifications";
+import { useFocusEffect } from "@react-navigation/native";
 
-const Notifications = ({navigation}) => {
-  const insets = useSafeAreaInsets()
-  const {theme} = useColourTheme()
+const Notifications = ({ navigation }) => {
+  const insets = useSafeAreaInsets();
+  const { theme } = useColourTheme();
+  const appState = useRef(AppState.currentState);
+  const [granted, setGranted] = useState("");
+
+  const getNotificationPermissions = async () => {
+    const { status: existingStatus } =
+      await NotificationsObj.getPermissionsAsync();
+      const isGranted = existingStatus === "granted"
+  
+    setGranted(isGranted);
+    if (!isGranted) {
+      console.log('Not granted so cancelling all notificaitons ');
+      await NotificationsObj.cancelAllScheduledNotificationsAsync()
+    }
+    return existingStatus;
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      getNotificationPermissions();
+    }, [getNotificationPermissions])
+  );
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === "active"
+      ) {
+        //Coming from background to foreground
+        getNotificationPermissions();
+      }
+      appState.current = nextAppState;
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [getNotificationPermissions]);
 
   return (
     <View
@@ -19,17 +60,39 @@ const Notifications = ({navigation}) => {
         paddingBottom: insets.bottom,
       }}
     >
-      <Header onNavigate={() => navigation.goBack()} headerText={'Notifications'} />
-      <View style={{padding: 14, gap: 14}}>
-        <NotificationOption title={'Health changes'} description={'Notify me when there is a change in my health stats'} />
-        <NotificationOption title={'Food tracking reminder'} description={'Remind me to log the food I have eaten'} />
-        <NotificationOption title={'Mood tracking reminder'} description={'Remind me to log my mood for the day '} />
-        <NotificationOption title={'Daily summary'} description={'Notify me when my daily summary is ready'} />
-        <NotificationOption title={'Streaks'} description={'Notify me when I have beaten my best streak'} />
-  
+      <Header
+        onNavigate={() => navigation.goBack()}
+        headerText={"Notifications"}
+      />
+      <View style={{ padding: 14, gap: 14 }}>
+        <NotificationOption
+          granted={granted}
+          title={"Health changes"}
+          description={"Notify me when there is a change in my health stats"}
+        />
+        <NotificationOption
+          granted={granted}
+          title={"Food tracking reminder"}
+          description={"Remind me to log the food I have eaten"}
+        />
+        <NotificationOption
+          granted={granted}
+          title={"Mood tracking reminder"}
+          description={"Remind me to log my mood for the day "}
+        />
+        <NotificationOption
+          granted={granted}
+          title={"Daily summary"}
+          description={"Notify me when my daily summary is ready"}
+        />
+        <NotificationOption
+          granted={granted}
+          title={"Streaks"}
+          description={"Notify me when I have beaten my best streak"}
+        />
       </View>
     </View>
-  )
-}
+  );
+};
 
-export default Notifications
+export default Notifications;

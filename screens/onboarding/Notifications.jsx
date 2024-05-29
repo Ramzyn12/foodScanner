@@ -1,4 +1,12 @@
-import { View, Text, SafeAreaView, Pressable, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  SafeAreaView,
+  Pressable,
+  StyleSheet,
+  Alert,
+  Linking,
+} from "react-native";
 import React from "react";
 import { Path, Svg } from "react-native-svg";
 import COLOURS from "../../constants/colours";
@@ -6,18 +14,59 @@ import Animated from "react-native-reanimated";
 import { useColourTheme } from "../../context/Themed";
 import { themedColours } from "../../constants/themedColours";
 // import { SharedElement } from "react-navigation-shared-element";
+import * as Device from "expo-device";
+import * as NotificationsObj from "expo-notifications";
 
 const Notifications = ({ navigation }) => {
   //ONLY SHOW THIS PAGE IF NOTIFCAITIONS NOT ENABLED?
-  const {theme} = useColourTheme()
+  const { theme } = useColourTheme();
 
-  const handleAllowNotification = () => {
+  const handleSkipNotifications = () => {
     navigation.navigate("InfoOne");
   };
 
+  const handleAllowNotificationPress = async () => {
+    if (!Device.isDevice) return;
+
+    const { status: existingStatus, ios } =
+      await NotificationsObj.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    console.log(ios.status, NotificationsObj.IosAuthorizationStatus);
+    let firstTime =
+      NotificationsObj.IosAuthorizationStatus[ios.status] === "NOT_DETERMINED";
+    console.log(firstTime);
+    if (existingStatus !== "granted") {
+      const { status } = await NotificationsObj.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== "granted" && !firstTime) {
+      Alert.alert(
+        "Enable Notifications",
+        "To enable in app notifications, you must enable notifications in settings",
+        [
+          {
+            text: "Ok",
+            onPress: () => {
+              Linking.openSettings();
+              navigation.navigate("InfoOne");
+            },
+          },
+          { text: "Cancel", onPress: () => navigation.navigate("InfoOne") },
+        ]
+      );
+    } else {
+      navigation.navigate("InfoOne");
+    }
+  };
+
   return (
-    <View style={{ flex: 1}}>
-      <View style={[styles.container,  {backgroundColor: themedColours.primaryBackground[theme]} ]}>
+    <View style={{ flex: 1 }}>
+      <View
+        style={[
+          styles.container,
+          { backgroundColor: themedColours.primaryBackground[theme] },
+        ]}
+      >
         <View style={styles.contentContainer}>
           <Svg width="120" height="121" viewBox="0 0 120 121" fill="none">
             <Path
@@ -37,8 +86,20 @@ const Notifications = ({ navigation }) => {
               fill={themedColours.primaryText[theme]}
             />
           </Svg>
-          <Text style={[styles.titleText, {color: themedColours.primaryText[theme]}]}>Enable notifications</Text>
-          <Text style={[styles.descriptionText, {color: themedColours.primaryText[theme]}]}>
+          <Text
+            style={[
+              styles.titleText,
+              { color: themedColours.primaryText[theme] },
+            ]}
+          >
+            Enable notifications
+          </Text>
+          <Text
+            style={[
+              styles.descriptionText,
+              { color: themedColours.primaryText[theme] },
+            ]}
+          >
             When there are important changes to your health or important updates
             in research, we’ll let you know.
           </Text>
@@ -46,16 +107,29 @@ const Notifications = ({ navigation }) => {
 
           <Pressable
             style={{ width: "100%" }}
-            onPress={handleAllowNotification}
+            onPress={handleAllowNotificationPress}
           >
-            <Animated.View sharedTransitionTag="greenButton" style={[styles.button, {backgroundColor: themedColours.primary[theme]}]}>
-              <Text style={[styles.buttonText, {color: themedColours.primaryBackground[theme]}]}>Allow Notifications</Text>
+            <Animated.View
+              sharedTransitionTag="greenButton"
+              style={[
+                styles.button,
+                { backgroundColor: themedColours.primary[theme] },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.buttonText,
+                  { color: themedColours.primaryBackground[theme] },
+                ]}
+              >
+                Allow Notifications
+              </Text>
             </Animated.View>
           </Pressable>
           {/* </SharedElement> */}
         </View>
         <View style={styles.ActionContainer}>
-          <Pressable onPress={() => navigation.navigate("InfoOne")}>
+          <Pressable onPress={handleSkipNotifications}>
             <Text
               style={{
                 fontSize: 14,
