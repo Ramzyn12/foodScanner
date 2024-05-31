@@ -6,6 +6,7 @@ import {
   Pressable,
   Keyboard,
   TouchableWithoutFeedback,
+  Dimensions,
 } from "react-native";
 import React, { useEffect, useLayoutEffect, useState } from "react";
 import AuthDesign from "../../components/onboarding/AuthDesign";
@@ -28,6 +29,10 @@ import { useKeyboardVisible } from "../../hooks/useKeyboardVisible";
 import { useColourTheme } from "../../context/Themed";
 import { themedColours } from "../../constants/themedColours";
 
+const {height: screenHeight} = Dimensions.get('window')
+
+console.log(screenHeight);
+
 const AuthState = {
   SIGN_IN: "signIn",
   SIGN_UP_FORM_HIDDEN: "signUpFormHidden",
@@ -41,7 +46,8 @@ const AuthScreen = ({ route, navigation }) => {
   const userInformation = useSelector(
     (state) => state.onboarding.userInformation
   );
-  const {theme} = useColourTheme()
+  const { theme } = useColourTheme();
+  const showTopUI = screenHeight > 750 || authState === AuthState.SIGN_UP_FORM_HIDDEN
 
   useLayoutEffect(() => {
     if (authType === "Log In") setAuthState(AuthState.SIGN_IN);
@@ -61,19 +67,26 @@ const AuthScreen = ({ route, navigation }) => {
   };
 
   return (
-    <View style={[styles.container, {backgroundColor: themedColours.primaryBackground[theme]}]}>
-
+    <KeyboardAvoidingView
+      behavior="padding"
+      // keyboardVerticalOffset={100}
+      style={[
+        styles.container,
+        { backgroundColor: themedColours.primaryBackground[theme] },
+      ]}
+    >
       {/* Design at top of page */}
-      <TopUI authState={authState} keyboardVisible={keyboardVisible} />
+      {showTopUI && <TopUI showAll={screenHeight > 750} authState={authState} keyboardVisible={keyboardVisible} />}
 
-      <KeyboardAvoidingView
-        behavior="padding"
-        style={{ paddingTop: keyboardVisible ? 50 : 25 }}
-      >
-
+      <View style={{ paddingTop: keyboardVisible ? 50 : 25 }}>
         {/* Main Title */}
         <View style={styles.writingContainer}>
-          <Text style={[styles.titleText, {color: themedColours.primaryText[theme]}]}>
+          <Text
+            style={[
+              styles.titleText,
+              { color: themedColours.primaryText[theme] },
+            ]}
+          >
             {authState === AuthState.SIGN_IN
               ? "Welcome back. Sign in to Ivy."
               : "Sign up to begin changing your life."}
@@ -108,9 +121,8 @@ const AuthScreen = ({ route, navigation }) => {
 
         {/* Change Auth Type Text */}
         <BottomAuthText authState={authState} onPress={handleAuthTypePress} />
-
-      </KeyboardAvoidingView>
-    </View>
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -119,6 +131,7 @@ export default AuthScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center' // so if remove TopUI, will be centered vertically
   },
   contentContainer: {
     alignItems: "center",

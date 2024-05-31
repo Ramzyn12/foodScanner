@@ -13,7 +13,7 @@ const AuthState = {
   SIGN_UP_FORM_SHOWN: "signUpFormShown",
 };
 
-const TopUI = ({ authState, keyboardVisible }) => {
+const TopUI = ({ authState, keyboardVisible, showAll }) => {
   const translateY = useSharedValue(0);
   const {theme} = useColourTheme()
 
@@ -28,12 +28,14 @@ const TopUI = ({ authState, keyboardVisible }) => {
       transform: [{ translateY: translateY.value }],
     };
   });
+  
 
   return (
-    <Animated.View style={[{ flex: 1, marginBottom: -15  }, animatedStyle]}>
+    // Removed margin -15, didnt seem necessary
+    <Animated.View style={[{ flex: 1  }, animatedStyle]}>
       <View style={[styles.topSquare, {backgroundColor: themedColours.tertiaryBackground[theme]}]}>
         {/* If not signIn or signUp then show */}
-        {authState === AuthState.SIGN_UP_FORM_HIDDEN && (
+        {authState === AuthState.SIGN_UP_FORM_HIDDEN && showAll &&  (
           <>
             <PhotoPhrame color={themedColours.primaryText[theme]} />
             <Calender color={themedColours.primaryText[theme]} />
@@ -51,6 +53,7 @@ const styles = StyleSheet.create({
   topSquare: {
     width: "100%",
     flex: 1,
+    // height: '70%',
     backgroundColor: "#F7F6EF",
     alignItems: "center",
     flexDirection: "row",

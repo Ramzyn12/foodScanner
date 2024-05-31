@@ -6,6 +6,7 @@ import {
   Pressable,
   TouchableOpacity,
   Animated,
+  ScrollView,
 } from "react-native";
 import React, { useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -23,7 +24,7 @@ const options = ["1", "2", "3", "4", "5", "6", "7"];
 const ConsumptionQuestion = ({ navigation }) => {
   const [selectedDays, setSelectedDays] = useState(null);
   const dispatch = useDispatch();
-  const {theme} = useColourTheme()
+  const { theme } = useColourTheme();
 
   const handleDaySelect = (value) => {
     setSelectedDays(value); // Set the selected gender
@@ -34,22 +35,31 @@ const ConsumptionQuestion = ({ navigation }) => {
   };
 
   return (
-    <View style={[styles.container, {backgroundColor: themedColours.primaryBackground[theme]}]}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: themedColours.primaryBackground[theme] },
+      ]}
+    >
       <ProgressBar percent={48} />
-      <Text style={[styles.titleText, {color: themedColours.primaryText[theme]}]}>
+      <Text
+        style={[styles.titleText, { color: themedColours.primaryText[theme] }]}
+      >
         On average, how many days per week do you consume processed food?
       </Text>
       {/* Radio Buttons */}
-      <View style={{ gap: 12 }}>
-        {options.map((option) => (
-          <RadioButton
-            key={option}
-            selectedValue={selectedDays}
-            value={option}
-            onSelect={handleDaySelect}
-          />
-        ))}
-      </View>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={{ gap: 12 }}>
+          {options.map((option) => (
+            <RadioButton
+              key={option}
+              selectedValue={selectedDays}
+              value={option}
+              onSelect={handleDaySelect}
+            />
+          ))}
+        </View>
+      </ScrollView>
     </View>
   );
 };

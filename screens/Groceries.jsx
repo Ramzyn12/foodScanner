@@ -94,7 +94,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderBottomWidth: 1,
     borderBottomColor: COLOURS.lightGray,
-    flex: 1
+    minWidth: '100%'
+    // flex: 1
   },
   toastContainer: {
     height: 44,

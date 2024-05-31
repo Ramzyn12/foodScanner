@@ -15,23 +15,23 @@ const Notifications = ({ navigation }) => {
   const appState = useRef(AppState.currentState);
   const [granted, setGranted] = useState("");
 
-  const getNotificationPermissions = async () => {
+  const setNotificationPermissions = async () => {
     const { status: existingStatus } =
       await NotificationsObj.getPermissionsAsync();
-      const isGranted = existingStatus === "granted"
-  
+    const isGranted = existingStatus === "granted";
+
     setGranted(isGranted);
     if (!isGranted) {
-      console.log('Not granted so cancelling all notificaitons ');
-      await NotificationsObj.cancelAllScheduledNotificationsAsync()
+      console.log("Not granted so cancelling all notificaitons ");
+      await NotificationsObj.cancelAllScheduledNotificationsAsync();
     }
     return existingStatus;
   };
 
   useFocusEffect(
     useCallback(() => {
-      getNotificationPermissions();
-    }, [getNotificationPermissions])
+      setNotificationPermissions();
+    }, [setNotificationPermissions])
   );
 
   useEffect(() => {
@@ -41,7 +41,7 @@ const Notifications = ({ navigation }) => {
         nextAppState === "active"
       ) {
         //Coming from background to foreground
-        getNotificationPermissions();
+        setNotificationPermissions();
       }
       appState.current = nextAppState;
     });
@@ -49,7 +49,7 @@ const Notifications = ({ navigation }) => {
     return () => {
       subscription.remove();
     };
-  }, [getNotificationPermissions]);
+  }, [setNotificationPermissions]);
 
   return (
     <View
@@ -64,33 +64,25 @@ const Notifications = ({ navigation }) => {
         onNavigate={() => navigation.goBack()}
         headerText={"Notifications"}
       />
-      <View style={{ padding: 14, gap: 14 }}>
-        <NotificationOption
-          granted={granted}
-          title={"Health changes"}
-          description={"Notify me when there is a change in my health stats"}
-        />
-        <NotificationOption
-          granted={granted}
-          title={"Food tracking reminder"}
-          description={"Remind me to log the food I have eaten"}
-        />
-        <NotificationOption
-          granted={granted}
-          title={"Mood tracking reminder"}
-          description={"Remind me to log my mood for the day "}
-        />
-        <NotificationOption
-          granted={granted}
-          title={"Daily summary"}
-          description={"Notify me when my daily summary is ready"}
-        />
-        <NotificationOption
-          granted={granted}
-          title={"Streaks"}
-          description={"Notify me when I have beaten my best streak"}
-        />
-      </View>
+      <ScrollView>
+        <View style={{ padding: 14, gap: 14 }}>
+          <NotificationOption
+            granted={granted}
+            title={"Health Tracking"}
+            description={"Remind me to log how I'm feeling today"}
+          />
+          <NotificationOption
+            granted={granted}
+            title={"Food tracking reminder"}
+            description={"Remind me to log the food I have eaten"}
+          />
+          <NotificationOption
+            granted={granted}
+            title={"Week completed"}
+            description={"Notify me when I have completed the current week"}
+          />
+        </View>
+      </ScrollView>
     </View>
   );
 };

@@ -20,6 +20,7 @@ const FoodDetailsEnvironment = () => {
         borderWidth: 1,
         borderColor: themedColours.stroke[theme],
         borderRadius: 20,
+        marginBottom: 60,
         gap: 20,
       }}
     >

@@ -31,10 +31,8 @@ const Notifications = ({ navigation }) => {
     const { status: existingStatus, ios } =
       await NotificationsObj.getPermissionsAsync();
     let finalStatus = existingStatus;
-    console.log(ios.status, NotificationsObj.IosAuthorizationStatus);
     let firstTime =
       NotificationsObj.IosAuthorizationStatus[ios.status] === "NOT_DETERMINED";
-    console.log(firstTime);
     if (existingStatus !== "granted") {
       const { status } = await NotificationsObj.requestPermissionsAsync();
       finalStatus = status;
