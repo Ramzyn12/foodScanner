@@ -136,7 +136,7 @@ const NotificationOption = ({ title, description, time, granted }) => {
       content: {
         title,
         body: "Test From notifications",
-        data: { data: "goes here" },
+        data: { data: "goes here" }, // Probs dont need
       },
       trigger: {
         hour: time.getHours(),

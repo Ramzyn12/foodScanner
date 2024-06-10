@@ -17,13 +17,14 @@ const openFoodFactsSearchAPI = axios.create({
 async function fetchProductWithFallback(searchTerm) {
   try {
     // First try to fetch using the search API
-    const response = await openFoodFactsSearchAPI.get("/search", {
+    const response = await openFoodFactsSearchAPI.get("/searc", {
       params: {
         // q: `states_tags:"en:photos-uploaded" brands_tags:"aldi" ${searchTerm}`,
-        q: `states_tags:"en:front-photo-selected" AND states_tags:"en:photos-uploaded" AND states_tags:"en:product-name-completed" AND states_tags:"en:ingredients-completed" AND states_tags:"en:brands-completed" ${searchTerm}`,
+        q: `states_tags:"en:front-photo-selected" AND states_tags:"en:photos-uploaded" AND states_tags:"en:product-name-completed" AND states_tags:"en:ingredients-completed" AND states_tags:"en:brands-completed" AND countries_tags:"en:united-kingdom" ${searchTerm}`,
         // q: searchTerm,
         fields: "brands,code,image_url,product_name,nova_group",
         page_size: 30,
+        countries: 'united-kingdom'
       },
     });
     // Check if data is valid
@@ -126,15 +127,17 @@ async function fetchOFFWithBarcode({ userId, barcode, date }) {
 
   // Maybe unknown should be the last one instead of "No"
   // Need to relook at tags!
+  console.log(product.ingredients_analysis_tags);
   const hasPalmOil = Array.isArray(product.ingredients_analysis_tags)
-    ? product.ingredients_analysis_tags.includes("en:palm-oil")
+    ? product.ingredients_analysis_tags.some((tag) => tag === "en:palm-oil")
       ? "Yes"
-      : product.ingredients_analysis_tags.includes(
-          "en:palm-oil-content-unknown"
+      : product.ingredients_analysis_tags.some(
+          (tag) => tag === "en:palm-oil-content-unknown"
         )
       ? "Unknown"
       : "No"
     : "Unknown";
+
 
   const co2Footprint = [
     knowledgePanels.carbon_footprint?.title_element?.subtitle,
@@ -179,11 +182,12 @@ async function fetchOFFWithBarcode({ userId, barcode, date }) {
 }
 
 async function fetchOFFWithSearch({ search_term }) {
-  const response = await fetchProductWithFallback(search_term); 
+  const response = await fetchProductWithFallback(search_term);
 
   // Maybe return empty array instead so dont need to throw error?
   // Test this to see what happens
-  if (!response) // response = [] 
+  if (!response)
+    // response = []
     throw new NotFoundError("No search results for this search term");
 
   const products = response;

@@ -102,7 +102,7 @@ const AddNotes = ({ route }) => {
           multiline
           scrollEnabled={false}
           placeholder="Enter your notes here..."
-          hitSlop={200}
+          hitSlop={400}
           value={notes}
           placeholderTextColor={themedColours.secondaryText[theme]}
           onChangeText={setNotes}

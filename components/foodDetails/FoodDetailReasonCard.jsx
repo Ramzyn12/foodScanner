@@ -27,8 +27,8 @@ const FoodDetailReasonCard = ({ type, currentFood }) => {
       : "No vegetable oil";
   } else if (type === "Palm") {
     svg = <PalmTree />;
-    backgroundColor = currentFood.hasPalmOil ? "#FAD8D5" : "#CAE2C3";
-    message = currentFood.hasPalmOil ? "Palm oil" : "No palm oil";
+    backgroundColor = currentFood.hasPalmOil === 'Yes' ? "#FAD8D5" : "#CAE2C3";
+    message = currentFood.hasPalmOil === 'Yes' ? "Palm oil" : "No palm oil";
   }
 
   return (
