@@ -67,7 +67,10 @@ const AppInitializer = () => {
 
   useEffect(() => {
     if (Platform.OS === "ios" && RC_API_KEY && firebaseUid) {
-      Purchases.configure({ apiKey: RC_API_KEY, appUserID: firebaseUid });
+      // USE THIS ONE AGAIN, Was just testing
+      // Remove usesStoreKit2...
+      Purchases.configure({ apiKey: RC_API_KEY, appUserID: firebaseUid, usesStoreKit2IfAvailable: true })
+      // Purchases.configure({ apiKey: RC_API_KEY });
     }
   }, [firebaseUid, RC_API_KEY]);
 

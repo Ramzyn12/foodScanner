@@ -84,9 +84,6 @@ const MeStack = () => {
           presentation: 'modal'
         }}
       />
-
-    
-
     </Stack.Navigator>
   );
 };

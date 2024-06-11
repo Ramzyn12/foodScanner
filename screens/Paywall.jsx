@@ -18,9 +18,11 @@ import BenefitCards from "../components/paywalls/BenefitCards";
 import PlanCards from "../components/paywalls/PlanCards";
 import CancelInfo from "../components/paywalls/CancelInfo";
 import BottomButtons from "../components/paywalls/BottomButtons";
+import PaywallNoTrial from "./paywalls/PaywallNoTrial";
 
 const Paywall = ({ navigation }) => {
   const [offering, setOffering] = useState(null);
+  const [elegibleFreeTrial, setElegibleFreeTrial] = useState(undefined)
   const { theme } = useColourTheme();
 
   // Handle all errors well!
@@ -28,16 +30,34 @@ const Paywall = ({ navigation }) => {
   const getOfferings = async () => {
     try {
       const offerings = await Purchases.getOfferings();
-      const customerInfo = await Purchases.checkTrialOrIntroductoryPriceEligibility(['rc_2499_1y_1w0', 'Pro']);
-      // console.log(JSON.stringify(offerings.current, null, 2));
-      console.log(JSON.stringify(customerInfo, null, 2));
+      const customerInfo = await Purchases.getCustomerInfo()
+      console.log(customerInfo)
       if (
         offerings.current !== null &&
         offerings.current.availablePackages.length !== 0
       ) {
+        const firstProduct = offerings.current.availablePackages[0].product;
+        const trialStatus =
+          await Purchases.checkTrialOrIntroductoryPriceEligibility([
+            firstProduct.identifier,
+          ]);
+
+        if (
+          Purchases.INTRO_ELIGIBILITY_STATUS[
+            trialStatus[firstProduct.identifier].status
+          ] === "INTRO_ELIGIBILITY_STATUS_ELIGIBLE"
+        ) {
+          console.log("ELEGIBLE!!");
+          setElegibleFreeTrial(true)
+        } else {
+          console.log("NOT ELIGIBLE OR UNKOWN :(");
+          setElegibleFreeTrial(false)
+        }
         setOffering(offerings.current);
       }
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const onPurchase = async (item) => {
@@ -58,8 +78,20 @@ const Paywall = ({ navigation }) => {
     getOfferings();
   }, []);
 
-  if (!offering) return <ActivityIndicator />;
+  const handleStartTrial = () => {
+    if (offering.availablePackages.length > 0) {
+      // Make sure you pick the trial offer and not any other one!
+      onPurchase(offering.availablePackages[0])
+    }
+  }
 
+  if (!offering || elegibleFreeTrial === undefined) return <ActivityIndicator />;
+
+  if (elegibleFreeTrial === false) { // change to false
+    return <PaywallNoTrial />
+  }
+
+  // Else return free trial one
   return (
     <View>
       <Pressable
@@ -75,9 +107,7 @@ const Paywall = ({ navigation }) => {
       </Pressable>
       <ScrollView>
         <View style={{ padding: 20, gap: 40, paddingBottom: 80 }}>
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
-          >
+          
             <Text
               style={{
                 color: themedColours.primaryText[theme],
@@ -87,10 +117,10 @@ const Paywall = ({ navigation }) => {
             >
               Your free trial
             </Text>
-          </View>
+          
           <TrialTimeline />
           <View style={{ gap: 14 }}>
-            <StartTrialPrompt />
+            <StartTrialPrompt onPress={handleStartTrial} />
             <BenefitCards />
           </View>
           <View>
@@ -104,7 +134,7 @@ const Paywall = ({ navigation }) => {
             >
               Choose another plan
             </Text>
-            <PlanCards />
+            <PlanCards freeTrial={true} />
           </View>
           <CancelInfo />
           <BottomButtons />
