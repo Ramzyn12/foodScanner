@@ -3,6 +3,7 @@ const FoodItem = require("../models/FoodItem");
 const SingleFood = require("../models/SingleFood");
 const { NotFoundError } = require("../utils/error");
 const { getCurrentDateLocal } = require("../utils/dateHelper");
+const User = require("../models/User");
 
 async function addFoodToDiary({ userId, foodDetails }) {
   const { barcode, singleFoodId, date } = foodDetails;
@@ -20,10 +21,10 @@ async function addFoodToDiary({ userId, foodDetails }) {
     }
 
     diaryDay = await DiaryDay.findOneAndUpdate(
-      { userId: userId, date: localDate }, 
+      { userId: userId, date: localDate },
       {
         // addToSet: Ensures can't add duplicate item
-        $addToSet: { consumedFoods: foodItem._id }, 
+        $addToSet: { consumedFoods: foodItem._id },
       },
       { new: true, upsert: true }
     );
@@ -38,14 +39,14 @@ async function addFoodToDiary({ userId, foodDetails }) {
       { new: true, upsert: true }
     );
   }
-  
-  if (!diaryDay) throw new NotFoundError("Error when updating diary day (Adding)");
+
+  if (!diaryDay)
+    throw new NotFoundError("Error when updating diary day (Adding)");
 
   await diaryDay.updateDiaryDayState(); // Processed, Unprocessed, Empty
 
   return diaryDay;
 }
-
 
 async function removeFoodFromDiaryDay({ userId, barcode, singleFoodId, date }) {
   const localDate = new Date(date + "T00:00:00.000Z");
@@ -56,13 +57,15 @@ async function removeFoodFromDiaryDay({ userId, barcode, singleFoodId, date }) {
     const foodItem = await FoodItem.findOne({ barcode });
 
     if (!foodItem) {
-      throw new NotFoundError("Food item not found in database", {barcode});
+      throw new NotFoundError("Food item not found in database", { barcode });
     }
     update = { $pull: { consumedFoods: foodItem._id } };
   } else if (singleFoodId) {
     const foodItem = await SingleFood.findById(singleFoodId);
     if (!foodItem) {
-      throw new NotFoundError("Food item not found in database", {singleFoodId});
+      throw new NotFoundError("Food item not found in database", {
+        singleFoodId,
+      });
     }
     update = { $pull: { consumedSingleFoods: foodItem._id } };
   }
@@ -112,12 +115,27 @@ async function getDiaryDay({ userId, date }) {
 
 async function getAllDiaryDays({ userId }) {
   // Need to make this truly local like get timezone offset from frontend!
-  const localDate = getCurrentDateLocal()
+  const localDate = getCurrentDateLocal();
 
-  let diaryDays = await DiaryDay.find({ userId: userId })
+  const user = await User.findById(userId);
+
+  if (!user)
+    throw new NotFoundError("Could not find user with this userId", { userId });
+
+  let query = DiaryDay.find({ userId: userId })
     .sort("date")
     .select("_id score date diaryDayState fastedState")
     .lean();
+
+
+  // If the user is not subscribed, limit the results to the last 7 days
+  if (!user.isSubscribed) {
+    query = query.limit(7);
+  }
+
+  let diaryDays = await query.exec();
+
+  console.log(diaryDays);
 
   if (!diaryDays.length) {
     // Create a diary day and send it in array!?
@@ -142,7 +160,9 @@ async function updateFastedState({ userId, date, fastedState }) {
   );
 
   if (!diaryDay) {
-    throw new NotFoundError('Updated fasted state failed for diary day', {date: localDate})
+    throw new NotFoundError("Updated fasted state failed for diary day", {
+      date: localDate,
+    });
   }
 
   return diaryDay;

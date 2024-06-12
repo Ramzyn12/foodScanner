@@ -1,5 +1,6 @@
 const admin = require("../firebase-server");
 const User = require("../models/User");
+const { UnauthorizedError } = require("../utils/error");
 
 const authMiddleware = async (req, res, next) => {
   try {
@@ -10,7 +11,10 @@ const authMiddleware = async (req, res, next) => {
     }
 
     if (!firebaseUser) {
-      return res.status(401).json("Firebase user not verified...");
+      // seem to get error here becuase no firebase Token, since no header, maybe because call
+      //befroe the axiosAPI can connect header from token or something??? 
+      throw new UnauthorizedError('Firebase user not verified', {firebaseToken, firebaseUser})
+      // return res.status(401).json("Firebase user not verified...");
     }
 
     // MAke this find one and update? 

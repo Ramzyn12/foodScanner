@@ -27,6 +27,14 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true
     },
+    isSubscribed: {
+      type: Boolean,
+      default: false
+    },
+    activeSubscription: {
+      type: String, //e.g rc_999_1m
+      default: null
+    },
     userInformation: {
       age: {
         type: Number,

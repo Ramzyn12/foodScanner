@@ -10,7 +10,7 @@ const sendErrorDev = (err, req, res) => {
     statusCode: err.statusCode,
     error: err.name || "Internal Server Error",
     message: err.message || "An unexpected error occurred",
-    // stack: err.stack, // Can include if want
+    stack: err.stack, // Can include if want
     details: err.details || {},
   };
 

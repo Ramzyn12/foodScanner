@@ -29,7 +29,7 @@ const TrialTimeline = ({ price }) => {
       </View>
       <TimelineItem day={1} description={'Trial Start'} svg={<LockIcon />}/>
       <TimelineItem day={5} description={'Reminder'} svg={<BellIcon />}/>
-      <TimelineItem day={7} description={'£39.99'} svg={<TickIcon />}/>
+      <TimelineItem day={7} description={price} svg={<TickIcon />}/>
     </View>
   );
 };

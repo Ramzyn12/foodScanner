@@ -5,7 +5,7 @@ import {
   StyleSheet,
   Pressable,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import COLOURS from "../../constants/colours";
 import Flask from "../../svgs/Flask";
@@ -21,12 +21,53 @@ import { useSubscriptionState } from "../../hooks/useSubscriptionState";
 import { useColourTheme } from "../../context/Themed";
 import { themedColours } from "../../constants/themedColours";
 // import { BlurView } from "@react-native-community/blur";
+import Purchases from "react-native-purchases";
+import { useCustomerInfo } from "../../hooks/useCustomerInfo";
 
 const FoodDetailsMainInfo = () => {
   const currentFood = useSelector((state) => state.food.currentFood);
   // const { isSubscribed } = useSubscriptionState()
-  const {theme} = useColourTheme()
-  const isSubscribed = true;
+  const { theme } = useColourTheme();
+  const [isSubscribed, setIsSubscribed] = useState(undefined)
+  // const isSubscribed = false;
+
+  const {customerInfo, error, loading} = useCustomerInfo()
+
+  useEffect(() => {
+    if (!customerInfo) return 
+    
+    if(typeof customerInfo.entitlements.active['Pro'] !== "undefined") {
+      setIsSubscribed(true)
+    } else {
+      setIsSubscribed(false)
+    }
+  }, [customerInfo])
+
+  console.log((customerInfo));
+  const [offeringDetails, setOfferingDetails] = useState("");
+
+  const getAndDisplayOffering = async () => {
+    const offerings = await Purchases.getOfferings();
+
+    if (
+      offerings.current !== null &&
+      offerings.current.availablePackages.length !== 0
+    ) {
+      const price = offerings.current.availablePackages[0].product.priceString;
+      const timeframe =
+        offerings.current.availablePackages[0].packageType === "ANNUAL"
+          ? "year"
+          : "month";
+      setOfferingDetails(`7 days free then just ${price}/${timeframe}`);
+    } else {
+      setOfferingDetails("");
+    }
+  };
+
+  useEffect(() => {
+    getAndDisplayOffering(); // Call this function when the component mounts
+  }, []);
+
   const isUnknown = currentFood.processedState === "Unknown";
   const title =
     currentFood.processedState === "Processed"
@@ -52,11 +93,13 @@ const FoodDetailsMainInfo = () => {
   };
 
   if (isUnknown) {
-    return null
+    return null;
   }
 
   return (
-    <View style={[styles.container, {borderColor: themedColours.stroke[theme]}]}>
+    <View
+      style={[styles.container, { borderColor: themedColours.stroke[theme] }]}
+    >
       {!isSubscribed && (
         <LinearGradient
           colors={["#0B5253", "#19999C"]}
@@ -67,7 +110,11 @@ const FoodDetailsMainInfo = () => {
           <Text style={styles.proFeatureText}>Pro</Text>
         </LinearGradient>
       )}
-      <Text style={[styles.titleText, {color: themedColours.primaryText[theme]}]}>{title}</Text>
+      <Text
+        style={[styles.titleText, { color: themedColours.primaryText[theme] }]}
+      >
+        {title}
+      </Text>
       {isSubscribed && (
         <View style={{ gap: 14 }}>
           <Text
@@ -114,7 +161,7 @@ const FoodDetailsMainInfo = () => {
                 fontFamily: "Mulish_700Bold",
               }}
             >
-              7 days free then £4.99/month
+              {offeringDetails}
             </Text>
           </LinearGradient>
         </Pressable>

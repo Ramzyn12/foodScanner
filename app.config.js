@@ -9,7 +9,7 @@ module.exports = ({ config }) => {
       // expo: {
       name: "ivyDev",
       slug: "ivy-dev",
-      version: "1.0.0",
+      version: "1.0.1",
       orientation: "portrait",
       icon: "./assets/icon.png",
       userInterfaceStyle: "automatic",
@@ -23,7 +23,7 @@ module.exports = ({ config }) => {
         supportsTablet: true,
         bundleIdentifier: "com.ramzyn12.Ivy.dev",
         googleServicesFile: "./GoogleService-Info.plist",
-        buildNumber: "2",
+        buildNumber: "1",
         usesAppleSignIn: true,
         userInterfaceStyle: "automatic",
         infoPlist: {

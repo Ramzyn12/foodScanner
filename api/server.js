@@ -23,7 +23,9 @@ const userRoutes = require("./routes/userRoutes");
 const metricRoutes = require("./routes/metricRoutes");
 const timelineRoutes = require("./routes/timelineRoutes");
 const noteRoutes = require("./routes/noteRoutes");
+const webhookRoutes = require("./routes/webhookRoutes");
 const errorHandler = require("./middleware/errorHandler");
+const { UnauthorizedError } = require("./utils/error");
 // const authMiddleware = require("./middleware/authMiddleware");
 
 // Middleware
@@ -40,12 +42,8 @@ app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/health-metrics", metricRoutes);
 app.use("/api/v1/timeline-weeks", timelineRoutes);
 app.use("/api/v1/notes", noteRoutes);
+app.use("/api/v1/webhooks", webhookRoutes);
 
-app.post("/webhooks", (req, res) => {
-  console.log("Received webhook:", req.body);
-
-  res.status(200).send("Webhook received");
-});
 
 // Error Handlers
 app.use("*", (req, res) => {

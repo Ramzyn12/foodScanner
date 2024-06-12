@@ -21,7 +21,7 @@ const RightArrow = () => {
   );
 };
 
-const SinglePlanCard = ({ price, savePercent, timeframe, subtitle, showSubtitle }) => {
+const SinglePlanCard = ({ price, savePercent, timeframe, subtitle, hideSubtitle }) => {
   const { theme } = useColourTheme();
   const title =
     timeframe === "ANNUAL"
@@ -102,7 +102,7 @@ const SinglePlanCard = ({ price, savePercent, timeframe, subtitle, showSubtitle 
               {perFrame}
             </Text>
           </View>
-          {showSubtitle && <Text
+          {!hideSubtitle && <Text
             style={{
               fontSize: 10,
               fontFamily: "Mulish_700Bold",

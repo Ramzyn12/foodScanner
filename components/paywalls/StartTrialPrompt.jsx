@@ -15,7 +15,7 @@ const end = {
   y: 0.5 - Math.cos(angleRad) / 2,
 };
 
-const StartTrialPrompt = ({onPress}) => {
+const StartTrialPrompt = ({ onPress, onScroll, yearlyPrice }) => {
   const { theme } = useColourTheme();
 
   return (
@@ -43,12 +43,10 @@ const StartTrialPrompt = ({onPress}) => {
           marginTop: 8,
         }}
       >
-        Free unlimited access for 7 days, then just
-        <Text style={{ fontFamily: "Mulish_700Bold" }}>
-          {` £39.99 per year `}
-        </Text>
-        (£3.29 per month).
+        {`Free unlimited access for 7 days, then just ${yearlyPrice} per year `}
+        <Text style={{fontFamily: 'Mulish_700Bold'}}>(the price of a heavily processed takeaway).</Text>
       </Text>
+
       <Pressable onPress={onPress}>
         <LinearGradient
           colors={["#0B5253", "#19999C"]}
@@ -73,7 +71,7 @@ const StartTrialPrompt = ({onPress}) => {
           </Text>
         </LinearGradient>
       </Pressable>
-      <Pressable>
+      <Pressable onPress={onScroll}>
         <Text
           style={{
             textAlign: "center",

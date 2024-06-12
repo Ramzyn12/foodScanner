@@ -32,7 +32,7 @@ const end = {
   y: 0.5 - Math.cos(angleRad) / 2,
 };
 
-const PaywallNoTrial = () => {
+const PaywallNoTrial = ({offering}) => {
   const { theme } = useColourTheme();
   const navigation = useNavigation()
   return (
@@ -87,7 +87,7 @@ const PaywallNoTrial = () => {
               Choose the plan that suits you best. You can easily cancel your
               plan at any time.
             </Text>
-            <PlanCards freeTrial={false} />
+            <PlanCards offerings={offering?.availablePackages} freeTrial={false} />
           </View>
           <View style={{ gap: 14 }}>
             {/* <StartTrialPrompt /> */}

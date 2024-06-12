@@ -556,7 +556,7 @@ These foods quickly elevate blood sugar, leading to inevitable crashes that trig
 Additionally, they're rich in omega-6 fatty acids from seed and vegetable oils, which are known to cause inflammation. This inflammation not only harms your overall health but also disrupts your metabolism and the way your body stores fat, making weight management increasingly challenging.\n
 The combination of these factors contributes significantly to the rising rates of obesity and related health issues.`}
           />
-          <Sources metricType={route.params.metricType} />
+          {/* <Sources metricType={route.params.metricType} /> */}
         </View>
       </KeyboardAwareScrollView>
     </View>
