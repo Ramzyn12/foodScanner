@@ -36,6 +36,8 @@ import { formatInTimeZone, fromZonedTime, toZonedTime } from "date-fns-tz";
 import { getAnyDateLocal, getCurrentDateLocal } from "../../utils/dateHelpers";
 import { useColourTheme } from "../../context/Themed";
 import { themedColours } from "../../constants/themedColours";
+import { useNavigation } from "@react-navigation/native";
+import { useCustomerInfo } from "../../hooks/useCustomerInfo";
 
 const windowWidth = Dimensions.get("window").width;
 
@@ -64,12 +66,26 @@ const transformCurrentDate = (date) => {
 const WeekHeader = ({ diaryData, daysFinished }) => {
   const [weeksData, setWeeksData] = useState([]);
   const carouselRef = useRef(null);
+  const navigation = useNavigation()
   const dispatch = useDispatch();
-  const {theme} = useColourTheme()
+  const { theme } = useColourTheme();
   const insets = useSafeAreaInsets();
   const nowDateString = getCurrentDateLocal();
   const chosenDateString = useSelector((state) => state.diary.chosenDate);
   const chosenDiaryDay = useSelector((state) => state.diary.currentDiaryDay);
+  const [isSubscribed, setIsSubscribed] = useState(false)
+
+  const {customerInfo, error, loading} = useCustomerInfo()
+
+  useEffect(() => {
+    if (!customerInfo) return 
+    
+    if(typeof customerInfo.entitlements.active['Pro'] !== "undefined") {
+      setIsSubscribed(true)
+    } else {
+      setIsSubscribed(false)
+    }
+  }, [customerInfo])
 
   // Has to be date for date-fns to work below
   const chosenDate = chosenDateString
@@ -123,7 +139,7 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
       const processedWeeks = processDiaryDaysToWeeks(diaryData);
       setWeeksData(processedWeeks);
     }
-  }, [diaryData]);
+  }, [diaryData, isSubscribed]);
 
   const handleGoToRecentDayPress = () => {
     dispatch(setChosenDate(nowDateString));
@@ -145,6 +161,7 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
       isSameWeek(currentWeekStartLocal, latestDate, { weekStartsOn: 1 }) ||
       isBefore(currentWeekStartLocal, latestDate)
     ) {
+      // Create placeholder week structure
       let week = Array(7)
         .fill(null)
         .map((_, index) => {
@@ -156,13 +173,14 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
           };
         });
 
-      // Map actual diary data onto the week structure
+      // Map actual diary data onto the placeholder week structure
       diaryDays.forEach((day) => {
         const dayDate = new Date(day.date);
         // THIS SHOULD WORK SINCE DAY DATE WILL BE like 00:000Z
         const formattedDate = day.date.split("T")[0];
         // const formattedDate = formatInTimeZone(dayDate, 'Europe/London', 'yyyy-MM-dd HH:mm:ssXXX').split(' ')[0] // 2014-10-25 06:46:20-04:00
 
+        // Maybe only need isSameWeek?
         if (
           isSameWeek(dayDate, currentWeekStartLocal, { weekStartsOn: 1 }) &&
           isBefore(dayDate, addDays(currentWeekStartLocal, 7))
@@ -183,13 +201,23 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
         earliestDate: diaryDays[0].date.split("T")[0],
       });
 
+
       // Proceed to the next week
       currentWeekStartLocal = getAnyDateLocal(
         addDays(currentWeekStartLocal, 7)
       );
+
+      // if (!isSubscribed) {
+      //   break;
+      // }
     }
 
-    return weeks;
+    if (!isSubscribed) {
+      return [weeks[weeks.length - 1]];
+    } else {
+      console.log('RETURNING ALL WEEKS', JSON.stringify(weeks, null, 2));
+      return weeks;
+    }
   };
 
   const determineDayType = (weekStart, dayIndex) => {
@@ -256,21 +284,29 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
   );
 
   function findWeekIndexByDate(weeksArray, targetDate) {
+
     // Loop through the array of weeks
-    return weeksArray.findIndex((week) => {
+    const index = weeksArray.findIndex((week) => {
       // Check if any day in the 'days' array of this week matches the target date
       return week.days.some((day) => day.date === getAnyDateLocal(targetDate));
     });
+
+    return index; // Ensure the index is always within range
   }
 
-  const hideBlur = isReduceTransparencyEnabled || theme === 'dark'
+  const hideBlur = isReduceTransparencyEnabled || theme === "dark";
 
   return (
     <BlurView
       intensity={hideBlur ? 0 : 80}
-      key={theme + isReduceTransparencyEnabled} // Make sure this key doesnt cause performance problems 
+      key={theme + isReduceTransparencyEnabled} // Make sure this key doesnt cause performance problems
       tint={theme}
-      style={{ position: "absolute", zIndex: 3000, paddingTop: insets.top + 5, backgroundColor: hideBlur && themedColours.primaryBackground[theme]}}
+      style={{
+        position: "absolute",
+        zIndex: 3000,
+        paddingTop: insets.top + 5,
+        backgroundColor: hideBlur && themedColours.primaryBackground[theme],
+      }}
     >
       <View
         style={{
@@ -325,8 +361,16 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
         ref={carouselRef}
         width={windowWidth}
         height={100}
+        // onScrollBegin={(e) => {
+        //   console.log('hey');
+        //   console.log(e);
+        // }}
         onSnapToItem={(index) => {
-          // if (index < weeksData.length - 2) Alert.alert("You need to pay");
+          console.log(index);
+          if (!isSubscribed && index === 0) {
+            // TRY MAKE THIS LESS ANNOYING? more scroll pixels needed to trigger
+            navigation.navigate('Paywall')
+          } 
           // carouselRef.current.scrollTo({ index: weeksData.length - 1 });
           // setCurrentIndex(weeksData.length - 1);
         }}

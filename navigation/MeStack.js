@@ -76,14 +76,14 @@ const MeStack = () => {
           headerShown: false,
         }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="Paywall"
         component={Paywall}
         options={{
           headerShown: false,
           presentation: 'modal'
         }}
-      />
+      /> */}
     </Stack.Navigator>
   );
 };

@@ -1,10 +1,10 @@
 const User = require("../models/User");
 const { NotFoundError } = require("../utils/error");
 
+// Here, you would typically update the user's subscription status to active
+// You could also initialize subscription-specific data, send a welcome email, or log the transaction
 async function handleInitialPurchase(event) {
-  // Here, you would typically update the user's subscription status to active
-  // You could also initialize subscription-specific data, send a welcome email, or log the transaction
-
+  // Update user subscription state
   const user = await User.findOneAndUpdate(
     { firebaseId: event.app_user_id },
     { $set: { isSubscribed: true, activeSubscription: event.product_id } },
@@ -19,10 +19,10 @@ async function handleInitialPurchase(event) {
   // Send welcome email
   // Log the transaction
 }
-async function handleRenewalPurchase(event) {
-  // Update user subscription status and expiry date
-  // Log the renewal transaction and update any relevant user metrics
 
+// Update user subscription status and expiry date
+// Log the renewal transaction and update any relevant user metrics
+async function handleRenewalPurchase(event) {
   const user = await User.findOneAndUpdate(
     { firebaseId: event.app_user_id },
     { $set: { isSubscribed: true, activeSubscription: event.product_id } },
@@ -33,11 +33,29 @@ async function handleRenewalPurchase(event) {
     throw new NotFoundError("User not found with this firebaseId", {
       firebaseId,
     });
+
+  // Send welcome back email
+  // Log / update the transaction
 }
 
 async function handleCancellation(event) {
-  // Set the user's subscription status to inactive or cancelled
+  // Look at and handle the differnet cancel reasons!
   // Optionally, schedule an exit survey email or retention offer
+  // Send sorry gone email and setup retention offer?
+}
+
+async function handleUncancellation(event) {
+  // Update the subscription status back to active
+  // You might also want to log this event or inform other services that the user has uncanceled
+}
+async function handleNonRenewingPurchase() {
+  // Log the purchase and possibly trigger a specific business logic depending on the product purchased
+  // Think I only need this for lifetime purchases so leave it for now?
+  console.log("ONLY TRIGGERS FOR LIFETIME?");
+}
+
+async function handleExpiration(event) {
+  // Update the user's subscription status
 
   const user = await User.findOneAndUpdate(
     { firebaseId: event.app_user_id },
@@ -49,21 +67,9 @@ async function handleCancellation(event) {
     throw new NotFoundError("User not found with this firebaseId", {
       firebaseId,
     });
+}
 
-  // Send sorry gone email and setup retention offer?
-}
-async function handleUncancellation() {
-  // Update the subscription status back to active
-  // You might also want to log this event or inform other services that the user has uncanceled
-}
-async function handleNonRenewingPurchase() {
-  // Log the purchase and possibly trigger a specific business logic depending on the product purchased
-  // Think I only need this for lifetime purchases
-}
-async function handleExpiration() {
-  // Update the user's subscription status to expired
-  // Clean up any entitlements associated with the subscription
-}
+
 async function handleBillingIssue() {
   // Flag the user account as having billing issues
   // Trigger communication to the user to update their payment method
@@ -85,6 +91,7 @@ async function handleTemporaryEntitlementGrant() {
   // Grant the user temporary access to premium features
   // Ensure to track the start and end dates of this entitlement
   // might be part of a promotional offer, Marketing scheme, or a corrective action in response to a service issue
+  // This event is sent in exceptional situations (for example, a partial app store outage) and is used to avoid customers making a purchase but not getting access to their entitlement. 
 }
 
 module.exports = {

@@ -122,20 +122,28 @@ async function getAllDiaryDays({ userId }) {
   if (!user)
     throw new NotFoundError("Could not find user with this userId", { userId });
 
-  let query = DiaryDay.find({ userId: userId })
-    .sort("date")
-    .select("_id score date diaryDayState fastedState")
-    .lean();
+  let query;
 
-
-  // If the user is not subscribed, limit the results to the last 7 days
+  // If the user is not subscribed, fetch only the last 7 diary days
   if (!user.isSubscribed) {
-    query = query.limit(7);
+    query = DiaryDay.find({ userId: userId })
+      .sort("-date") // Sort by date in descending order
+      .limit(7) // Limit to the last 7 entries
+      .select("_id score date diaryDayState fastedState")
+      .lean();
+  } else {
+    // For subscribed users, fetch all diary days
+    query = DiaryDay.find({ userId: userId })
+      .sort("date") // Sort by date in ascending order
+      .select("_id score date diaryDayState fastedState")
+      .lean();
   }
 
   let diaryDays = await query.exec();
 
-  console.log(diaryDays);
+  if (!user.isSubscribed) {
+    diaryDays.reverse();
+  }
 
   if (!diaryDays.length) {
     // Create a diary day and send it in array!?

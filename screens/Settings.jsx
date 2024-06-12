@@ -22,9 +22,21 @@ import HeartIcon from "../svgs/HeartIcon";
 import Header from "../components/settings/Header";
 import { useColourTheme } from "../context/Themed";
 import { themedColours } from "../constants/themedColours";
+import Purchases from "react-native-purchases";
+
 const Settings = ({ navigation }) => {
   const insets = useSafeAreaInsets();
-  const {theme} = useColourTheme()
+  const { theme } = useColourTheme();
+
+  const restorePurchases = async () => {
+    try {
+      const restore = await Purchases.restorePurchases();
+      console.log(restore);
+    } catch (e) {
+      Alert.alert("Error restoring purchases", e.message);
+    }
+  };
+
   return (
     <View
       style={{
@@ -34,39 +46,51 @@ const Settings = ({ navigation }) => {
         paddingBottom: insets.bottom,
       }}
     >
-      <Header headerText={'Settings'} onNavigate={() => navigation.goBack()} />
+      <Header headerText={"Settings"} onNavigate={() => navigation.goBack()} />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={{ paddingHorizontal: 20, paddingBottom: 15, gap: 13 }}>
           {/* Title */}
-          <Text style={{ fontSize: 34, fontFamily: "Mulish_700Bold", color: themedColours.primaryText[theme] }}>
+          <Text
+            style={{
+              fontSize: 34,
+              fontFamily: "Mulish_700Bold",
+              color: themedColours.primaryText[theme],
+            }}
+          >
             Settings
           </Text>
           <ProBanner />
-          <Text
-            style={{
-              fontSize: 14,
-              fontFamily: "Mulish_700Bold",
-              color: themedColours.primary[theme],
-              padding: 10,
-              textAlign: "center",
-            }}
-          >
-            Restore Purchases
-          </Text>
+          <Pressable hitSlop={10} onPress={restorePurchases}>
+            <Text
+              style={{
+                fontSize: 14,
+                fontFamily: "Mulish_700Bold",
+                color: themedColours.primary[theme],
+                padding: 10,
+                textAlign: "center",
+              }}
+            >
+              Restore Purchases
+            </Text>
+          </Pressable>
         </View>
         <Divider />
         {/* First options */}
         <View style={{ paddingVertical: 14 }}>
           <SettingOption
             optionText="Account"
-            optionSvg={<ProfileCircle color={themedColours.primaryText[theme]} />}
+            optionSvg={
+              <ProfileCircle color={themedColours.primaryText[theme]} />
+            }
             showArrow={true}
-            onPress={() => navigation.navigate('Account')}
+            onPress={() => navigation.navigate("Account")}
           />
           <SettingOption
             optionText="Notifications"
-            optionSvg={<NotificationBell color={themedColours.primaryText[theme]} />}
-            onPress={() => navigation.navigate('Notifications')}
+            optionSvg={
+              <NotificationBell color={themedColours.primaryText[theme]} />
+            }
+            onPress={() => navigation.navigate("Notifications")}
             showArrow={true}
           />
           <SettingOption
@@ -136,7 +160,11 @@ const Settings = ({ navigation }) => {
             >
               Made with
             </Text>
-            <HeartIcon color={themedColours.secondaryText[theme]} width={17} height={14} />
+            <HeartIcon
+              color={themedColours.secondaryText[theme]}
+              width={17}
+              height={14}
+            />
             <Text
               style={{
                 fontSize: 17,

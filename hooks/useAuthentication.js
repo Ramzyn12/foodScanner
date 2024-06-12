@@ -42,6 +42,7 @@ export const useAuthentication = () => {
       } else {
         storage.delete("firebaseToken");
         setIsLoggedIn(false);
+        console.log('USER NO LONGER FOUND, unsubscribeAuthChange');
         setFirebaseUid(null);
       }
       setIsLoading(false);
@@ -59,6 +60,9 @@ export const useAuthentication = () => {
             console.error("Error refreshing token:", error);
             handleSignOut("Session expired. Please log in again.");
           });
+      } else {
+        console.log('USER NO LONGER FOUND, tokenChanged function useAuthentication');
+
       }
     });
 

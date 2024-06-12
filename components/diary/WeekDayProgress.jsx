@@ -33,8 +33,6 @@ const WeekDayProgress = ({
   // Change to date-fns is Before
   const beforeEarliest = new Date(date) < new Date(earliestDate);
 
-  console.log(beforeEarliest, dayType, diaryDayState, isFasting);
-
   useEffect(() => {
     // Milliseconds of each, equal since start of day local time both cases
     if (chosenDateObj.getTime() === thisDateObj.getTime()) {

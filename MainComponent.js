@@ -21,6 +21,7 @@ import Toast from "react-native-toast-message";
 import { toastConfig } from "./toastConfig";
 import { themedColours } from "./constants/themedColours";
 import { useColourTheme } from "./context/Themed";
+import Paywall from "./screens/Paywall";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -44,20 +45,6 @@ function MainComponent({ loggedIn }) {
   useEffect(() => {
     dispatch(setHapticSetting(hapticsEnabledData));
   }, [hapticsEnabledData]);
-
-  useEffect(() => {
-    Purchases.addCustomerInfoUpdateListener(info => {
-      if (info.entitlements.active.pro) {
-        console.log("User's pro subscription is active.");
-        
-      } else {
-        console.log("User's pro subscription is not active.");
-        // Handle the removal of pro status in your app
-      }
-    });
-
-    // return () => purchaserInfoUpdateListener.remove();
-  }, []);
 
   return (
     <NavigationContainer theme={{colors: {
@@ -83,6 +70,14 @@ function MainComponent({ loggedIn }) {
               contentStyle: { borderRadius: 20 },
             }}
             component={FoodDetails}
+          />
+          <Stack.Screen
+            name="Paywall"
+            component={Paywall}
+            options={{
+              headerShown: false,
+              presentation: 'modal'
+            }}
           />
         </Stack.Navigator>
       )}

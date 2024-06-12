@@ -1,14 +1,25 @@
-import { View, Text } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import React from "react";
 import { Path, Svg } from "react-native-svg";
 import { useColourTheme } from "../../context/Themed";
 import { themedColours } from "../../constants/themedColours";
-
+import Purchases from "react-native-purchases";
 const BottomButtons = () => {
-  const {theme} = useColourTheme()
+  const { theme } = useColourTheme();
+
+  const restorePurchases = async () => {
+    try {
+      const restore = await Purchases.restorePurchases();
+      console.log(restore);
+    } catch (e) {
+      Alert.alert("Error restoring purchases", e.message);
+    }
+  };
   return (
     <View>
-      <View
+      <Pressable
+        onPress={restorePurchases}
+        hitSlop={10}
         style={{
           height: 44,
           gap: 8,
@@ -17,8 +28,16 @@ const BottomButtons = () => {
         }}
       >
         <UndoIcon />
-        <Text style={{fontSize: 14, fontFamily: 'Mulish_700Bold', color: themedColours.secondaryText[theme]}}>Restore Purchase</Text>
-      </View>
+        <Text
+          style={{
+            fontSize: 14,
+            fontFamily: "Mulish_700Bold",
+            color: themedColours.secondaryText[theme],
+          }}
+        >
+          Restore Purchase
+        </Text>
+      </Pressable>
       <View
         style={{
           height: 44,
@@ -28,7 +47,15 @@ const BottomButtons = () => {
         }}
       >
         <ShieldIcon />
-        <Text style={{fontSize: 14, fontFamily: 'Mulish_700Bold', color: themedColours.secondaryText[theme]}}>Privacy Policy</Text>
+        <Text
+          style={{
+            fontSize: 14,
+            fontFamily: "Mulish_700Bold",
+            color: themedColours.secondaryText[theme],
+          }}
+        >
+          Privacy Policy
+        </Text>
       </View>
       <View
         style={{
@@ -39,7 +66,15 @@ const BottomButtons = () => {
         }}
       >
         <DocumentIcon />
-        <Text style={{fontSize: 14, fontFamily: 'Mulish_700Bold', color: themedColours.secondaryText[theme]}}>Terms of Service</Text>
+        <Text
+          style={{
+            fontSize: 14,
+            fontFamily: "Mulish_700Bold",
+            color: themedColours.secondaryText[theme],
+          }}
+        >
+          Terms of Service
+        </Text>
       </View>
     </View>
   );

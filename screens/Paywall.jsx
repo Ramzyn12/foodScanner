@@ -19,6 +19,7 @@ import PlanCards from "../components/paywalls/PlanCards";
 import CancelInfo from "../components/paywalls/CancelInfo";
 import BottomButtons from "../components/paywalls/BottomButtons";
 import PaywallNoTrial from "./paywalls/PaywallNoTrial";
+import * as Notifications from "expo-notifications";
 
 const Paywall = ({ navigation }) => {
   const [offering, setOffering] = useState(null);
@@ -31,27 +32,18 @@ const Paywall = ({ navigation }) => {
   const getOfferings = async () => {
     try {
       const offerings = await Purchases.getOfferings();
-      // const customerInfo = await Purchases.getCustomerInfo()
-      console.log(JSON.stringify(offerings, null, 2));
       if (
         offerings.current !== null &&
         offerings.current.availablePackages.length !== 0
       ) {
-        const firstProduct = offerings.current.availablePackages[0].product;
-        const trialStatus =
-          await Purchases.checkTrialOrIntroductoryPriceEligibility([
-            firstProduct.identifier,
-          ]);
+        const firstPackage = offerings.current.availablePackages[0];
+        const isElegible = await getElegibilityStatus(firstPackage);
 
-        if (
-          Purchases.INTRO_ELIGIBILITY_STATUS[
-            trialStatus[firstProduct.identifier].status
-          ] === "INTRO_ELIGIBILITY_STATUS_ELIGIBLE"
-        ) {
-          console.log("ELEGIBLE!!");
+        if (isElegible) {
+          console.log("ELEGIBLE");
           setElegibleFreeTrial(true);
         } else {
-          console.log("NOT ELIGIBLE OR UNKOWN :(");
+          console.log("NOT ELIGIBLE");
           setElegibleFreeTrial(false);
         }
         setOffering(offerings.current);
@@ -61,12 +53,40 @@ const Paywall = ({ navigation }) => {
     }
   };
 
+  const getElegibilityStatus = async (item) => {
+    const trialStatus =
+      await Purchases.checkTrialOrIntroductoryPriceEligibility([
+        item.product.identifier,
+      ]);
+
+
+    if (
+      Purchases.INTRO_ELIGIBILITY_STATUS[trialStatus[item.product.identifier].status] === "INTRO_ELIGIBILITY_STATUS_ELIGIBLE"
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   const onPurchase = async (item) => {
-    // return console.log(item);
+    const isFreeTrial = await getElegibilityStatus(item);
+
     try {
       const { customerInfo } = await Purchases.purchasePackage(item);
       if (typeof customerInfo.entitlements.active["Pro"] !== "undefined") {
-        Alert.alert("Welcome to Pro", "Your in");
+        Alert.alert("Welcome to Pro", "Your in"); // Improve - see what others do
+        if (isFreeTrial) {
+          // May need to prompt for notifications now
+          Notifications.scheduleNotificationAsync({
+            content: {
+              title: "Free trial ending 2 days",
+              body: "Trial ending two days ",
+            },
+            // trigger: { seconds: 20 },
+            trigger: { seconds: 5 * 24 * 60 * 60 }, // 5 days in seconds
+          });
+        }
       }
     } catch (e) {
       if (!e.userCancelled) {
