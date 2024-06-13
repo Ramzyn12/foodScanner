@@ -1,20 +1,32 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, Alert } from "react-native";
 import React from "react";
 import { Path, Svg } from "react-native-svg";
 import { useColourTheme } from "../../context/Themed";
 import { themedColours } from "../../constants/themedColours";
 import Purchases from "react-native-purchases";
+
 const BottomButtons = () => {
   const { theme } = useColourTheme();
 
   const restorePurchases = async () => {
     try {
       const restore = await Purchases.restorePurchases();
-      console.log(restore);
+      if (typeof restore.entitlements.active["Pro"] !== "undefined") {
+        Alert.alert(
+          "Purchases Restored",
+          "Your purchases have been successfully restored."
+        );
+      } else {
+        Alert.alert(
+          "Error restoring purchases",
+          "No previous purchases were found on this apple account"
+        );
+      }
     } catch (e) {
       Alert.alert("Error restoring purchases", e.message);
     }
   };
+
   return (
     <View>
       <Pressable

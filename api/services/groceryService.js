@@ -1,7 +1,8 @@
 const FoodItem = require("../models/FoodItem");
 const Grocery = require("../models/Grocery");
 const SingleFood = require("../models/SingleFood");
-const { NotFoundError } = require("../utils/error");
+const User = require("../models/User");
+const { NotFoundError, BadRequestError } = require("../utils/error");
 
 async function addFoodToGroceryList({ userId, foodDetails }) {
   // Dont let it add two duplicates
@@ -9,6 +10,8 @@ async function addFoodToGroceryList({ userId, foodDetails }) {
   const { barcode, singleFoodId } = foodDetails;
 
   let item, itemModel;
+
+  const user = await User.findById(userId);
 
   if (barcode) {
     item = await FoodItem.findOne({ barcode: barcode });
@@ -27,14 +30,27 @@ async function addFoodToGroceryList({ userId, foodDetails }) {
 
   const groceryItem = { item: item._id, itemModel, checked: false };
 
-  const groceries = await Grocery.findOneAndUpdate(
-    { userId: userId },
-    {
-      $addToSet: { groceries: groceryItem },
-      $push: { itemOrder: item._id }, // Add item ID to the end of the itemOrder array
-    },
-    { new: true, upsert: true }
-  );
+  let groceries = await Grocery.findOne({ userId });
+
+  if (!groceries) {
+    groceries = await Grocery.create({
+      userId,
+      groceries: [groceryItem],
+    });
+
+    return groceries;
+  }
+
+  const itemsInGroceries = groceries.groceries.length;
+
+  if (itemsInGroceries >= 5 && !user.isSubscribed) {
+    throw new BadRequestError("Subscription Required to add more than 5");
+  }
+
+  groceries = await groceries.updateOne({
+    $addToSet: { groceries: groceryItem },
+    $push: { itemOrder: item._id }, // Add item ID to the end of the itemOrder array
+  });
 
   return groceries;
 }
@@ -54,7 +70,6 @@ async function getGroceryList({ userId }) {
 }
 
 async function removeFoodFromGroceryList({ userId, barcode, singleFoodId }) {
-
   let itemId;
 
   if (barcode) {
@@ -141,7 +156,6 @@ async function updateSortPreference({ userId, sortPreference }) {
 }
 
 async function updateOrder({ userId, itemOrder }) {
-
   const groceryList = await Grocery.findOneAndUpdate(
     { userId },
     { $set: { itemOrder } },

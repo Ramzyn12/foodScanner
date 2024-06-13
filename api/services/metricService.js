@@ -2,6 +2,7 @@ const HealthMetric = require("../models/HealthMetric");
 const { addDays, format } = require('date-fns');
 const { getCurrentDateLocal } = require("../utils/dateHelper");
 const { BadRequestError, NotFoundError } = require("../utils/error");
+const User = require("../models/User");
 
 
 async function updateHealthMetric({ date, metric, userId, metricValue, unitOfMeasure }) {
@@ -52,6 +53,13 @@ async function getAllDataForMetric({ metric, userId, timeFrame }) {
   if (!['Week', 'Month', 'Year'].includes(timeFrame)) {
     throw new BadRequestError('Invalid time frame value', { timeFrame });
   }
+
+  const user = await User.findById(userId);
+
+  if (timeFrame !== 'Week' && !user.isSubscribed) {
+    throw new BadRequestError('Subscription Required to access more data')
+  }
+  
   const days = timeFrame === 'Month' ? 28 : timeFrame === 'Year' ? 364 : 7
   const today = new Date(getCurrentDateLocal());
   const endDate = today; // Set end of today

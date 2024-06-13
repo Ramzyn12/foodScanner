@@ -60,6 +60,8 @@ import { getCurrentDateLocal } from "../utils/dateHelpers";
 import Toast from "react-native-toast-message";
 import { useColourTheme } from "../context/Themed";
 import { themedColours } from "../constants/themedColours";
+import { useNavigation } from "@react-navigation/native";
+import { useCustomerInfo } from "../hooks/useCustomerInfo";
 
 const screenWidth = Dimensions.get("screen").width;
 
@@ -131,6 +133,20 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
   const releaseTimeoutRef = useRef(null);
   const { theme } = useColourTheme();
 
+  const [isSubscribed, setIsSubscribed] = useState(undefined)
+
+  const {customerInfo, error, loading} = useCustomerInfo()
+
+  useEffect(() => {
+    if (!customerInfo) return 
+    
+    if(typeof customerInfo.entitlements.active['Pro'] !== "undefined") {
+      setIsSubscribed(true)
+    } else {
+      setIsSubscribed(false)
+    }
+  }, [customerInfo])
+
   const handleBarPress = (datum) => {
     setSelectedX(datum.date);
     setTooltipVisible(true); // Show tooltip
@@ -153,6 +169,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
     data,
     isLoading,
     isError: isErrorGraphData,
+    error: errorGraphData
   } = useQuery({
     // Should be called get graph data
     queryFn: () =>
@@ -163,6 +180,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
     retry: 1,
     queryKey: ["MetricGraphData", route.params.metricType, selectedTimeFrame],
   });
+
 
   const emptyData = data?.every((item) => item.metricValue === null);
 
@@ -224,6 +242,10 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
   };
 
   const handleTimeFrameChange = (timeFrame) => {
+    if (timeFrame !== 'Week' && !isSubscribed) {
+      navigation.navigate('Paywall')
+      return 
+    }
     setSelectedTimeFrame(timeFrame);
   };
 

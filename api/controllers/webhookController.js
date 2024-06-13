@@ -20,7 +20,7 @@ const handleRcEvents = (req, res) => {
 
   // Maybe here log the event? or call the rest API as they say to then log response
 
-  switch (event) {
+  switch (event.type) {
     case "INITIAL_PURCHASE":
       webhookService.handleInitialPurchase(event)
       console.log(event);

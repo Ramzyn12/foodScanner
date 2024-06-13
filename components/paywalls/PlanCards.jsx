@@ -3,13 +3,15 @@ import React from "react";
 import SinglePlanCard from "./SinglePlanCard";
 import Purchases from "react-native-purchases";
 import * as Notifications from "expo-notifications";
+import { useNavigation } from "@react-navigation/native";
 
-const PlanCards = ({ freeTrial, offerings }) => {
+const PlanCards = ({ freeTrial, offerings, setIsPurchasing }) => {
   const getPercentSaved = () => {
     const decimalSaved =
       1 - offerings[0].product.price / (offerings[1].product.price * 12);
     return decimalSaved.toFixed(2) * 100;
   };
+  const navigation = useNavigation()
 
   const getElegibilityStatus = async (item) => {
     const trialStatus =
@@ -29,11 +31,14 @@ const PlanCards = ({ freeTrial, offerings }) => {
   };
 
   const onPurchase = async (item) => {
+    setIsPurchasing(true)
     const isFreeTrial = await getElegibilityStatus(item);
 
     try {
       const { customerInfo } = await Purchases.purchasePackage(item);
       if (typeof customerInfo.entitlements.active["Pro"] !== "undefined") {
+        setIsPurchasing(true)
+        navigation.goBack()
         Alert.alert("Welcome to Pro", "Your in"); // Improve - see what others do
         if (isFreeTrial) {
           // May need to prompt for notifications now 
@@ -51,6 +56,8 @@ const PlanCards = ({ freeTrial, offerings }) => {
       if (!e.userCancelled) {
         console.log(e);
       }
+    } finally {
+      setIsPurchasing(false)
     }
   };
 

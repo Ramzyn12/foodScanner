@@ -1,7 +1,7 @@
 const DiaryDay = require("../models/DiaryDay");
 const FoodItem = require("../models/FoodItem");
 const SingleFood = require("../models/SingleFood");
-const { NotFoundError } = require("../utils/error");
+const { NotFoundError, BadRequestError } = require("../utils/error");
 const { getCurrentDateLocal } = require("../utils/dateHelper");
 const User = require("../models/User");
 
@@ -9,6 +9,8 @@ async function addFoodToDiary({ userId, foodDetails }) {
   const { barcode, singleFoodId, date } = foodDetails;
 
   const localDate = new Date(date + "T00:00:00.000Z");
+
+  const user = await User.findById(userId);
 
   let foodItem;
   let diaryDay;
@@ -20,30 +22,58 @@ async function addFoodToDiary({ userId, foodDetails }) {
       foodItem = await FoodItem.create(foodDetails);
     }
 
-    diaryDay = await DiaryDay.findOneAndUpdate(
-      { userId: userId, date: localDate },
-      {
-        // addToSet: Ensures can't add duplicate item
-        $addToSet: { consumedFoods: foodItem._id },
-      },
-      { new: true, upsert: true }
-    );
+    // diaryDay = await DiaryDay.findOneAndUpdate(
+    //   { userId: userId, date: localDate },
+    //   {
+    //     // addToSet: Ensures can't add duplicate item
+    //     $addToSet: { consumedFoods: foodItem._id },
+    //   },
+    //   { new: true, upsert: true }
+    // );
   } else if (singleFoodId) {
     foodItem = await SingleFood.findById(singleFoodId);
 
-    diaryDay = await DiaryDay.findOneAndUpdate(
-      { userId: userId, date: localDate },
-      {
-        $addToSet: { consumedSingleFoods: foodItem._id },
-      },
-      { new: true, upsert: true }
-    );
+    // diaryDay = await DiaryDay.findOneAndUpdate(
+    //   { userId: userId, date: localDate },
+    //   {
+    //     $addToSet: { consumedSingleFoods: foodItem._id },
+    //   },
+    //   { new: true, upsert: true }
+    // );
   }
+
+  diaryDay = await DiaryDay.findOne({
+    userId: userId,
+    date: localDate,
+  });
 
   if (!diaryDay) {
     // OR maybe create one??
-    throw new NotFoundError("No diary day found!", {userId, localDate});
+    diaryDay = await DiaryDay.create({
+      userId,
+      date: localDate,
+      consumedFoods: barcode ? [foodItem._id] : [],
+      consumedSingleFoods: singleFoodId ? [foodItem._id] : [],
+    });
+
+    await diaryDay.updateDiaryDayState(); // Processed, Unprocessed, Empty
+
+    return diaryDay;
+    // throw new NotFoundError("No diary day found!", { userId, localDate });
   }
+
+  const itemsInDiary =
+    diaryDay.consumedFoods.length + diaryDay.consumedSingleFoods.length;
+
+  if (itemsInDiary >= 5 && !user.isSubscribed) {
+    throw new BadRequestError("Subscription Required to add more than 5");
+  }
+
+  const update = barcode
+    ? { $addToSet: { consumedFoods: foodItem._id } }
+    : { $addToSet: { consumedSingleFoods: foodItem._id } };
+
+  await diaryDay.updateOne(update);
 
   await diaryDay.updateDiaryDayState(); // Processed, Unprocessed, Empty
 

@@ -20,10 +20,12 @@ import CancelInfo from "../components/paywalls/CancelInfo";
 import BottomButtons from "../components/paywalls/BottomButtons";
 import PaywallNoTrial from "./paywalls/PaywallNoTrial";
 import * as Notifications from "expo-notifications";
+import LoadingPaywall from "../components/paywalls/LoadingPaywall";
 
 const Paywall = ({ navigation }) => {
   const [offering, setOffering] = useState(null);
   const [elegibleFreeTrial, setElegibleFreeTrial] = useState(undefined);
+  const [isPurchasing, setIsPurchasing] = useState(false);
   const { theme } = useColourTheme();
   const scrollViewRef = useRef(null); // Create a ref for the ScrollView
 
@@ -59,9 +61,10 @@ const Paywall = ({ navigation }) => {
         item.product.identifier,
       ]);
 
-
     if (
-      Purchases.INTRO_ELIGIBILITY_STATUS[trialStatus[item.product.identifier].status] === "INTRO_ELIGIBILITY_STATUS_ELIGIBLE"
+      Purchases.INTRO_ELIGIBILITY_STATUS[
+        trialStatus[item.product.identifier].status
+      ] === "INTRO_ELIGIBILITY_STATUS_ELIGIBLE"
     ) {
       return true;
     } else {
@@ -70,11 +73,13 @@ const Paywall = ({ navigation }) => {
   };
 
   const onPurchase = async (item) => {
+    setIsPurchasing(true);
     const isFreeTrial = await getElegibilityStatus(item);
 
     try {
       const { customerInfo } = await Purchases.purchasePackage(item);
       if (typeof customerInfo.entitlements.active["Pro"] !== "undefined") {
+        navigation.goBack();
         Alert.alert("Welcome to Pro", "Your in"); // Improve - see what others do
         if (isFreeTrial) {
           // May need to prompt for notifications now
@@ -92,6 +97,8 @@ const Paywall = ({ navigation }) => {
       if (!e.userCancelled) {
         console.log(e);
       }
+    } finally {
+      setIsPurchasing(false);
     }
   };
 
@@ -106,8 +113,7 @@ const Paywall = ({ navigation }) => {
     }
   };
 
-  if (!offering || elegibleFreeTrial === undefined)
-    return <ActivityIndicator />;
+  if (!offering || elegibleFreeTrial === undefined) return <LoadingPaywall />;
 
   if (elegibleFreeTrial === false) {
     // change to false
@@ -120,7 +126,7 @@ const Paywall = ({ navigation }) => {
     }
   };
 
-  // Else return free trial one
+  // Else elegible so return free trial one
   return (
     <View>
       <Pressable
@@ -169,6 +175,7 @@ const Paywall = ({ navigation }) => {
               Choose another plan
             </Text>
             <PlanCards
+            setIsPurchasing={setIsPurchasing}
               offerings={offering?.availablePackages}
               freeTrial={true}
             />
@@ -177,6 +184,20 @@ const Paywall = ({ navigation }) => {
           <BottomButtons />
         </View>
       </ScrollView>
+      {isPurchasing && (
+        <View
+          style={{
+            flex: 1,
+            position: "absolute",
+            left: 0,
+            top: 0,
+            right: 0,
+            bottom: 0,
+            opacity: 0.3,
+            backgroundColor: "black",
+          }}
+        />
+      )}
     </View>
   );
 };

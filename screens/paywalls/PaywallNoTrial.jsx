@@ -32,9 +32,10 @@ const end = {
   y: 0.5 - Math.cos(angleRad) / 2,
 };
 
-const PaywallNoTrial = ({offering}) => {
+const PaywallNoTrial = ({ offering }) => {
   const { theme } = useColourTheme();
-  const navigation = useNavigation()
+  const navigation = useNavigation();
+  const [isPurchasing, setIsPurchasing] = useState(false);
   return (
     <View>
       <Pressable
@@ -50,7 +51,7 @@ const PaywallNoTrial = ({offering}) => {
       </Pressable>
       <ScrollView>
         <View style={{ padding: 20, gap: 40, paddingBottom: 80 }}>
-          <View style={{ flexDirection: "row", gap: 8, alignItems: 'center' }}>
+          <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }}>
             <Text
               style={{
                 color: themedColours.primaryText[theme],
@@ -82,23 +83,66 @@ const PaywallNoTrial = ({offering}) => {
             </LinearGradient>
           </View>
           <View>
-            <Text style={{marginBottom: 8, fontSize: 20, fontFamily: 'Mulish_700Bold', color: themedColours.primaryText[theme]}}>Our plans</Text>
-            <Text style={{marginBottom: 14, fontFamily: 'Mulish_400Regular', color: themedColours.secondaryText[theme],fontSize: 14}}>
+            <Text
+              style={{
+                marginBottom: 8,
+                fontSize: 20,
+                fontFamily: "Mulish_700Bold",
+                color: themedColours.primaryText[theme],
+              }}
+            >
+              Our plans
+            </Text>
+            <Text
+              style={{
+                marginBottom: 14,
+                fontFamily: "Mulish_400Regular",
+                color: themedColours.secondaryText[theme],
+                fontSize: 14,
+              }}
+            >
               Choose the plan that suits you best. You can easily cancel your
               plan at any time.
             </Text>
-            <PlanCards offerings={offering?.availablePackages} freeTrial={false} />
+            <PlanCards
+              setIsPurchasing={setIsPurchasing}
+              offerings={offering?.availablePackages}
+              freeTrial={false}
+            />
           </View>
           <View style={{ gap: 14 }}>
             {/* <StartTrialPrompt /> */}
-            <Text style={{marginBottom: 8, fontSize: 20, fontFamily: 'Mulish_700Bold', color: themedColours.primaryText[theme]}}>Everything you need to thrive</Text>
+            <Text
+              style={{
+                marginBottom: 8,
+                fontSize: 20,
+                fontFamily: "Mulish_700Bold",
+                color: themedColours.primaryText[theme],
+              }}
+            >
+              Everything you need to thrive
+            </Text>
             <BenefitCards />
           </View>
-          
+
           <CancelInfo />
           <BottomButtons />
         </View>
       </ScrollView>
+      {isPurchasing && (
+        <View
+          style={{
+            flex: 1,
+            position: "absolute",
+            left: 0,
+            top: 0,
+            right: 0,
+            bottom: 0,
+            opacity: 0.3,
+            backgroundColor: "black",
+          }}
+        />
+      )}
     </View>
   );
 };

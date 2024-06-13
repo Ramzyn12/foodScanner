@@ -20,7 +20,7 @@ import { getCurrentDateLocal } from "../utils/dateHelpers";
 import { setCurrentFood } from "../redux/foodSlice";
 import debounce from "lodash.debounce";
 import throttle from "lodash.throttle";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { isPending } from "@reduxjs/toolkit";
 
 // I've decided to just use a small debounce to prevent abuse
@@ -34,6 +34,7 @@ export const useFoodDetailsActions = (expectedId) => {
   const [addedToDiary, setAddedToDiary] = useState(false);
   const mutationCounterDiary = useRef(0);
   const mutationCounterGrocery = useRef(0);
+  const navigation = useNavigation();
 
   const [addedToGroceries, SetAddedToGroceries] = useState(false);
   const chosenDate =
@@ -96,10 +97,19 @@ export const useFoodDetailsActions = (expectedId) => {
       queryClient.invalidateQueries({ queryKey: ["DiaryDay", variables.date] });
     },
     onError: (err, variables, context) => {
-      Toast.show({
-        type: "customErrorToast",
-        text1: `Failed to add food, Please try again later`,
-      });
+      if (err.response.data.message.startsWith("Subscription Required")) {
+        Toast.show({
+          type: "customErrorToast",
+          text1: `Upgrade to Pro to add unlimited items!`,
+        });
+        navigation.navigate("Paywall");
+      } else {
+        Toast.show({
+          type: "customErrorToast",
+          text1: `Failed to add food, Please try again later`,
+        });
+      }
+
       mutationCounterDiary.current = 0;
       const queryKey = variables.singleFoodId
         ? ["FoodDetailsIvy", variables.singleFoodId, variables.date]
@@ -186,11 +196,18 @@ export const useFoodDetailsActions = (expectedId) => {
       // }
     },
     onError: (err, variables, context) => {
-      console.log(err);
-      Toast.show({
-        type: "customErrorToast",
-        text1: `Failed to add to list, Please try again later`,
-      });
+      if (err.response.data.message.startsWith("Subscription Required")) {
+        Toast.show({
+          type: "customErrorToast",
+          text1: `Upgrade to Pro to add unlimited items!`,
+        });
+        navigation.navigate("Paywall");
+      } else {
+        Toast.show({
+          type: "customErrorToast",
+          text1: `Failed to add to list, Please try again later`,
+        });
+      }
       mutationCounterGrocery.current = 0;
       const queryKey = variables.singleFoodId
         ? ["FoodDetailsIvy", variables.singleFoodId, chosenDate]

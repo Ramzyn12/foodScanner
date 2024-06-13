@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Pressable } from "react-native";
+import { View, Text, ScrollView, Pressable, Alert } from "react-native";
 import React from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ArrowLeft from "../svgs/ArrowLeft";
@@ -31,7 +31,17 @@ const Settings = ({ navigation }) => {
   const restorePurchases = async () => {
     try {
       const restore = await Purchases.restorePurchases();
-      console.log(restore);
+      if (typeof restore.entitlements.active["Pro"] !== "undefined") {
+        Alert.alert(
+          "Purchases Restored",
+          "Your purchases have been successfully restored."
+        );
+      } else {
+        Alert.alert(
+          "Error restoring purchases",
+          "No previous purchases were found on this apple account"
+        );
+      }
     } catch (e) {
       Alert.alert("Error restoring purchases", e.message);
     }
