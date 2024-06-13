@@ -5,7 +5,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ArrowLeft from "../svgs/ArrowLeft";
 import COLOURS from "../constants/colours";
@@ -18,6 +18,7 @@ import { getTimelineWeek } from "../axiosAPI/timelineAPI";
 import LoadingWeeklyOverview from "../components/WeeklyOverview/LoadingWeeklyOverview";
 import { useColourTheme } from "../context/Themed";
 import { themedColours } from "../constants/themedColours";
+import { useCustomerInfo } from "../hooks/useCustomerInfo";
 
 const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
 <g clip-path="url(#clip0_1126_4878)">
@@ -47,10 +48,12 @@ const data = {
   svg: svgString,
 };
 
-const WeeklyOverview = ({ route }) => {
+const WeeklyOverview = ({ route, navigation }) => {
   const insets = useSafeAreaInsets();
   const week = route.params.week;
   const {theme} = useColourTheme()
+  const {customerInfo, error, loading: LoadingCustomerInfo} = useCustomerInfo()
+
   const {
     data: weekData,
     isLoading,
@@ -61,13 +64,29 @@ const WeeklyOverview = ({ route }) => {
     retry: 1
   });
 
-  if (isLoading) return <LoadingWeeklyOverview route={route} />;
+
+  useEffect(() => {
+    if (!customerInfo) return 
+    
+    if(typeof customerInfo.entitlements.active['Pro'] !== "undefined") {
+      return
+    } else {
+      navigation.goBack()
+      navigation.navigate('Paywall')
+    }
+  }, [customerInfo])
+
+
+
+  if (isLoading || LoadingCustomerInfo) return <LoadingWeeklyOverview route={route} />;
   if (isError)
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
         <Text>Error loading weekly overview</Text>
       </View>
     );
+
+  
 
   return (
     <View style={{ paddingTop: insets.top, flex: 1, backgroundColor: themedColours.primaryBackground[theme] }}>

@@ -40,8 +40,10 @@ async function addFoodToDiary({ userId, foodDetails }) {
     );
   }
 
-  if (!diaryDay)
-    throw new NotFoundError("Error when updating diary day (Adding)");
+  if (!diaryDay) {
+    // OR maybe create one??
+    throw new NotFoundError("No diary day found!", {userId, localDate});
+  }
 
   await diaryDay.updateDiaryDayState(); // Processed, Unprocessed, Empty
 

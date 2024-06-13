@@ -20,57 +20,53 @@ const handleRcEvents = (req, res) => {
 
   // Maybe here log the event? or call the rest API as they say to then log response
 
-  switch (event.type) {
+  switch (event) {
     case "INITIAL_PURCHASE":
       webhookService.handleInitialPurchase(event)
-      console.log(event.type);
+      console.log(event);
       break;
     case "RENEWAL":
       webhookService.handleRenewalPurchase(event)
-      console.log(event.type);
-      break;
-    case "INITIAL_PURCHASE":
-      webhookService.handleInitialPurchase(event)
-      console.log(event.type);
+      console.log(event);
       break;
     case "CANCELLATION":
       webhookService.handleCancellation(event)
-      console.log(event.type);
+      console.log(event);
       break;
     case "UNCANCELLATION":
       webhookService.handleUncancellation(event)
-      console.log(event.type);
+      console.log(event);
       break;
     case "NON_RENEWING_PURCHASE":
       webhookService.handleNonRenewingPurchase(event)
-      console.log(event.type);
+      console.log(event);
       break;
     case "EXPIRATION":
       webhookService.handleExpiration(event)
-      console.log(event.type);
+      console.log(event);
       break;
     case "BILLING_ISSUE":
       webhookService.handleBillingIssue(event)
-      console.log(event.type);
+      console.log(event);
       break;
     case "PRODUCT_CHANGE":
       webhookService.handleProductChange(event)
-      console.log(event.type);
+      console.log(event);
       break;
     case "TRANSFER":
       webhookService.handleTransfer(event)
-      console.log(event.type);
+      console.log(event);
       break;
     case "SUBSCRIPTION_EXTENDED":
       webhookService.handleSubscriptionExtended(event)
-      console.log(event.type);
+      console.log(event);
       break;
     case "TEMPORARY_ENTITLEMENT_GRANT":
       webhookService.handleTemporaryEntitlementGrant(event)
-      console.log(event.type);
+      console.log(event);
       break;
     default:
-      console.log("Unhandled event type:", event.type);
+      console.log("Unhandled event type:", event);
   }
 
   // Always respond to RevenueCat to acknowledge receipt of the webhook

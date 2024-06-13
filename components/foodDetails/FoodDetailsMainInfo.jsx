@@ -23,13 +23,14 @@ import { themedColours } from "../../constants/themedColours";
 // import { BlurView } from "@react-native-community/blur";
 import Purchases from "react-native-purchases";
 import { useCustomerInfo } from "../../hooks/useCustomerInfo";
+import { useNavigation } from "@react-navigation/native";
 
 const FoodDetailsMainInfo = () => {
   const currentFood = useSelector((state) => state.food.currentFood);
   // const { isSubscribed } = useSubscriptionState()
   const { theme } = useColourTheme();
   const [isSubscribed, setIsSubscribed] = useState(undefined)
-  // const isSubscribed = false;
+  const navigation = useNavigation()
 
   const {customerInfo, error, loading} = useCustomerInfo()
 
@@ -43,7 +44,6 @@ const FoodDetailsMainInfo = () => {
     }
   }, [customerInfo])
 
-  console.log((customerInfo));
   const [offeringDetails, setOfferingDetails] = useState("");
 
   const getAndDisplayOffering = async () => {
@@ -146,7 +146,7 @@ const FoodDetailsMainInfo = () => {
         />
       )}
       {!isSubscribed && (
-        <Pressable onPress={() => setisSubscribed(true)}>
+        <Pressable onPress={() => navigation.navigate('Paywall')}>
           <LinearGradient
             colors={["#0B5253", "#19999C"]}
             start={start}

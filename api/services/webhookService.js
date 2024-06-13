@@ -1,8 +1,6 @@
 const User = require("../models/User");
 const { NotFoundError } = require("../utils/error");
 
-// Here, you would typically update the user's subscription status to active
-// You could also initialize subscription-specific data, send a welcome email, or log the transaction
 async function handleInitialPurchase(event) {
   // Update user subscription state
   const user = await User.findOneAndUpdate(
@@ -16,12 +14,14 @@ async function handleInitialPurchase(event) {
       firebaseId,
     });
 
+  if (event.period_type === "TRIAL") {
+    // Send email in 5 days as reminder
+  }
+
   // Send welcome email
   // Log the transaction
 }
 
-// Update user subscription status and expiry date
-// Log the renewal transaction and update any relevant user metrics
 async function handleRenewalPurchase(event) {
   const user = await User.findOneAndUpdate(
     { firebaseId: event.app_user_id },
@@ -34,19 +34,35 @@ async function handleRenewalPurchase(event) {
       firebaseId,
     });
 
-  // Send welcome back email
-  // Log / update the transaction
+  // Send confirmation email or notification about renewal
+  // Log the transaction
 }
 
 async function handleCancellation(event) {
   // Look at and handle the differnet cancel reasons!
-  // Optionally, schedule an exit survey email or retention offer
-  // Send sorry gone email and setup retention offer?
+  if (event.cancel_reason === "UNSUBSCRIBE") {
+    // Send sorry gone email and setup retention offer?
+    // schedule a retention offer
+  } else if (event.cancel_reason === "BILLING_ERROR") {
+    // Flag the user account as having billing issues
+    // Notify the user they need to update billing or will expire
+    // Could find expiration time via the end_period or something
+    // Could send them link or instruciton to reduce churn
+  } else if (event.cancel_reason === "DEVELOPER_INITIATED") {
+    // Send email saying we needed to cancel because...
+  } else if (event.cancel_reason === "PRICE_INCREASE") {
+    // Maybe offer rentention offer or say bye email etc..
+  } else {
+    // CUSTOMER_SUPPORT || UNKNOWN
+    // Do something else
+  }
+  // Log to database
+  console.log(event);
 }
 
 async function handleUncancellation(event) {
-  // Update the subscription status back to active
-  // You might also want to log this event or inform other services that the user has uncanceled
+  // Log the event
+  // email we're happy to have you back!
 }
 async function handleNonRenewingPurchase() {
   // Log the purchase and possibly trigger a specific business logic depending on the product purchased
@@ -67,31 +83,92 @@ async function handleExpiration(event) {
     throw new NotFoundError("User not found with this firebaseId", {
       firebaseId,
     });
-}
 
+  // Email sad to see you go - offer rentention maybe?
+  // Log event
+}
 
 async function handleBillingIssue() {
-  // Flag the user account as having billing issues
-  // Trigger communication to the user to update their payment method
+  // Can be safely ignored since handled in Cancellation reason BILLING_ISSUE
 }
-async function handleProductChange() {
+
+async function handleProductChange(event) {
   // Update the user's subscription details to reflect the new product
-  // Probs just need to change package type rather than isSubscribed
+  // MAY NOT WANT TO UPDATE PRODUCT AS IT ONLY CHANGES AFTER LAST ONE ENDS
+
+  // const user = await User.findOneAndUpdate(
+  //   { firebaseId: event.app_user_id },
+  //   { $set: { activeSubscription: event.new_product_id } },
+  //   { new: true }
+  // );
+
+  // if (!user)
+  //   throw new NotFoundError("User not found with this firebaseId", {
+  //     firebaseId,
+  //   });
+
+  console.log(event);
+  // Send email explaining what will happen now product change
+  // E.g if changed from year to month, will need to wait for year to expire
   // Log the change and adjust entitlements if necessary
 }
-async function handleTransfer() {
+async function handleTransfer(event) {
   // Update both the transferring and receiving user's subscription status
   // This might involve revoking access from one user and granting it to another
+  // MAY NEED TO ADD transactions here as important both dont fail
+
+  const transfererFirebaseId = event.transferred_from;
+  const recipientFirebaseId = event.transferred_to;
+
+  // Returns previous document so we can use the activeSubscription
+  const transferringUser = await User.findOneAndUpdate(
+    { firebaseId: transfererFirebaseId },
+    { $set: { isSubscribed: false, activeSubscription: null } }
+  );
+
+  if (!transferringUser) {
+    throw new NotFoundError("Transferring user not found", {
+      firebaseId: transfererFirebaseId,
+    });
+  }
+
+  const receivingUser = await User.findOneAndUpdate(
+    { firebaseId: recipientFirebaseId },
+    {
+      $set: {
+        isSubscribed: true,
+        activeSubscription: transferringUser.activeSubscription,
+      },
+    },
+    { new: true } // Include session to make this part of the transaction
+  );
+
+  if (!receivingUser) {
+    throw new NotFoundError("Recieving user not found", {
+      firebaseId: transfererFirebaseId,
+    });
+  }
 }
 async function handleSubscriptionExtended() {
   // Extend the user's subscription end date
   // Log the extension and possibly notify the user
+  // This only happens if promtional offer / customer service etc...
 }
-async function handleTemporaryEntitlementGrant() {
-  // Grant the user temporary access to premium features
+async function handleTemporaryEntitlementGrant(event) {
+  // Grant the user 24 hour access to premium features
   // Ensure to track the start and end dates of this entitlement
-  // might be part of a promotional offer, Marketing scheme, or a corrective action in response to a service issue
-  // This event is sent in exceptional situations (for example, a partial app store outage) and is used to avoid customers making a purchase but not getting access to their entitlement. 
+  // This event is sent in exceptional situations (for example, a partial app store outage)
+  // and is used to avoid customers making a purchase but not getting access to their entitlement.
+  const user = await User.findOneAndUpdate(
+    { firebaseId: event.app_user_id },
+    { $set: { isSubscribed: true, activeSubscription: event.product_id } },
+    { new: true }
+  );
+
+  if (!user)
+    throw new NotFoundError("User not found with this firebaseId", {
+      firebaseId,
+    });
 }
 
 module.exports = {

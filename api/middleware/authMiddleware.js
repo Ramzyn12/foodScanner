@@ -2,6 +2,7 @@ const admin = require("../firebase-server");
 const User = require("../models/User");
 const { UnauthorizedError } = require("../utils/error");
 
+// NEED BETTER ERROR HANDLING
 const authMiddleware = async (req, res, next) => {
   try {
     const firebaseToken = req.headers.authorization?.split(" ")[1];
