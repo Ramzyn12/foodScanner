@@ -22,7 +22,6 @@ export function useCustomerInfo() {
 
   useEffect(() => {
     fetchCustomerInfo();  // Initial fetch on component mount
-  
   }, []);
 
   useEffect(() => {

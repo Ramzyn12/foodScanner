@@ -69,7 +69,11 @@ yarn-error.*
 *.pem
 
 # local env files
-.env*.local
+.env
+.env.*
+api/.env
+api/.env.*
+*.local
 
 # typescript
 *.tsbuildinfo

@@ -21,6 +21,7 @@ import BottomButtons from "../components/paywalls/BottomButtons";
 import PaywallNoTrial from "./paywalls/PaywallNoTrial";
 import * as Notifications from "expo-notifications";
 import LoadingPaywall from "../components/paywalls/LoadingPaywall";
+import { ENTITLEMENT_ID } from "../constants/rcConstants";
 
 const Paywall = ({ navigation }) => {
   const [offering, setOffering] = useState(null);
@@ -51,7 +52,7 @@ const Paywall = ({ navigation }) => {
         setOffering(offerings.current);
       }
     } catch (e) {
-      console.log(e);
+      Alert.alert('Error getting offers', e.message);
     }
   };
 
@@ -78,7 +79,7 @@ const Paywall = ({ navigation }) => {
 
     try {
       const { customerInfo } = await Purchases.purchasePackage(item);
-      if (typeof customerInfo.entitlements.active["Pro"] !== "undefined") {
+      if (typeof customerInfo.entitlements.active[ENTITLEMENT_ID] !== "undefined") {
         navigation.goBack();
         Alert.alert("Welcome to Pro", "Your in"); // Improve - see what others do
         if (isFreeTrial) {
@@ -96,6 +97,9 @@ const Paywall = ({ navigation }) => {
     } catch (e) {
       if (!e.userCancelled) {
         console.log(e);
+      }
+      if (e.code === Purchases.PURCHASES_ERROR_CODE.PURCHASE_CANCELLED_ERROR) {
+        Alert.alert('Error purchasing package', e.message);
       }
     } finally {
       setIsPurchasing(false);
@@ -184,7 +188,7 @@ const Paywall = ({ navigation }) => {
           <BottomButtons />
         </View>
       </ScrollView>
-      {isPurchasing && (
+      {/* {isPurchasing && (
         <View
           style={{
             flex: 1,
@@ -197,7 +201,7 @@ const Paywall = ({ navigation }) => {
             backgroundColor: "black",
           }}
         />
-      )}
+      )} */}
     </View>
   );
 };

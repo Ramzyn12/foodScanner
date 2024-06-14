@@ -32,7 +32,6 @@ SplashScreen.preventAutoHideAsync(); // Prevent auto-hide
 const queryClient = new QueryClient();
 
 const App = () => {
-
   return (
     <>
       <Provider store={store}>
@@ -69,7 +68,11 @@ const AppInitializer = () => {
     if (Platform.OS === "ios" && RC_API_KEY && firebaseUid) {
       // USE THIS ONE AGAIN, Was just testing
       // Remove usesStoreKit2...
-      Purchases.configure({ apiKey: RC_API_KEY, appUserID: firebaseUid, usesStoreKit2IfAvailable: true })
+      Purchases.configure({
+        apiKey: RC_API_KEY,
+        appUserID: firebaseUid,
+        usesStoreKit2IfAvailable: true, // REMOVE THIS
+      });
       // Purchases.configure({ apiKey: RC_API_KEY });
     }
   }, [firebaseUid, RC_API_KEY]);

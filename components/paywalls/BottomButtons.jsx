@@ -4,6 +4,7 @@ import { Path, Svg } from "react-native-svg";
 import { useColourTheme } from "../../context/Themed";
 import { themedColours } from "../../constants/themedColours";
 import Purchases from "react-native-purchases";
+import { ENTITLEMENT_ID } from "../../constants/rcConstants";
 
 const BottomButtons = () => {
   const { theme } = useColourTheme();
@@ -11,7 +12,7 @@ const BottomButtons = () => {
   const restorePurchases = async () => {
     try {
       const restore = await Purchases.restorePurchases();
-      if (typeof restore.entitlements.active["Pro"] !== "undefined") {
+      if (typeof restore.entitlements.active[ENTITLEMENT_ID] !== "undefined") {
         Alert.alert(
           "Purchases Restored",
           "Your purchases have been successfully restored."

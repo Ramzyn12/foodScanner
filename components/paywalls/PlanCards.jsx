@@ -4,6 +4,7 @@ import SinglePlanCard from "./SinglePlanCard";
 import Purchases from "react-native-purchases";
 import * as Notifications from "expo-notifications";
 import { useNavigation } from "@react-navigation/native";
+import { ENTITLEMENT_ID } from "../../constants/rcConstants";
 
 const PlanCards = ({ freeTrial, offerings, setIsPurchasing }) => {
   const getPercentSaved = () => {
@@ -36,7 +37,7 @@ const PlanCards = ({ freeTrial, offerings, setIsPurchasing }) => {
 
     try {
       const { customerInfo } = await Purchases.purchasePackage(item);
-      if (typeof customerInfo.entitlements.active["Pro"] !== "undefined") {
+      if (typeof customerInfo.entitlements.active[ENTITLEMENT_ID] !== "undefined") {
         setIsPurchasing(true)
         navigation.goBack()
         Alert.alert("Welcome to Pro", "Your in"); // Improve - see what others do
