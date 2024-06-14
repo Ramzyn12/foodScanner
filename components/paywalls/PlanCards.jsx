@@ -62,9 +62,15 @@ const PlanCards = ({ freeTrial, offerings, setIsPurchasing }) => {
     }
   };
 
+
   return (
     <View style={{ gap: 14 }}>
       {offerings.map((offering) => {
+        if (offering.product.introPrice) {
+          // Conditionally render intro price time
+          // Not always 7 Day Free...
+         
+        }
         const description =
           offering.packageType === "ANNUAL"
             ? "7 DAY FREE TRIAL INCLUDED"

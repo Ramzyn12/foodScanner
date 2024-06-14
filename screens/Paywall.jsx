@@ -22,6 +22,7 @@ import PaywallNoTrial from "./paywalls/PaywallNoTrial";
 import * as Notifications from "expo-notifications";
 import LoadingPaywall from "../components/paywalls/LoadingPaywall";
 import { ENTITLEMENT_ID } from "../constants/rcConstants";
+import { useCustomerInfo } from "../hooks/useCustomerInfo";
 
 const Paywall = ({ navigation }) => {
   const [offering, setOffering] = useState(null);
@@ -35,10 +36,13 @@ const Paywall = ({ navigation }) => {
   const getOfferings = async () => {
     try {
       const offerings = await Purchases.getOfferings();
+      offerings.current
+      // console.log(JSON.stringify(offerings.current, null, 2))
       if (
         offerings.current !== null &&
         offerings.current.availablePackages.length !== 0
       ) {
+        // maybe change to offerings.current.annual to be more accurate
         const firstPackage = offerings.current.availablePackages[0];
         const isElegible = await getElegibilityStatus(firstPackage);
 

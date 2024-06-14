@@ -1,5 +1,29 @@
+const { default: axios } = require("axios");
 const User = require("../models/User");
 const { NotFoundError } = require("../utils/error");
+const CustomerReceipt = require("../models/CustomerReceipt");
+
+const REVENUECAT_API_KEY = process.env.RC_IOS_KEY;
+
+const getAndStoreCustomerReceipts = async (event) => {
+  try {
+    const customerInfoRes = await axios.get(
+      `https://api.revenuecat.com/v1/subscribers/${event.app_user_id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${REVENUECAT_API_KEY}`,
+        },
+      }
+    );
+
+    const customerInfo = customerInfoRes.data.subscriber
+
+    await CustomerReceipt.create(customerInfo)
+  } catch (error) {
+    console.error("Error checking subscription status from RevenueCat", error);
+    return null; // Handle error appropriately
+  }
+};
 
 async function handleInitialPurchase(event) {
   // Update user subscription state
@@ -34,6 +58,9 @@ async function handleRenewalPurchase(event) {
       firebaseId,
     });
 
+  const customerInfo = await getAndStoreCustomerReceipts(event);
+  console.log(customerInfo);
+
   // Send confirmation email or notification about renewal
   // Log the transaction
 }
@@ -57,7 +84,8 @@ async function handleCancellation(event) {
     // Do something else
   }
   // Log to database
-  console.log(event);
+  const customerInfo = await getAndStoreCustomerReceipts(event);
+  console.log(customerInfo);
 }
 
 async function handleUncancellation(event) {
@@ -84,6 +112,8 @@ async function handleExpiration(event) {
       firebaseId,
     });
 
+    const customerInfo = await getAndStoreCustomerReceipts(event);
+    console.log(customerInfo);
   // Email sad to see you go - offer rentention maybe?
   // Log event
 }
