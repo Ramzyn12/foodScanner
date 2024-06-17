@@ -4,9 +4,13 @@ import ArrowLeft from "../../svgs/ArrowLeft";
 import COLOURS from "../../constants/colours";
 import { useColourTheme } from "../../context/Themed";
 import { themedColours } from "../../constants/themedColours";
+import MoreCircle from "../../svgs/MoreCircle";
+import ContextMenu from "react-native-context-menu-view";
 
-const Header = ({headerText, onNavigate}) => {
-  const {theme} = useColourTheme()
+const Header = ({ headerText, onNavigate, weightUnit, onUnitChange }) => {
+  const { theme } = useColourTheme();
+  const isWeight = headerText === "Weight";
+  
   return (
     <View
       style={{
@@ -24,7 +28,11 @@ const Header = ({headerText, onNavigate}) => {
         onPress={onNavigate}
         style={{ position: "absolute", left: 25, top: 5 }}
       >
-        <ArrowLeft color={themedColours.primaryText[theme]} width={5.5} height={11.5} />
+        <ArrowLeft
+          color={themedColours.primaryText[theme]}
+          width={5.5}
+          height={11.5}
+        />
       </Pressable>
       <Text
         style={{
@@ -37,6 +45,21 @@ const Header = ({headerText, onNavigate}) => {
       >
         {headerText}
       </Text>
+      {isWeight && (
+        <ContextMenu
+          actions={[{ title: "Imperial", selected: weightUnit === 'imperial' }, { title: "Metric",  selected: weightUnit === 'metric' }]}
+          dropdownMenuMode={true}
+          onPress={(e) => {
+            onUnitChange(e.nativeEvent.name.toLowerCase())
+            // console.log(e.nativeEvent.name, e.nativeEvent.index);
+          }}
+          style={{ position: "absolute", right: 0, top: -20, zIndex: 40000 }}
+        >
+          <View style={{ padding: 25 }}>
+            <MoreCircle />
+          </View>
+        </ContextMenu>
+      )}
     </View>
   );
 };

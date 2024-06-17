@@ -62,48 +62,10 @@ import { useColourTheme } from "../context/Themed";
 import { themedColours } from "../constants/themedColours";
 import { useNavigation } from "@react-navigation/native";
 import { useCustomerInfo } from "../hooks/useCustomerInfo";
+import SegmentedControl from "@react-native-segmented-control/segmented-control";
+import { format, isToday } from "date-fns";
 
 const screenWidth = Dimensions.get("screen").width;
-
-const CustomTooltip = ({ x, y, datum, visible }) => {
-  if (!visible || datum.metricValue === null) {
-    return null;
-  }
-
-  const metricValue =
-    datum.metric === "Weight"
-      ? datum.metricValue + datum.unitOfMeasure
-      : datum.metricValue;
-
-  const textLength = String(metricValue).length;
-  const leftAdjustment = textLength * 5; // Adjust this value based on your needs
-
-  return (
-    <View
-      style={{
-        backgroundColor: "rgba(255, 255, 255, 0.20)",
-        padding: 10,
-        borderRadius: 5,
-        position: "absolute",
-        left: x - 15 - textLength * 1.5,
-        top: y && y - 60,
-        gap: 8,
-        alignItems: "center",
-        // top: 75
-      }}
-    >
-      <Text
-        style={{
-          color: "white",
-          fontSize: Math.max(24 - textLength * 1.2, 15),
-          fontFamily: "Mulish_700Bold",
-        }}
-      >
-        {metricValue}
-      </Text>
-    </View>
-  );
-};
 
 const convertWeightValue = (value, fromUnit, toUnit) => {
   if (value === 0) return 0;
@@ -125,33 +87,28 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
   const [selectedTimeFrame, setSelectedTimeFrame] = useState("Week");
   const [isLastLoggedToday, setIsLastLoggedToday] = useState(false);
   const [weightUnit, setWeightUnit] = useState("imperial");
+  const [displayMetric, setDisplayMetric] = useState("");
+  const [displayDate, setDisplayDate] = useState("");
   const isImperial = weightUnit === "imperial";
   const isMetric = weightUnit === "metric";
   const [selectedX, setSelectedX] = useState(null);
-  const [tooltipVisible, setTooltipVisible] = useState(false);
-  const [isDisabled, setIsDisabled] = useState(false);
-  const releaseTimeoutRef = useRef(null);
+  const [maxWeight, setMaxWeight] = useState(0);
+  const [isHolding, setIsHolding] = useState(false);
   const { theme } = useColourTheme();
 
-  const [isSubscribed, setIsSubscribed] = useState(undefined)
+  const [isSubscribed, setIsSubscribed] = useState(undefined);
 
-  const {customerInfo, error, loading} = useCustomerInfo()
+  const { customerInfo, error, loading } = useCustomerInfo();
 
   useEffect(() => {
-    if (!customerInfo) return 
-    
-    if(typeof customerInfo.entitlements.active['Pro'] !== "undefined") {
-      setIsSubscribed(true)
-    } else {
-      setIsSubscribed(false)
-    }
-  }, [customerInfo])
+    if (!customerInfo) return;
 
-  const handleBarPress = (datum) => {
-    setSelectedX(datum.date);
-    setTooltipVisible(true); // Show tooltip
-    setIsDisabled(true);
-  };
+    if (typeof customerInfo.entitlements.active["Pro"] !== "undefined") {
+      setIsSubscribed(true);
+    } else {
+      setIsSubscribed(false);
+    }
+  }, [customerInfo]);
 
   const daysOfTimeFrame =
     selectedTimeFrame === "Week" ? 7 : selectedTimeFrame === "Month" ? 28 : 364;
@@ -169,7 +126,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
     data,
     isLoading,
     isError: isErrorGraphData,
-    error: errorGraphData
+    error: errorGraphData,
   } = useQuery({
     // Should be called get graph data
     queryFn: () =>
@@ -180,7 +137,6 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
     retry: 1,
     queryKey: ["MetricGraphData", route.params.metricType, selectedTimeFrame],
   });
-
 
   const emptyData = data?.every((item) => item.metricValue === null);
 
@@ -215,9 +171,55 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
       if (isWeight) {
         newAdjustedData = normalizeDataToUnit(newAdjustedData, weightUnit);
       }
+      const mostRecentValidData = [...newAdjustedData]
+        .reverse()
+        .find((d) => d.metricValue !== null);
+
+      if (!mostRecentValidData) {
+        setDisplayMetric("No data");
+        setDisplayDate(
+          `Add your ${route.params.metricType.toLowerCase()} to see data`
+        );
+      } else {
+        setDisplayMetric(
+          `${mostRecentValidData.metricValue}${
+            isWeight ? mostRecentValidData.unitOfMeasure : "/10"
+          }`
+        );
+        setDisplayDate(formatDate(mostRecentValidData.date));
+      }
+      setMaxWeight(
+        Math.max(...newAdjustedData.map((val) => val.metricValue || 0))
+      );
       setAdjustedData(newAdjustedData);
     }
-  }, [data]);
+  }, [data, weightUnit]);
+
+  const formatDate = (dateString) => {
+    if (!dateString) return ""; // safeguard against undefined input
+    const date = new Date(dateString);
+    if (isToday(date)) {
+      return "Today";
+    }
+    return date.toLocaleDateString("en-US", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC", // Adjust timeZone if necessary
+    });
+  };
+  // console.log(displayDate, displayMetric);
+
+  const updateDisplay = (datum) => {
+    if (datum.metricValue === "null") return;
+    if (isWeight) {
+      setDisplayMetric(`${datum.metricValue}${datum.unitOfMeasure}`);
+    } else {
+      setDisplayMetric(`${datum.metricValue}/10`);
+    }
+    setDisplayDate(formatDate(datum.date));
+  };
 
   const normalizeDataToUnit = (data, unit) => {
     let measure = unit === "imperial" ? "kg" : "lbs";
@@ -237,14 +239,21 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
       const convertedData = normalizeDataToUnit(adjustedData, targetUnit);
       // Update the data and the unit state
       setAdjustedData(convertedData);
+      // setDisplayMetric((prev) => `${prev.metricValue}${datum.unitOfMeasure}`);
+      let targetMeasure = targetUnit === "imperial" ? "kg" : "lbs";
+      // let currentMeasure = weightUnit === "imperial" ? "kg" : "lbs";
+      // setMaxWeight((val) => convertWeightValue(val, currentMeasure, targetMeasure))
+      setMaxWeight(
+        Math.max(...convertedData.map((val) => val.metricValue || 0))
+      );
       setWeightUnit(targetUnit);
     }
   };
 
   const handleTimeFrameChange = (timeFrame) => {
-    if (timeFrame !== 'Week' && !isSubscribed) {
-      navigation.navigate('Paywall')
-      return 
+    if (timeFrame !== "Week" && !isSubscribed) {
+      navigation.navigate("Paywall");
+      return;
     }
     setSelectedTimeFrame(timeFrame);
   };
@@ -266,12 +275,6 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
   // Change Loading state? Maybe test this with loadss of data
   // if (isLoading || adjustedData.length === 0) return <Text>Loading...</Text>;
 
-  const handleBarRelease = () => {
-    setSelectedX(null);
-    setTooltipVisible(false); // Hide tooltip
-    setIsDisabled(false);
-  };
-
   return (
     <View
       style={{
@@ -283,6 +286,8 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
       <Header
         onNavigate={() => navigation.goBack()}
         headerText={route.params.metricType || "Weight"}
+        weightUnit={weightUnit}
+        onUnitChange={handleGraphUnitChange}
       />
       <KeyboardAwareScrollView
         // automaticallyAdjustKeyboardInsets
@@ -297,7 +302,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
           style={{
             flex: 1,
             gap: 20,
-            paddingBottom: 150,
+            paddingBottom: 70,
           }}
         >
           <Text
@@ -309,77 +314,40 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
           >
             {route.params.metricType}
           </Text>
-          {isWeight && (
-            <View style={{ flexDirection: "row", gap: 8 }}>
-              <Pressable
-                onPress={() => handleGraphUnitChange("imperial")}
-                style={{
-                  height: 36,
-                  paddingHorizontal: 14,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: 30,
-                  backgroundColor: isImperial
-                    ? themedColours.primary[theme]
-                    : themedColours.primaryBackground[theme],
-                  borderWidth: 1,
-                  borderColor: isImperial
-                    ? "transparent"
-                    : themedColours.stroke[theme],
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 14,
-                    fontFamily: "Mulish_700Bold",
-                    color: isImperial
-                      ? themedColours.primaryBackground[theme]
-                      : themedColours.primaryText[theme],
-                  }}
-                >
-                  Imperial
-                </Text>
-              </Pressable>
-              <Pressable
-                onPress={() => handleGraphUnitChange("metric")}
-                style={{
-                  height: 36,
-                  paddingHorizontal: 14,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: 30,
-                  backgroundColor: isMetric
-                    ? themedColours.primary[theme]
-                    : themedColours.primaryBackground[theme],
-                  borderWidth: 1,
-                  borderColor: isMetric
-                    ? "transparent"
-                    : themedColours.stroke[theme],
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 14,
-                    fontFamily: "Mulish_700Bold",
-                    color: isMetric
-                      ? themedColours.primaryBackground[theme]
-                      : themedColours.primaryText[theme],
-                  }}
-                >
-                  Metric
-                </Text>
-              </Pressable>
-            </View>
-          )}
-          <View
-            style={{
-              backgroundColor: themedColours.primary[theme],
-              height: 480,
-              borderRadius: 20,
-              paddingVertical: 10,
+          <SegmentedControl
+            values={["Week", "Month", "Year"]}
+            selectedIndex={0}
+            appearance={theme}
+            fontStyle={{
+              color: themedColours.primaryText[theme],
+              fontSize: 13,
+              fontFamily: "Mulish_600SemiBold",
             }}
-          >
-            {/* {emptyData && <Text style={{position: 'absolute', left: '50%', top: '50%', zIndex: 3000, color: 'yellow', fontSize: 20}}>HELLLLLOOO</Text>} */}
+            onValueChange={(val) => handleTimeFrameChange(val)}
+          />
+          <View>
+            <Text
+              style={{
+                fontSize: 19,
+                textAlign: "center",
+                fontFamily: "Mulish_700Bold",
+                marginBottom: 8,
+                color: themedColours.primaryText[theme],
+              }}
+            >
+              {displayMetric}
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                textAlign: "center",
+                fontFamily: "Mulish_700Bold",
+                marginBottom: 20,
+                color: themedColours.secondaryText[theme],
+              }}
+            >
+              {displayDate}
+            </Text>
             {isErrorGraphData && (
               <Text
                 style={{
@@ -394,61 +362,36 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                 Error
               </Text>
             )}
-            <ChangeDateDropdown
-              selectedTimeFrame={selectedTimeFrame}
-              onTimeFrameChange={handleTimeFrameChange}
-            />
             <VictoryChart
-              domainPadding={{ x: [20, 35], y: 80 }}
-              height={450}
-              width={screenWidth - 20}
-              containerComponent={
-                <VictoryVoronoiContainer
-                  labels={({ datum }) => `${datum.metricValue}`}
-                  labelComponent={<CustomTooltip visible={tooltipVisible} />} // Always render with visibility control
-                  voronoiPadding={40}
-                  // activateLabels={tooltipVisible}
-                  voronoiDimension="x"
-                  // disable={isDisabled}
-                  onActivated={(points) => {
-                    if (
-                      points &&
-                      points.length > 0 &&
-                      points[0].metricValue !== null
-                    ) {
-                      handleBarPress(points[0]);
-                    }
-                  }}
-                />
-              }
-              events={[
-                {
-                  target: "parent",
-                  eventHandlers: {
-                    onTouchEnd: () => {
-                      handleBarRelease();
-                      return null;
-                    },
-                  },
-                },
-              ]}
+              padding={{ left: 20, right: 20, bottom: 40 }}
+              height={300}
+              width={screenWidth - 40}
+              // containerComponent={
+              //   <VictoryVoronoiContainer
+              //     voronoiDimension="x"
+              //     onActivated={(points, props) => {
+              //       const mouseOverNullPoint = points.some(point => point.metricValue === null)
+              //       if (
+              //         points &&
+              //         points.length > 0 &&
+              //         !mouseOverNullPoint
+              //       ) {
+              //         // Shows two since two bars, we use the 1 index since consistent results
+              //         const datum = points[1];
+              //         // console.log(datum.metricValue, 'VALUE');
+              //         if (datum.metricValue !== null) {
+              //           updateDisplay(datum);
+              //           setSelectedX(datum.date);
+              //           setIsHolding(true);
+              //         }
+              //       }
+              //     }}
+              //     onTouchEnd={(points) => {
+              //       setIsHolding(false)
+              //     }}
+              //   />
+              // }
             >
-              {!emptyData && !isErrorGraphData && (
-                <VictoryAxis
-                  style={{
-                    axis: { stroke: "transparent" }, // Hides the axis line
-                    tickLabels: {
-                      fill: themedColours.primaryBackground[theme],
-                      opacity: 0.4,
-                      fontSize: 11,
-                      fontFamily: "Mulish_700Bold",
-                    },
-                  }}
-                  tickFormat={(t) => t}
-                  tickValues={isWeight ? undefined : [0, 2, 4, 6, 8, 10]}
-                  dependentAxis
-                />
-              )}
               {/* can do better than this with absoulte */}
               {emptyData && (
                 <VictoryLabel
@@ -478,13 +421,13 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                     lineHeight={1.4} // Adjust the line height to control spacing
                     style={[
                       {
-                        fill: themedColours.primaryBackground[theme],
+                        fill: themedColours.primaryText[theme],
                         opacity: 0.8,
                         fontSize: 11,
                         fontFamily: "Mulish_700Bold",
                       },
                       {
-                        fill: themedColours.primaryBackground[theme],
+                        fill: themedColours.primaryText[theme],
                         opacity: 0.6,
                         fontSize: 10,
                         fontFamily: "Mulish_500Medium",
@@ -500,28 +443,94 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                   })}\n${d.getDate()}`;
                 }}
               />
+              {/* Grey underlay */}
               <VictoryBar
+                alignment="left"
+                data={adjustedData.map((d) => ({
+                  ...d,
+                  metricValue: isWeight ? maxWeight : 10,
+                }))}
+                x="date"
+                barRatio={0.45}
+                y="metricValue"
+                style={{
+                  data: {
+                    fill: themedColours.secondaryBackground[theme],
+                    opacity: ({ datum }) =>
+                      !isHolding ? 1 : datum.date === selectedX ? 1 : 0.2,
+                  }, // Grey color for the underlay
+                }}
+                padding={{ top: 0, left: 0, bottom: 0, right: 0 }}
+                cornerRadius={{
+                  top: ({ barWidth, datum }) => {
+                    return Math.floor(barWidth / 1.2);
+                  },
+                  bottom: ({ barWidth, datum }) => {
+                    return Math.floor(barWidth / 1.2);
+                  },
+                }}
+              />
+              <VictoryBar
+                alignment="left"
                 data={adjustedData}
                 x="date"
+                barRatio={0.45}
                 name="bar1"
+                padding={{ top: 0, left: 0, bottom: 0, right: 0 }}
                 y="metricValue"
                 style={{
                   data: {
                     opacity: ({ datum }) =>
-                      datum.date === selectedX ? 1 : 0.2,
-                    fill: themedColours.primaryBackground[theme],
+                      !isHolding ? 1 : datum.date === selectedX ? 1 : 0.2,
+
+                    fill: themedColours.primary[theme],
                   },
                 }}
+                events={[
+                  {
+                    target: "data",
+                    eventHandlers: {
+                      // onPressIn: (_, { datum }) => {
+                      //   updateDisplay(datum);
+                      //   setSelectedX(datum.date);
+                      //   setIsHolding(true);
+                      //   // console.log(datum);
+                      // },
+                      // onPressIn: () => {
+                      //   console.log('pressed');
+                      // },
+                      onClick: () => {
+                        console.log('cliked');
+                      },
+                      // onTouchStart: () => {
+                      //   console.log('started');
+                      // }
+                      // onPressOut: () => {
+                      //   setSelectedX(null);
+                      //   setIsHolding(false);
+                      // },
+                    },
+                  },
+                ]}
                 cornerRadius={{
                   top: ({ barWidth, datum }) => {
-                    return Math.floor(barWidth / 2);
+                    return Math.floor(barWidth / 1.2);
+                  },
+                  bottom: ({ barWidth, datum }) => {
+                    return Math.floor(barWidth / 1.2);
                   },
                 }}
               />
             </VictoryChart>
           </View>
           <View style={{ gap: 14 }}>
-            <Text style={{ fontSize: 17, fontFamily: "Mulish_600SemiBold", color: themedColours.primaryText[theme] }}>
+            <Text
+              style={{
+                fontSize: 17,
+                fontFamily: "Mulish_600SemiBold",
+                color: themedColours.primaryText[theme],
+              }}
+            >
               {question}
             </Text>
             {route.params.metricType === "Weight" && (

@@ -6,6 +6,7 @@ if barcode, checks if foodItem else creates and adds to consumedFoods
 if singleFoodId (ivyId) just adds to consumedSingleFoods
 */
 const addFoodToDiaryDay = async (req, res) => {
+  throw new Error('error')
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {

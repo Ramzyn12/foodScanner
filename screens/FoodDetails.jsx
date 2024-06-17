@@ -96,7 +96,7 @@ const FoodDetails = ({ navigation, route }) => {
         style={{
           height: 44,
           width: "90%",
-          backgroundColor: themedColours.primaryText[theme],
+          backgroundColor: '#DB1200',
           borderRadius: 20,
           flexDirection: "row",
           alignItems: "center",
