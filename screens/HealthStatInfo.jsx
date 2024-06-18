@@ -167,6 +167,55 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
     },
   });
 
+  const dataToYearlyAverage = (data) => {
+    // Create an object to store the sum and count of each month's data
+    const monthlyData = {};
+
+    data.forEach((entry) => {
+      const date = new Date(entry.date);
+      const month = date.getUTCMonth(); // get month as UTC
+      const year = date.getUTCFullYear(); // get year as UTC
+      const key = `${year}-${month}`;
+
+      if (!monthlyData[key]) {
+        monthlyData[key] = {
+          sum: 0,
+          count: 0,
+          firstDate: new Date(Date.UTC(year, month)),
+        };
+      }
+
+      if (entry.metricValue !== null) {
+        monthlyData[key].sum += entry.metricValue;
+        monthlyData[key].count += 1;
+      }
+    });
+
+    // Convert the monthlyData object to an array of average values
+    const monthlyAverages = Object.keys(monthlyData).map((key) => {
+      const { sum, count, firstDate } = monthlyData[key];
+      const average = count > 0 ? sum / count : null;
+
+    
+      return {
+        date: firstDate,
+        metricValue: average ?  parseFloat(average.toFixed(1)) : average,
+        metric: route.params.metricType,
+        // updatedAt: "2024-06-17T08:47:52.099Z",
+        // userId: "664c6883d98714a675539a64",
+        // __v: 0,
+        // _id: "666ff83870b96c6dafa5024f",
+        // createdAt: "2024-06-17T08:47:52.099Z",
+      };
+    });
+
+    if (monthlyAverages.length > 12) {
+      monthlyAverages.shift();
+    }
+
+    return monthlyAverages;
+  };
+
   useEffect(() => {
     if (data) {
       const lastLoggedToday = data[data.length - 1].metricValue !== null;
@@ -175,10 +224,14 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
       if (isWeight) {
         newAdjustedData = normalizeDataToUnit(newAdjustedData, weightUnit);
       }
-      const recentData = data.findLast(
+
+      if (selectedTimeFrame === "Year") {
+        newAdjustedData = dataToYearlyAverage(newAdjustedData);
+      }
+
+      const recentData = newAdjustedData.findLast(
         (d) => d.metricValue !== null
       );
-
       setMostRecentValidData(recentData);
 
       if (!recentData) {
@@ -197,6 +250,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
       setMaxWeight(
         Math.max(...newAdjustedData.map((val) => val.metricValue || 0))
       );
+      console.log(newAdjustedData);
       setAdjustedData(newAdjustedData);
     }
   }, [data, weightUnit]);
@@ -257,6 +311,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
   };
 
   const handleTimeFrameChange = (timeFrame) => {
+    console.log(timeFrame);
     if (timeFrame !== "Week" && !isSubscribed) {
       navigation.navigate("Paywall");
       return;
@@ -283,6 +338,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
       />
       <ScrollView
         scrollEnabled={isScrollEnabled}
+        // scrollEnabled={true}
         showsVerticalScrollIndicator={false}
         style={{ flex: 1, padding: 20 }}
       >
@@ -311,7 +367,8 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
               fontSize: 13,
               fontFamily: "Mulish_600SemiBold",
             }}
-            onValueChange={(val) => handleTimeFrameChange(val)}
+            onChange={(e) => handleTimeFrameChange(e.nativeEvent.value)}
+            // onValueChange={(val) => handleTimeFrameChange(val)}
           />
           <View>
             <Text
@@ -355,6 +412,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
             <VictoryChart
               padding={{ left: 20, right: 20, bottom: 40 }}
               height={300}
+              // domain={{y: [0, 10]}}
               width={screenWidth - 40}
               events={[
                 {
@@ -362,20 +420,22 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                   eventHandlers: {
                     onTouchEnd: (e) => {
                       setIsHolding(false);
-                      if (longPressTimer.current)
+                      if (longPressTimer.current) {
                         clearTimeout(longPressTimer.current);
+                      }
                       setIsScrollEnabled(true);
                       if (mostRecentValidData) {
                         updateDisplay(mostRecentValidData);
                       }
                     },
                     onTouchStart: (e) => {
-                      if (longPressTimer.current)
+                      if (longPressTimer.current) {
                         clearTimeout(longPressTimer.current);
+                      }
                       // Set a new timer
                       longPressTimer.current = setTimeout(() => {
                         setIsScrollEnabled(false);
-                      }, 100); // Delay of 100 milliseconds
+                      }, 100);
                     },
                   },
                 },
@@ -385,12 +445,6 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                   voronoiDimension="x"
                   voronoiBlacklist={["bar2"]}
                   onActivated={(points, props) => {
-                    // setIsScrollEnabled(false)
-                    // const mouseOverNullPoint = points[0]?.metricValue === null;
-                    // if (mouseOverNullPoint) {
-                    //   console.log("REASON IS NULL");
-                    //   setIsHolding(false);
-                    // }
                     if (points && points.length > 0 && !isScrollEnabled) {
                       const datum = points[0];
                       // console.log(datum.metricValue, 'VALUE');
@@ -404,7 +458,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                 />
               }
             >
-              {emptyData && (
+              {/* {emptyData && (
                 <VictoryLabel
                   text="No Data"
                   x={screenWidth / 2 - 20} // Adjust x and y to center the label
@@ -416,15 +470,16 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                     fontFamily: "Mulish_700Bold",
                   }}
                 />
-              )}
+              )} */}
               <VictoryAxis
-                tickCount={7}
+                tickCount={selectedTimeFrame === "Year" ? 12 : 7}
                 style={{
                   axis: { stroke: "transparent" }, // Hides the axis line
                   tickLabels: {
                     fill: "transparent",
                   }, // Style for the tick labels
                 }}
+                tickValues={adjustedData.map((val) => val.date)}
                 tickLabelComponent={
                   <VictoryLabel
                     textAnchor="middle"
@@ -448,19 +503,35 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                 } // Use the custom label component
                 tickFormat={(date) => {
                   if (isErrorGraphData) return "";
+                  const monthAbbr = [
+                    "Jan",
+                    "Feb",
+                    "Mar",
+                    "Apr",
+                    "May",
+                    "Jun",
+                    "Jul",
+                    "Aug",
+                    "Sep",
+                    "Oct",
+                    "Nov",
+                    "Dec",
+                  ]; // Array of month abbreviations
                   const d = new Date(date);
+                  if (selectedTimeFrame === "Year") {
+                    return monthAbbr[d.getMonth()]; // Get abbreviation based on month index
+                  }
                   return `${d.toLocaleDateString("en-US", {
                     weekday: "short",
                   })}\n${d.getDate()}`;
                 }}
               />
-
               <VictoryBar
                 alignment="left"
                 name="bar2"
                 data={adjustedData.map((d) => ({
                   ...d,
-                  metricValue: isWeight ? maxWeight : 10,
+                  metricValue: isWeight ? maxWeight : 10, // Need to change this to max value
                 }))}
                 x="date"
                 barRatio={0.45}
@@ -470,7 +541,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                     fill: themedColours.secondaryBackground[theme],
                     opacity: ({ datum }) =>
                       !isHolding ? 1 : datum.date === selectedX ? 1 : 0.2,
-                  }, // Grey color for the underlay
+                  },
                 }}
                 padding={{ top: 0, left: 0, bottom: 0, right: 0 }}
                 cornerRadius={{
@@ -498,23 +569,18 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                     fill: themedColours.primary[theme],
                   },
                 }}
-                // events={[
-                //   {
-                //     target: "data",
-                //     eventHandlers: {
-                //       onPressIn: (_, { datum }) => {
-                //         updateDisplay(datum);
-                //         setSelectedX(datum.date);
-                //         setIsHolding(true);
-                //         console.log(datum);
-                //       },
-                //       onPressOut: () => {
-                //         setSelectedX(null);
-                //         setIsHolding(false);
-                //       },
-                //     },
-                //   },
-                // ]}
+                events={[
+                  {
+                    target: "data",
+                    eventHandlers: {
+                      onPressIn: (_, { datum }) => {
+                        updateDisplay(datum);
+                        setSelectedX(datum.date);
+                        setIsHolding(true);
+                      },
+                    },
+                  },
+                ]}
                 cornerRadius={{
                   top: ({ barWidth, datum }) => {
                     return Math.floor(barWidth / 1.2);
