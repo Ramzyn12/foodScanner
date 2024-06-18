@@ -22,7 +22,7 @@ import PaywallNoTrial from "./paywalls/PaywallNoTrial";
 import * as Notifications from "expo-notifications";
 import LoadingPaywall from "../components/paywalls/LoadingPaywall";
 import { ENTITLEMENT_ID } from "../constants/rcConstants";
-import { useCustomerInfo } from "../hooks/useCustomerInfo";
+// import { useCustomerInfo } from "../hooks/useCustomerInfo";
 
 const Paywall = ({ navigation }) => {
   const [offering, setOffering] = useState(null);
@@ -36,7 +36,8 @@ const Paywall = ({ navigation }) => {
   const getOfferings = async () => {
     try {
       const offerings = await Purchases.getOfferings();
-      offerings.current
+      console.log(offerings);
+
       // console.log(JSON.stringify(offerings.current, null, 2))
       if (
         offerings.current !== null &&
@@ -56,7 +57,7 @@ const Paywall = ({ navigation }) => {
         setOffering(offerings.current);
       }
     } catch (e) {
-      Alert.alert('Error getting offers', e.message);
+      Alert.alert("Error getting offers", e.message);
     }
   };
 
@@ -83,7 +84,9 @@ const Paywall = ({ navigation }) => {
 
     try {
       const { customerInfo } = await Purchases.purchasePackage(item);
-      if (typeof customerInfo.entitlements.active[ENTITLEMENT_ID] !== "undefined") {
+      if (
+        typeof customerInfo.entitlements.active[ENTITLEMENT_ID] !== "undefined"
+      ) {
         navigation.goBack();
         Alert.alert("Welcome to Pro", "Your in"); // Improve - see what others do
         if (isFreeTrial) {
@@ -103,7 +106,7 @@ const Paywall = ({ navigation }) => {
         console.log(e);
       }
       if (e.code === Purchases.PURCHASES_ERROR_CODE.PURCHASE_CANCELLED_ERROR) {
-        Alert.alert('Error purchasing package', e.message);
+        Alert.alert("Error purchasing package", e.message);
       }
     } finally {
       setIsPurchasing(false);
@@ -183,7 +186,7 @@ const Paywall = ({ navigation }) => {
               Choose another plan
             </Text>
             <PlanCards
-            setIsPurchasing={setIsPurchasing}
+              setIsPurchasing={setIsPurchasing}
               offerings={offering?.availablePackages}
               freeTrial={true}
             />

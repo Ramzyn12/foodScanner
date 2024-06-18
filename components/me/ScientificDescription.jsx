@@ -45,10 +45,12 @@ const ScientificDescription = ({ metricType }) => {
   return (
     <View
       style={{
-        padding: 20,
+        paddingTop: 20,
+        borderTopWidth: 1,
+        borderTopColor: themedColours.stroke[theme],
         gap: 20,
-        backgroundColor: themedColours.tertiaryBackground[theme],
-        borderRadius: 20,
+        backgroundColor: themedColours.primaryBackground[theme],
+        // borderRadius: 20,
       }}
     >
       <Text

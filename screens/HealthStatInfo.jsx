@@ -35,12 +35,8 @@ import {
   useFont,
   Text as SkiaText,
   matchFont,
+  useDerivedValueOnJS,
 } from "@shopify/react-native-skia";
-import {
-  Mulish_300Light,
-  Mulish_500Medium,
-  Mulish_700Bold,
-} from "@expo-google-fonts/mulish";
 import ArrowDown from "../svgs/ArrowDown";
 import ArrowDownShort from "../svgs/ArrowDownShort";
 import ScientificDescription from "../components/me/ScientificDescription";
@@ -48,7 +44,12 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import Sources from "../components/me/Sources";
 import HealthSlider from "../components/me/HealthSlider";
 import WeightInput from "../components/me/WeightInput";
-import { useDerivedValue } from "react-native-reanimated";
+import Animated, {
+  runOnJS,
+  useAnimatedReaction,
+  useDerivedValue,
+  withTiming,
+} from "react-native-reanimated";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   getAllDataForMetric,
@@ -94,7 +95,10 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
   const [selectedX, setSelectedX] = useState(null);
   const [maxWeight, setMaxWeight] = useState(0);
   const [isHolding, setIsHolding] = useState(false);
+  const [isScrollEnabled, setIsScrollEnabled] = useState(true);
+  const [mostRecentValidData, setMostRecentValidData] = useState(null);
   const { theme } = useColourTheme();
+  const longPressTimer = useRef(null);
 
   const [isSubscribed, setIsSubscribed] = useState(undefined);
 
@@ -171,22 +175,24 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
       if (isWeight) {
         newAdjustedData = normalizeDataToUnit(newAdjustedData, weightUnit);
       }
-      const mostRecentValidData = [...newAdjustedData]
-        .reverse()
-        .find((d) => d.metricValue !== null);
+      const recentData = data.findLast(
+        (d) => d.metricValue !== null
+      );
 
-      if (!mostRecentValidData) {
+      setMostRecentValidData(recentData);
+
+      if (!recentData) {
         setDisplayMetric("No data");
         setDisplayDate(
           `Add your ${route.params.metricType.toLowerCase()} to see data`
         );
       } else {
         setDisplayMetric(
-          `${mostRecentValidData.metricValue}${
-            isWeight ? mostRecentValidData.unitOfMeasure : "/10"
+          `${recentData.metricValue}${
+            isWeight ? recentData.unitOfMeasure : "/10"
           }`
         );
-        setDisplayDate(formatDate(mostRecentValidData.date));
+        setDisplayDate(formatDate(recentData.date));
       }
       setMaxWeight(
         Math.max(...newAdjustedData.map((val) => val.metricValue || 0))
@@ -258,20 +264,6 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
     setSelectedTimeFrame(timeFrame);
   };
 
-  const handleUpdateMetric = () => {
-    Keyboard.dismiss(); // Dismiss the keyboard upon submission
-    updateHealthMetricMutation.mutate({
-      metric: route.params.metricType,
-      date: getCurrentDateLocal(),
-      metricValue: isWeight ? weightValue : value,
-      unitOfMeasure: weightUnit === "imperial" ? "kg" : "lbs",
-    });
-    setWeightValue("");
-    if (scrollViewRef.current) {
-      scrollViewRef.current.scrollToPosition(0, 0); //animated: true for smooth scrolling
-    }
-  };
-
   // Change Loading state? Maybe test this with loadss of data
   // if (isLoading || adjustedData.length === 0) return <Text>Loading...</Text>;
 
@@ -289,13 +281,9 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
         weightUnit={weightUnit}
         onUnitChange={handleGraphUnitChange}
       />
-      <KeyboardAwareScrollView
-        // automaticallyAdjustKeyboardInsets
-        ref={scrollViewRef}
-        keyboardDismissMode="on-drag"
-        keyboardShouldPersistTaps="always"
+      <ScrollView
+        scrollEnabled={isScrollEnabled}
         showsVerticalScrollIndicator={false}
-        enableResetScrollToCoords={false}
         style={{ flex: 1, padding: 20 }}
       >
         <View
@@ -348,6 +336,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
             >
               {displayDate}
             </Text>
+
             {isErrorGraphData && (
               <Text
                 style={{
@@ -362,37 +351,59 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                 Error
               </Text>
             )}
+            {/* GRAPH */}
             <VictoryChart
               padding={{ left: 20, right: 20, bottom: 40 }}
               height={300}
               width={screenWidth - 40}
-              // containerComponent={
-              //   <VictoryVoronoiContainer
-              //     voronoiDimension="x"
-              //     onActivated={(points, props) => {
-              //       const mouseOverNullPoint = points.some(point => point.metricValue === null)
-              //       if (
-              //         points &&
-              //         points.length > 0 &&
-              //         !mouseOverNullPoint
-              //       ) {
-              //         // Shows two since two bars, we use the 1 index since consistent results
-              //         const datum = points[1];
-              //         // console.log(datum.metricValue, 'VALUE');
-              //         if (datum.metricValue !== null) {
-              //           updateDisplay(datum);
-              //           setSelectedX(datum.date);
-              //           setIsHolding(true);
-              //         }
-              //       }
-              //     }}
-              //     onTouchEnd={(points) => {
-              //       setIsHolding(false)
-              //     }}
-              //   />
-              // }
+              events={[
+                {
+                  target: "parent",
+                  eventHandlers: {
+                    onTouchEnd: (e) => {
+                      setIsHolding(false);
+                      if (longPressTimer.current)
+                        clearTimeout(longPressTimer.current);
+                      setIsScrollEnabled(true);
+                      if (mostRecentValidData) {
+                        updateDisplay(mostRecentValidData);
+                      }
+                    },
+                    onTouchStart: (e) => {
+                      if (longPressTimer.current)
+                        clearTimeout(longPressTimer.current);
+                      // Set a new timer
+                      longPressTimer.current = setTimeout(() => {
+                        setIsScrollEnabled(false);
+                      }, 100); // Delay of 100 milliseconds
+                    },
+                  },
+                },
+              ]}
+              containerComponent={
+                <VictoryVoronoiContainer
+                  voronoiDimension="x"
+                  voronoiBlacklist={["bar2"]}
+                  onActivated={(points, props) => {
+                    // setIsScrollEnabled(false)
+                    // const mouseOverNullPoint = points[0]?.metricValue === null;
+                    // if (mouseOverNullPoint) {
+                    //   console.log("REASON IS NULL");
+                    //   setIsHolding(false);
+                    // }
+                    if (points && points.length > 0 && !isScrollEnabled) {
+                      const datum = points[0];
+                      // console.log(datum.metricValue, 'VALUE');
+                      if (datum.metricValue !== null) {
+                        updateDisplay(datum);
+                        setSelectedX(datum.date);
+                        setIsHolding(true);
+                      }
+                    }
+                  }}
+                />
+              }
             >
-              {/* can do better than this with absoulte */}
               {emptyData && (
                 <VictoryLabel
                   text="No Data"
@@ -443,9 +454,10 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                   })}\n${d.getDate()}`;
                 }}
               />
-              {/* Grey underlay */}
+
               <VictoryBar
                 alignment="left"
+                name="bar2"
                 data={adjustedData.map((d) => ({
                   ...d,
                   metricValue: isWeight ? maxWeight : 10,
@@ -486,32 +498,23 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                     fill: themedColours.primary[theme],
                   },
                 }}
-                events={[
-                  {
-                    target: "data",
-                    eventHandlers: {
-                      // onPressIn: (_, { datum }) => {
-                      //   updateDisplay(datum);
-                      //   setSelectedX(datum.date);
-                      //   setIsHolding(true);
-                      //   // console.log(datum);
-                      // },
-                      // onPressIn: () => {
-                      //   console.log('pressed');
-                      // },
-                      onClick: () => {
-                        console.log('cliked');
-                      },
-                      // onTouchStart: () => {
-                      //   console.log('started');
-                      // }
-                      // onPressOut: () => {
-                      //   setSelectedX(null);
-                      //   setIsHolding(false);
-                      // },
-                    },
-                  },
-                ]}
+                // events={[
+                //   {
+                //     target: "data",
+                //     eventHandlers: {
+                //       onPressIn: (_, { datum }) => {
+                //         updateDisplay(datum);
+                //         setSelectedX(datum.date);
+                //         setIsHolding(true);
+                //         console.log(datum);
+                //       },
+                //       onPressOut: () => {
+                //         setSelectedX(null);
+                //         setIsHolding(false);
+                //       },
+                //     },
+                //   },
+                // ]}
                 cornerRadius={{
                   top: ({ barWidth, datum }) => {
                     return Math.floor(barWidth / 1.2);
@@ -523,62 +526,6 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
               />
             </VictoryChart>
           </View>
-          <View style={{ gap: 14 }}>
-            <Text
-              style={{
-                fontSize: 17,
-                fontFamily: "Mulish_600SemiBold",
-                color: themedColours.primaryText[theme],
-              }}
-            >
-              {question}
-            </Text>
-            {route.params.metricType === "Weight" && (
-              <WeightInput
-                weightUnit={weightUnit}
-                setWeightUnit={setWeightUnit}
-                value={weightValue}
-                setValue={setWeightValue}
-              />
-            )}
-            {route.params.metricType !== "Weight" && (
-              <View style={{ marginTop: 65 }}>
-                <HealthSlider
-                  metricType={route.params.metricType}
-                  value={value}
-                  setValue={setValue}
-                />
-              </View>
-            )}
-            <Pressable
-              onPress={handleUpdateMetric}
-              style={{
-                borderWidth: 1,
-                borderColor: isLastLoggedToday
-                  ? themedColours.stroke[theme]
-                  : "transparent",
-                backgroundColor: isLastLoggedToday
-                  ? "transparent"
-                  : themedColours.primary[theme],
-                height: 44,
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: 12,
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontFamily: "Mulish_700Bold",
-                  color: isLastLoggedToday
-                    ? themedColours.primaryText[theme]
-                    : "white",
-                }}
-              >
-                {isLastLoggedToday ? "Update" : "Log"}
-              </Text>
-            </Pressable>
-          </View>
           <ScientificDescription
             metricType={route.params.metricType}
             title="Weight and processed food"
@@ -589,7 +536,7 @@ The combination of these factors contributes significantly to the rising rates o
           />
           {/* <Sources metricType={route.params.metricType} /> */}
         </View>
-      </KeyboardAwareScrollView>
+      </ScrollView>
     </View>
   );
 };

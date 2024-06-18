@@ -4,9 +4,9 @@ import { themedColours } from "../../constants/themedColours";
 import { useColourTheme } from "../../context/Themed";
 import ToDoList from "../../svgs/ToDoList";
 import SingleBenefitCard from "./SingleBenefitCard";
-import CalenderTwenty from "../../svgs/CalenderTwenty";
 import TimelineHealth from "../../svgs/TimelineHealth";
 import AdvancedFlask from "../../svgs/AdvancedFlask";
+import CalenderTwenty from "../../svgs/CalenderTwenty";
 
 const cards = [
   {svg: <ToDoList />, title: 'Track Unlimited Foods', subtitle: 'Track an unlimited number of food items each day by searching or scanning barcodes.'},
