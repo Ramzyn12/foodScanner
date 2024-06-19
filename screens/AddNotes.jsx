@@ -1,4 +1,14 @@
-import { View, Text, ScrollView, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  ActivityIndicator,
+  Touchable,
+  TouchableOpacity,
+  Pressable,
+  PanResponder,
+  Platform,
+} from "react-native";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import OverviewHeader from "../components/WeeklyOverview/OverviewHeader";
@@ -18,9 +28,9 @@ const AddNotes = ({ route }) => {
   const day = route.params.day;
   const notesInputRef = useRef(null); // Create a ref for the TextInput
   const queryClient = useQueryClient();
-  const {theme} = useColourTheme()
+  const { theme } = useColourTheme();
 
-  const { data, isLoading, isError, isSuccess, error } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ["Note", date],
     queryFn: () => getNote({ date: getAnyDateLocal(date) }),
     retry: false,
@@ -30,41 +40,53 @@ const AddNotes = ({ route }) => {
     mutationFn: updateNote,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["Note", date] });
-      // keep this toast or change it?
-      Toast.show({
-        type: "success",
-        text1: "Note saved!",
-      });
+
+      // queryClient.setQueryData(["Note", date], { note: notes });
     },
     onError: (err) => {
       Toast.show({
         type: "customErrorToast",
         text1: "Failed to save note, please try again later",
       });
+
+      // Revert to previous note if error
       if (data.note) setNotes(data.note);
-      // Need to show toast, and try go back to previous note?
-      //or just say try again later
     },
   });
 
   // Need to improve this massively, logic is a bit weird
   useEffect(() => {
     let timer;
-    if (isSuccess && data && data.note) {
-      setNotes(data.note); // If there's existing note data, fill it in
-    } else if (notes === "") {
-      // notesInputRef.current?.blur();
+
+    if (data && data.note) {
+      // If note available set to state
+      setNotes(data.note);
+    } else {
+      // Notes empty so focus after timer
       timer = setTimeout(() => {
         notesInputRef.current?.focus();
       }, 400);
     }
 
     return () => clearTimeout(timer); // Clear timeout if component unmounts
-  }, [data, isSuccess, isError]);
+  }, [data, isError]);
 
   const handleSaveNotes = () => {
-    updateNoteMutation.mutate({ note: notes, date });
+    if (notes !== data.note) {
+      // Notes have changed so we can save
+      updateNoteMutation.mutate({ note: notes, date });
+    }
+
     notesInputRef.current?.blur();
+  };
+
+  const handleSelectionFocus = (e) => {
+    if (notesInputRef.current) {
+      const { start } = e.nativeEvent.selection
+      notesInputRef.current.setNativeProps({
+        selection: { start: start, end: start },
+      });
+    }
   };
 
   if (isLoading) return <ActivityIndicator />; // NEED BETTER LOADING HERE?
@@ -76,7 +98,13 @@ const AddNotes = ({ route }) => {
     );
 
   return (
-    <View style={{ paddingTop: insets.top, flex: 1, backgroundColor: themedColours.primaryBackground[theme] }}>
+    <View
+      style={{
+        paddingTop: insets.top,
+        flex: 1,
+        backgroundColor: themedColours.primaryBackground[theme],
+      }}
+    >
       <OverviewHeader
         notes={notes}
         day={day}
@@ -87,6 +115,7 @@ const AddNotes = ({ route }) => {
         extraScrollHeight={100}
         viewIsInsideTabBar={true}
         directionalLockEnabled={true}
+        enableResetScrollToCoords={false}
         //   style={{flex: 1}}
         // contentContainerStyle={{flex: 1}}
       >
@@ -97,13 +126,16 @@ const AddNotes = ({ route }) => {
             paddingTop: 20,
             borderRadius: 5,
             fontSize: 16,
-            color: themedColours.primaryText[theme]
+            color: themedColours.primaryText[theme],
           }}
           multiline
           scrollEnabled={false}
           placeholder="Enter your notes here..."
           hitSlop={400}
+          rejectResponderTermination={false}
           value={notes}
+          onSelectionChange={(event) => handleSelectionFocus(event)}
+          selectTextOnFocus={false}
           placeholderTextColor={themedColours.secondaryText[theme]}
           onChangeText={setNotes}
           textAlignVertical="top" // For better text alignment in multiline mode

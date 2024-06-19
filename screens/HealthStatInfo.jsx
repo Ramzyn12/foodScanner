@@ -68,6 +68,23 @@ import { format, isToday } from "date-fns";
 
 const screenWidth = Dimensions.get("screen").width;
 
+const monthAbbr = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+const fullMonthNames = ["January", "February", "March", "April", "May", "June", 
+                    "July", "August", "September", "October", "November", "December"];
+
 const convertWeightValue = (value, fromUnit, toUnit) => {
   if (value === 0) return 0;
   if (!value) return null; // Handle null, undefined, and zero to prevent NaN results
@@ -87,7 +104,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
   const [adjustedData, setAdjustedData] = useState([]);
   const [selectedTimeFrame, setSelectedTimeFrame] = useState("Week");
   const [isLastLoggedToday, setIsLastLoggedToday] = useState(false);
-  const [weightUnit, setWeightUnit] = useState("imperial");
+  const [weightUnit, setWeightUnit] = useState("metric");
   const [displayMetric, setDisplayMetric] = useState("");
   const [displayDate, setDisplayDate] = useState("");
   const isImperial = weightUnit === "imperial";
@@ -97,6 +114,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
   const [isHolding, setIsHolding] = useState(false);
   const [isScrollEnabled, setIsScrollEnabled] = useState(true);
   const [mostRecentValidData, setMostRecentValidData] = useState(null);
+  const [maxMetric, setMaxMetric] = useState(10);
   const { theme } = useColourTheme();
   const longPressTimer = useRef(null);
 
@@ -114,18 +132,6 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
     }
   }, [customerInfo]);
 
-  const daysOfTimeFrame =
-    selectedTimeFrame === "Week" ? 7 : selectedTimeFrame === "Month" ? 28 : 364;
-
-  const question =
-    route.params.metricType === "Weight"
-      ? `What's your weight today?`
-      : route.params.metricType === "Energy"
-      ? "How are your energy levels today?"
-      : route.params.metricType === "Anxiety"
-      ? "How is your anxiety today?"
-      : "How well did you sleep last night?";
-
   const {
     data,
     isLoading,
@@ -140,31 +146,6 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
       }),
     retry: 1,
     queryKey: ["MetricGraphData", route.params.metricType, selectedTimeFrame],
-  });
-
-  const emptyData = data?.every((item) => item.metricValue === null);
-
-  const updateHealthMetricMutation = useMutation({
-    mutationFn: updateHealthMetric,
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ["RecentMetric", variables.metric],
-      });
-      queryClient.invalidateQueries({ queryKey: ["TimelineWeek"] });
-      queryClient.invalidateQueries({
-        queryKey: [
-          "MetricGraphData",
-          route.params.metricType,
-          selectedTimeFrame,
-        ],
-      });
-    },
-    onError: (err) => {
-      Toast.show({
-        type: "customErrorToast",
-        text1: "Failed to update metric, please try again later",
-      });
-    },
   });
 
   const dataToYearlyAverage = (data) => {
@@ -195,23 +176,21 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
     const monthlyAverages = Object.keys(monthlyData).map((key) => {
       const { sum, count, firstDate } = monthlyData[key];
       const average = count > 0 ? sum / count : null;
+      console.log(count, sum);
 
-    
       return {
         date: firstDate,
-        metricValue: average ?  parseFloat(average.toFixed(1)) : average,
+        metricValue: average ? parseFloat(average.toFixed(1)) : average,
         metric: route.params.metricType,
-        // updatedAt: "2024-06-17T08:47:52.099Z",
-        // userId: "664c6883d98714a675539a64",
-        // __v: 0,
-        // _id: "666ff83870b96c6dafa5024f",
-        // createdAt: "2024-06-17T08:47:52.099Z",
+        unitOfMeasure: weightUnit === 'imperial' ? 'lbs' : 'kg'
       };
     });
 
     if (monthlyAverages.length > 12) {
       monthlyAverages.shift();
     }
+
+    console.log(data);
 
     return monthlyAverages;
   };
@@ -247,9 +226,10 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
         );
         setDisplayDate(formatDate(recentData.date));
       }
-      setMaxWeight(
+      setMaxMetric(
         Math.max(...newAdjustedData.map((val) => val.metricValue || 0))
       );
+
       console.log(newAdjustedData);
       setAdjustedData(newAdjustedData);
     }
@@ -258,6 +238,10 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
   const formatDate = (dateString) => {
     if (!dateString) return ""; // safeguard against undefined input
     const date = new Date(dateString);
+    if (selectedTimeFrame === 'Year') {
+      const date = new Date(dateString)
+      return `${fullMonthNames[date.getMonth()]} ${date.getFullYear()}` 
+    }
     if (isToday(date)) {
       return "Today";
     }
@@ -273,6 +257,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
 
   const updateDisplay = (datum) => {
     if (datum.metricValue === "null") return;
+    console.log(datum, 'DATUM');
     if (isWeight) {
       setDisplayMetric(`${datum.metricValue}${datum.unitOfMeasure}`);
     } else {
@@ -282,7 +267,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
   };
 
   const normalizeDataToUnit = (data, unit) => {
-    let measure = unit === "imperial" ? "kg" : "lbs";
+    let measure = unit === "imperial" ? "lbs" : "kg";
     return data.map((entry) => ({
       ...entry,
       metricValue:
@@ -303,7 +288,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
       let targetMeasure = targetUnit === "imperial" ? "kg" : "lbs";
       // let currentMeasure = weightUnit === "imperial" ? "kg" : "lbs";
       // setMaxWeight((val) => convertWeightValue(val, currentMeasure, targetMeasure))
-      setMaxWeight(
+      setMaxMetric(
         Math.max(...convertedData.map((val) => val.metricValue || 0))
       );
       setWeightUnit(targetUnit);
@@ -503,23 +488,14 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                 } // Use the custom label component
                 tickFormat={(date) => {
                   if (isErrorGraphData) return "";
-                  const monthAbbr = [
-                    "Jan",
-                    "Feb",
-                    "Mar",
-                    "Apr",
-                    "May",
-                    "Jun",
-                    "Jul",
-                    "Aug",
-                    "Sep",
-                    "Oct",
-                    "Nov",
-                    "Dec",
-                  ]; // Array of month abbreviations
+                  // Array of month abbreviations
                   const d = new Date(date);
+                  const dayAbbr = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
                   if (selectedTimeFrame === "Year") {
                     return monthAbbr[d.getMonth()]; // Get abbreviation based on month index
+                  }
+                  if (selectedTimeFrame === "Week") {
+                    return dayAbbr[d.getDay()]; // Get abbreviation based on month index
                   }
                   return `${d.toLocaleDateString("en-US", {
                     weekday: "short",
@@ -531,7 +507,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                 name="bar2"
                 data={adjustedData.map((d) => ({
                   ...d,
-                  metricValue: isWeight ? maxWeight : 10, // Need to change this to max value
+                  metricValue: maxMetric || 10 ,
                 }))}
                 x="date"
                 barRatio={0.45}

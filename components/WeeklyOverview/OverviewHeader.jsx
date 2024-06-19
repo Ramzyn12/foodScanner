@@ -11,9 +11,9 @@ const OverviewHeader = ({ week, title, day, onSave, notes }) => {
 
   const handleGoback = () => {
     navigation.goBack()
-    // if (onSave && notes) {
-    //   onSave()
-    // }
+    if (onSave) {
+      onSave()
+    }
   }
   const {theme} = useColourTheme()
 
@@ -67,7 +67,7 @@ const OverviewHeader = ({ week, title, day, onSave, notes }) => {
               color: themedColours.primary[theme],
             }}
           >
-            Save
+            Done
           </Text>
         </Pressable>
       )}
