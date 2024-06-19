@@ -11,7 +11,7 @@ import { startOfDay } from "date-fns";
 import GreyFail from "../../svgs/GreyFail";
 import PendingClock from "../../svgs/PendingClock";
 import LogModal from "../me/LogModal";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { getCurrentDateLocal } from "../../utils/dateHelpers";
 import Animated, {
   Easing,
@@ -24,6 +24,8 @@ import Animated, {
 } from "react-native-reanimated";
 import { useColourTheme } from "../../context/Themed";
 import { themedColours } from "../../constants/themedColours";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import auth from "@react-native-firebase/auth";
 
 const DayAccordian = ({ dayData, day }) => {
   const [accordianOpen, setAccordianOpen] = useState(false);
@@ -33,10 +35,13 @@ const DayAccordian = ({ dayData, day }) => {
   const dateOfEntry = new Date(dayData?.date);
   const today = new Date(getCurrentDateLocal());
   const { theme } = useColourTheme();
+  const [notes, setNotes] = useState('')
+  const userId = auth().currentUser?.uid
 
   const isPresent = today.toISOString() === dateOfEntry.toISOString();
   const isFuture = dateOfEntry > today;
 
+  console.log(notes, dateOfEntry, 'ACCORIDNA');
 
   const isSuccess =
     dayData.diaryDetails.fastedState === true ||
@@ -86,6 +91,22 @@ const DayAccordian = ({ dayData, day }) => {
       height: animatedHeight,
     };
   });
+
+  const getNotesFromStorage = async () => {
+    const date = dayData?.date
+
+    try {
+      const note = await AsyncStorage.getItem(`${userId}_${date}`);
+      setNotes(note)
+    } catch (e) {
+      console.error('Failed to save notes to AsyncStorage', e);
+    }
+  }
+
+  useFocusEffect(() => {
+    getNotesFromStorage()
+  })
+  
 
   return (
     <Pressable
@@ -187,7 +208,7 @@ const DayAccordian = ({ dayData, day }) => {
               </Text>
               <ArrowRight color={themedColours.secondaryText[theme]} />
             </View>
-            {dayData?.note?.note && (
+            {(dayData?.note?.note || notes) && (
               <Text
                 numberOfLines={3}
                 ellipsizeMode="tail"
@@ -198,7 +219,7 @@ const DayAccordian = ({ dayData, day }) => {
                   color: themedColours.secondaryText[theme],
                 }}
               >
-                {dayData?.note?.note.trim().split("\n").join(". ")}
+                {notes?.trim().split("\n").join(". ") || dayData?.note?.note.trim().split("\n").join(". ")}
               </Text>
             )}
           </Pressable>

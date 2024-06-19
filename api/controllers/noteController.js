@@ -24,6 +24,7 @@ const getNote = async (req, res) => {
   const userId = req.user._id;
   const { date } = req.params;
 
+
   const note = await Note.findOne({ userId, date });
 
   if (!note) {
