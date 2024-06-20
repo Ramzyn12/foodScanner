@@ -24,7 +24,7 @@ async function fetchProductWithFallback(searchTerm) {
         // q: searchTerm,
         fields: "brands,code,image_url,product_name,nova_group",
         page_size: 30,
-        countries: 'united-kingdom'
+        countries: "united-kingdom",
       },
     });
     // Check if data is valid
@@ -102,7 +102,7 @@ async function fetchOFFWithBarcode({ userId, barcode, date }) {
     checkIsInGroceryList(userId, barcode, true),
     checkIsConsumedToday(userId, barcode, true, date),
     openFoodFactsAPI.get(
-      `/api/v3/product/${barcode}?fields=knowledge_panels,ingredients_text_en,ingredients_analysis_tags,nova_group,ingredients_hierarchy,brands,image_url,product_name`
+      `/api/v3/product/${barcode}?fields=knowledge_panels,ingredients_text_en,ingredients_tags,ingredients_text,ingredients_analysis_tags,nova_group,ingredients_hierarchy,brands,image_url,product_name`
     ),
   ]);
 
@@ -112,14 +112,15 @@ async function fetchOFFWithBarcode({ userId, barcode, date }) {
     throw new NotFoundError("Product data not available");
   }
 
-  const knowledgePanels = product.knowledge_panels || {};
+  const knowledgePanels = product?.knowledge_panels || {};
 
-  const ingredients = product.ingredients_text_en || "";
+  const ingredients = product.ingredients_text_en || product.ingredients_text || "";
 
   const additives = (knowledgePanels.additives?.elements || []).map((el) => {
     // Safely navigate to the desired title using optional chaining.
     const title =
       knowledgePanels[el.panel_element?.panel_id]?.title_element?.title;
+
     // If the title doesn't exist, return a default string.
     // return title || "Unknown additive found";
     return title;
@@ -127,22 +128,25 @@ async function fetchOFFWithBarcode({ userId, barcode, date }) {
 
   // Maybe unknown should be the last one instead of "No"
   // Need to relook at tags!
-  console.log(product.ingredients_analysis_tags);
-  const hasPalmOil = Array.isArray(product.ingredients_analysis_tags)
-    ? product.ingredients_analysis_tags.some((tag) => tag === "en:palm-oil")
-      ? "Yes"
-      : product.ingredients_analysis_tags.some(
-          (tag) => tag === "en:palm-oil-content-unknown"
-        )
-      ? "Unknown"
-      : "No"
-    : "Unknown";
 
+  const getPalmOilContent = (product) => {
+    if (!Array.isArray(product.ingredients_analysis_tags)) return "Unknown";
+    const hasPalmOil = product.ingredients_analysis_tags.includes("en:palm-oil")
+      ? "Yes"
+      : product.ingredients_analysis_tags.includes("en:palm-oil-free")
+      ? "No"
+      : "Unknown";
+
+    return hasPalmOil
+  };
 
   const co2Footprint = [
     knowledgePanels.carbon_footprint?.title_element?.subtitle,
     knowledgePanels.carbon_footprint?.title_element?.title,
   ];
+
+  const packagingImpact =
+    knowledgePanels.ecoscore_packaging?.title_element?.title;
 
   const processedState =
     product.nova_group === 1
@@ -156,9 +160,11 @@ async function fetchOFFWithBarcode({ userId, barcode, date }) {
       : "Unknown";
 
   // Need to deal with this on frontend and make sure its correct way to find it
-  const hasVegetableOil = Array.isArray(product.ingredients_hierarchy)
-    ? product.ingredients_hierarchy?.includes("en:vegetable-oil-and-fat")
+  const hasVegetableOil = Array.isArray(product.ingredients_tags)
+    ? product.ingredients_tags.some( tag => tag === "en:vegetable-oil-and-fat" || tag === 'en:vegetable-oil') 
     : "Unknown";
+
+  console.log(hasVegetableOil, product.ingredients_tags);
 
   const ecoscore =
     knowledgePanels.ecoscore_total?.title_element?.grade?.toUpperCase();
@@ -174,10 +180,11 @@ async function fetchOFFWithBarcode({ userId, barcode, date }) {
     barcode: barcode,
     isConsumedToday,
     isInGroceryList,
-    hasPalmOil,
+    hasPalmOil: getPalmOilContent(product),
     hasVegetableOil,
     co2Footprint,
     ecoscore,
+    packagingImpact,
   };
 }
 

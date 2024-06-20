@@ -10,12 +10,12 @@ const FoodDetailsIngredientsList = () => {
   const currentFood = useSelector((state) => state.food.currentFood);
   const filteredIngredients = currentFood.ingredients;
   const {theme} = useColourTheme()
-
+  const subtitle = currentFood.ingredients ? 'All ingredients found in this product.' : 'Ingredients currently missing for this product'
   return (
     <View style={{ marginTop: 20, padding: 20, borderWidth: 1, borderColor: themedColours.stroke[theme], borderRadius: 20 }}>
       <Text style={[styles.titleText, {color: themedColours.primaryText[theme]}]}>Ingredients</Text>
-      <Text style={[styles.subtitleText, {color: themedColours.secondaryText[theme]}]}>All ingredients found in this product.</Text>
-      <Text style={[styles.ingredientsText, {color: themedColours.primaryText[theme]}]}>{filteredIngredients}</Text>
+      <Text style={[styles.subtitleText, {color: themedColours.secondaryText[theme], paddingBottom: currentFood.ingredients ? 20 : 0}]}>{subtitle}</Text>
+      {currentFood.ingredients && <Text style={[styles.ingredientsText, {color: themedColours.primaryText[theme]}]}>{filteredIngredients}</Text>}
     </View>
   );
 };

@@ -30,6 +30,7 @@ export const useFoodDetails = (foodDetails, singleFoodDetails) => {
         additives: foodDetails.additives || [],
         ecoscore: foodDetails.ecoscore,
         processedScore: foodDetails?.processedScore,
+        packagingImpact: foodDetails?.packagingImpact,
       };
       dispatch(setCurrentFood(normalizedData));
       saveRecentScan(normalizedData);

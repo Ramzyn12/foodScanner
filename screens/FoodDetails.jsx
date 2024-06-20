@@ -34,12 +34,17 @@ import { getCurrentDateLocal } from "../utils/dateHelpers";
 import LoadingFoodDetails from "../components/foodDetails/LoadingFoodDetails";
 import { useColourTheme } from "../context/Themed";
 import { themedColours } from "../constants/themedColours";
+import { useCustomerInfo } from "../hooks/useCustomerInfo";
+import { useNavigation } from "@react-navigation/native";
+import Purchases from "react-native-purchases";
+import TryProButton from "../components/foodDetails/TryProButton";
 
 const FoodDetails = ({ navigation, route }) => {
   const barcode = route?.params?.barcodeId;
   const singleFoodId = route?.params?.singleFoodId;
   const currentFood = useSelector((state) => state.food.currentFood);
   const {theme} = useColourTheme()
+
   const chosenDate =
     useSelector((state) => state.diary.chosenDate) || getCurrentDateLocal();
 
@@ -69,6 +74,8 @@ const FoodDetails = ({ navigation, route }) => {
     queryFn: async () => await fetchFoodWithIvyId(singleFoodId, chosenDate),
   });
 
+
+ 
   // handle the normalisation
   const readyToShow = useFoodDetails(foodDetails, singleFoodDetails);
 
@@ -127,26 +134,28 @@ const FoodDetails = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: themedColours.primaryBackground[theme] }}>
+    <View style={{ flex: 1, backgroundColor: themedColours.primaryBackground[theme] }}>
       <FoodDetailsSimpleInfo expectedId={singleFoodId || barcode} />
       <ScrollView showsVerticalScrollIndicator={false}>
         {currentFood?.processedScore && <FoodDetailsScoreStrip />}
         {/* {currentFood?.additives?.length > 0 && <FoodDetailsLessonCarousel />} */}
         {/* {currentFood?.description && <Text>{currentFood?.description}</Text>} */}
         <View style={{ paddingHorizontal: 20 }}>
+          <FoodDetailsIngredientsList />
           <FoodDetailsMainInfo />
-          {currentFood?.ingredients && <FoodDetailsIngredientsList />}
-
           <FoodDetailsEnvironment />
+          <TryProButton />
         </View>
       </ScrollView>
       {/* <Toast position="bottom" config={toastConfig} /> */}
       <Toast position="bottom" bottomOffset={40} config={toastConfig} />
-    </SafeAreaView>
+    </View>
   );
 };
 
 export default FoodDetails;
+
+
 
 const styles = StyleSheet.create({
   toastContainer: {
