@@ -120,7 +120,7 @@ const PaywallNoTrial = ({ offering }) => {
                 color: themedColours.primaryText[theme],
               }}
             >
-              Everything you need to thrive
+              Everything you need to know about millions of grocery products.
             </Text>
             <BenefitCards />
           </View>
@@ -137,13 +137,15 @@ const PaywallNoTrial = ({ offering }) => {
             left: 0,
             top: 0,
             right: 0,
-            alignItems: 'center',
-            justifyContent: 'center',
+            alignItems: "center",
+            justifyContent: "center",
             bottom: 0,
             opacity: 0.3,
             backgroundColor: "black",
           }}
-        ><ActivityIndicator /></View>
+        >
+          <ActivityIndicator />
+        </View>
       )}
     </View>
   );

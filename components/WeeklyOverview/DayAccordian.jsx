@@ -26,6 +26,7 @@ import { useColourTheme } from "../../context/Themed";
 import { themedColours } from "../../constants/themedColours";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import auth from "@react-native-firebase/auth";
+import { storage } from "../../utils/MMKVStorage";
 
 const DayAccordian = ({ dayData, day }) => {
   const [accordianOpen, setAccordianOpen] = useState(false);
@@ -35,21 +36,34 @@ const DayAccordian = ({ dayData, day }) => {
   const dateOfEntry = new Date(dayData?.date);
   const today = new Date(getCurrentDateLocal());
   const { theme } = useColourTheme();
-  const [notes, setNotes] = useState('')
-  const userId = auth().currentUser?.uid
+  const [notes, setNotes] = useState("");
+  const userId = auth().currentUser?.uid;
 
   const isPresent = today.toISOString() === dateOfEntry.toISOString();
   const isFuture = dateOfEntry > today;
 
-  console.log(notes, dateOfEntry, 'ACCORIDNA');
+  console.log(notes, dateOfEntry, "ACCORIDNA");
 
   const isSuccess =
     dayData.diaryDetails.fastedState === true ||
     dayData.diaryDetails.diaryDayState === "unprocessed";
 
-  const svgWithoutTime = isSuccess ? <GreenTickCircle /> : <GreyFail color={themedColours.secondaryText[theme]} colorCross={themedColours.secondaryBackground[theme]} />;
+  const svgWithoutTime = isSuccess ? (
+    <GreenTickCircle />
+  ) : (
+    <GreyFail
+      color={themedColours.secondaryText[theme]}
+      colorCross={themedColours.secondaryBackground[theme]}
+    />
+  );
 
-  const svg = isPresent ? <PendingClock color={themedColours.primary[theme]} /> : isFuture ? "" : svgWithoutTime;
+  const svg = isPresent ? (
+    <PendingClock color={themedColours.primary[theme]} />
+  ) : isFuture ? (
+    ""
+  ) : (
+    svgWithoutTime
+  );
 
   const messageWithoutTime = isSuccess
     ? "Success - no processed food"
@@ -93,20 +107,16 @@ const DayAccordian = ({ dayData, day }) => {
   });
 
   const getNotesFromStorage = async () => {
-    const date = dayData?.date
+    const date = dayData?.date;
 
-    try {
-      const note = await AsyncStorage.getItem(`${userId}_${date}`);
-      setNotes(note)
-    } catch (e) {
-      console.error('Failed to save notes to AsyncStorage', e);
-    }
-  }
+    const note = storage.getString(`${userId}_${date}`);
+    console.log("NOTE RECIEVED", note, date);
+    setNotes(note);
+  };
 
   useFocusEffect(() => {
-    getNotesFromStorage()
-  })
-  
+    getNotesFromStorage();
+  });
 
   return (
     <Pressable
@@ -158,7 +168,10 @@ const DayAccordian = ({ dayData, day }) => {
             style={{
               fontSize: 14,
               fontFamily: "Mulish_700Bold",
-              color: (isSuccess || isPresent) ? themedColours.primary[theme] : themedColours.secondaryText[theme],
+              color:
+                isSuccess || isPresent
+                  ? themedColours.primary[theme]
+                  : themedColours.secondaryText[theme],
             }}
           >
             {message}
@@ -219,7 +232,8 @@ const DayAccordian = ({ dayData, day }) => {
                   color: themedColours.secondaryText[theme],
                 }}
               >
-                {notes?.trim().split("\n").join(". ") || dayData?.note?.note.trim().split("\n").join(". ")}
+                {notes?.trim().split("\n").join(". ") ||
+                  dayData?.note?.note.trim().split("\n").join(". ")}
               </Text>
             )}
           </Pressable>

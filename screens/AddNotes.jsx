@@ -24,6 +24,7 @@ import { themedColours } from "../constants/themedColours";
 import { useKeyboardVisible } from "../hooks/useKeyboardVisible";
 import auth from "@react-native-firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { storage } from "../utils/MMKVStorage";
 
 const AddNotes = ({ route }) => {
   const insets = useSafeAreaInsets();
@@ -46,57 +47,40 @@ const AddNotes = ({ route }) => {
     enabled: false, // then  Could retry if couldnt get from async storage?
   });
 
+  const getDataFromBackend = async (timer) => {
+    const backendData = await refetch();
+    if (backendData.data && backendData.data.note) {
+      setNotes(backendData.data.note);
+      setInitialNotes(backendData.data.note);
+
+      // Save the fetched notes to AsyncStorage
+      storage.set(`${userId}_${date}`, backendData.data.note);
+    } else {
+      storage.set(`${userId}_${date}`, "");
+
+      timer = setTimeout(() => {
+        notesInputRef.current?.focus();
+      }, 400);
+    }
+  };
+
   useEffect(() => {
     let timer;
 
     const fetchLocalNotes = async () => {
       try {
-        const localNotes = await AsyncStorage.getItem(`${userId}_${date}`);
-        if (localNotes !== null) {
+        const localNotes = storage.getString(`${userId}_${date}`);
+        if (localNotes !== undefined) {
           setNotes(localNotes);
-          setInitialNotes(localNotes); // Set initial notes from AsyncStorage
-          console.log("FETCHING FROM LOCAL", localNotes);
+          setInitialNotes(localNotes);
         } else {
-          // Fallback to fetching from backend if no local data
-          const backendData = await refetch();
-          if (backendData.data && backendData.data.note) {
-            setNotes(backendData.data.note);
-            setInitialNotes(backendData.data.note);
-            console.log("FETCHING FROM BACKEND", backendData.data.note);
-
-            // Save the fetched notes to AsyncStorage
-            await AsyncStorage.setItem(
-              `${userId}_${date}`,
-              backendData.data.note
-            );
-          } else {
-            console.log("FETCHING FROM BACKEND NO DATA",);
-
-            timer = setTimeout(() => {
-              notesInputRef.current?.focus();
-            }, 400);
-          }
+          // Fallback to fetching from backend if no local data yet
+          getDataFromBackend(timer);
         }
       } catch (e) {
         console.log("Failed to fetch notes from AsyncStorage", e);
         // Fallback to fetching from backend in case of error
-        const backendData = await refetch();
-        if (backendData.data && backendData.data.note) {
-          setNotes(backendData.data.note);
-          setInitialNotes(backendData.data.note);
-          // Save the fetched notes to AsyncStorage
-          await AsyncStorage.setItem(
-            `${userId}_${date}`,
-            backendData.data.note
-          );
-          console.log("FETCHING FROM BACKEND", backendData.data.note);
-        } else {
-          console.log("FETCHING FROM BACKEND MO DATA");
-
-          timer = setTimeout(() => {
-            notesInputRef.current?.focus();
-          }, 400);
-        }
+        getDataFromBackend(timer);
       } finally {
         setIsLoadingLocal(false);
       }
@@ -112,7 +96,7 @@ const AddNotes = ({ route }) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["Note", date] });
 
-      setInitialNotes(notes)
+      setInitialNotes(notes);
       // queryClient.setQueryData(["Note", date], { note: notes });
     },
     onError: (err) => {
@@ -126,37 +110,11 @@ const AddNotes = ({ route }) => {
     },
   });
 
-  // Need to improve this massively, logic is a bit weird
-  // useEffect(() => {
-  //   let timer;
-
-  //   if (!data) return
-
-  //   if (data && data.note) {
-  //     setNotes(data.note);
-  //     setInitialNotes(data.note);
-
-  //   } else {
-  //     timer = setTimeout(() => {
-  //       notesInputRef.current?.focus();
-  //     }, 400);
-  //   }
-
-  //   return () => clearTimeout(timer); // Clear timeout if component unmounts
-  // }, [data, isError]);
-
   const handleSaveNotes = async () => {
-    console.log(notes, initialNotes);
     if (notes !== initialNotes) {
-      // Notes have changed so we can save
+      // Notes have changed so we can save to db and storage
       updateNoteMutation.mutate({ note: notes, date });
-
-      try {
-        await AsyncStorage.setItem(`${userId}_${date}`, notes);
-        console.log("SAVED");
-      } catch (e) {
-        console.error("Failed to save notes to AsyncStorage", e);
-      }
+      storage.set(`${userId}_${date}`, notes);
     }
 
     notesInputRef.current?.blur();

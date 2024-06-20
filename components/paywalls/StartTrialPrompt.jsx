@@ -33,14 +33,14 @@ const StartTrialPrompt = ({ onPress, onScroll, yearlyPrice }) => {
           fontFamily: "Mulish_700Bold",
         }}
       >
-        Everything you need to thrive
+        Everything you need to know about millions of grocery products.
       </Text>
       <Text
         style={{
           color: themedColours.primaryText[theme],
           fontSize: 14,
           fontFamily: "Mulish_500Medium",
-          marginTop: 8,
+          marginTop: 14,
         }}
       >
         {`Free unlimited access for 7 days, then just ${yearlyPrice} per year `}
