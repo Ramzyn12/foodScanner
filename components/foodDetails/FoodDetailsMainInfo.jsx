@@ -119,9 +119,9 @@ const FoodDetailsMainInfo = () => {
       ? "We recommend avoiding this product as it is considered highly processed based on the ingredients and additives."
       : "This product is a great choice as it occurs naturally on the earth, is nutrient dense, and does not contain harmful additives or ingredients.";
 
-  if (isUnknown) {
-    return null;
-  }
+  // if (isUnknown) {
+  //   return null;
+  // }
 
   return (
     <View
@@ -153,19 +153,24 @@ const FoodDetailsMainInfo = () => {
           >
             {message}
           </Text>
-          <ScrollView showsHorizontalScrollIndicator={false} horizontal >
+          <ScrollView showsHorizontalScrollIndicator={false} horizontal>
             <View style={styles.foodDetailReasonContainer}>
-              <FoodDetailReasonCard
-                type={"Additive"}
-                currentFood={currentFood}
-              />
+              {currentFood.additives.length > 0 && (
+                <FoodDetailReasonCard
+                  type={"Additive"}
+                  currentFood={currentFood}
+                />
+              )}
               <FoodDetailReasonCard
                 type={"Vegetable"}
                 currentFood={currentFood}
               />
               <FoodDetailReasonCard type={"Palm"} currentFood={currentFood} />
               <FoodDetailReasonCard type={"Nova"} currentFood={currentFood} />
-              <FoodDetailReasonCard type={"Ingredients"} currentFood={currentFood} />
+              <FoodDetailReasonCard
+                type={"Ingredients"}
+                currentFood={currentFood}
+              />
             </View>
           </ScrollView>
           {currentFood.additives?.map((el) => (

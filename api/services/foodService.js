@@ -102,7 +102,7 @@ async function fetchOFFWithBarcode({ userId, barcode, date }) {
     checkIsInGroceryList(userId, barcode, true),
     checkIsConsumedToday(userId, barcode, true, date),
     openFoodFactsAPI.get(
-      `/api/v3/product/${barcode}?fields=knowledge_panels,ingredients_text_en,ingredients_tags,ingredients_text,ingredients_analysis_tags,nova_group,ingredients_hierarchy,brands,image_url,product_name`
+      `/api/v3/product/${barcode}?fields=knowledge_panels,ingredients_text_en,ingredients_n,ingredients_tags,ingredients_text,ingredients_analysis_tags,nova_group,ingredients_hierarchy,brands,image_url,product_name`
     ),
   ]);
 
@@ -179,11 +179,13 @@ async function fetchOFFWithBarcode({ userId, barcode, date }) {
     ingredients: ingredients,
     additives: additives,
     barcode: barcode,
+    novaScore: product.nova_group,
     isConsumedToday,
     isInGroceryList,
     hasPalmOil: getPalmOilContent(product),
     hasVegetableOil,
     co2Footprint,
+    ingredientsCount: product?.ingredients_n,
     ecoscore,
     packagingImpact,
   };

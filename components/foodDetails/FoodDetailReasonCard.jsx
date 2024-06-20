@@ -7,6 +7,23 @@ import PalmTree from "../../svgs/PalmTree";
 import { themedColours } from "../../constants/themedColours";
 import { useColourTheme } from "../../context/Themed";
 import InfoCircle from "../../svgs/InfoCircle";
+import { Log } from "victory-native";
+
+const QuestionMark = () => {
+  const { theme } = useColourTheme();
+
+  return (
+    <Text
+      style={{
+        fontSize: 20,
+        fontWeight: 400,
+        color: themedColours.primaryText[theme],
+      }}
+    >
+      ?
+    </Text>
+  );
+};
 
 const FoodDetailReasonCard = ({ type, currentFood }) => {
   const { theme } = useColourTheme();
@@ -18,22 +35,43 @@ const FoodDetailReasonCard = ({ type, currentFood }) => {
     backgroundColor = currentFood.additives.length > 0 ? "#FAD8D5" : "#CAE2C3";
     message = currentFood.additives.length > 0 ? `Additives` : "No additives";
   } else if (type === "Vegetable") {
-    svg = <RainDrops />;
-    backgroundColor = currentFood.hasVegetableOil ? "#FAD8D5" : "#CAE2C3";
-    message = currentFood.hasVegetableOil ? "Seed oil" : "No seed oil";
-  } else if (type === "Palm") {
-    svg = <PalmTree />;
-    backgroundColor = currentFood.hasPalmOil === "Yes" ? "#FAD8D5" : "#CAE2C3";
-    message = currentFood.hasPalmOil === "Yes" ? "Palm oil" : "No palm oil";
-  } else if (type === "Nova") {
-    svg = <InfoCircle color={themedColours.primaryText[theme]} />;
+    svg =
+      currentFood.hasVegetableOil === "Unknown" ? (
+        <QuestionMark />
+      ) : (
+        <RainDrops />
+      );
     backgroundColor =
-      currentFood?.NovaScore === 3 || currentFood?.NovaScore === 4
+      currentFood.hasVegetableOil === "Unknown"
+        ? themedColours.secondaryBackground[theme]
+        : currentFood.hasVegetableOil
         ? "#FAD8D5"
         : "#CAE2C3";
-    message = `Nova ${currentFood?.NovaScore || ""}`;
+    message = currentFood.hasVegetableOil ? "Seed oil" : "No seed oil";
+  } else if (type === "Palm") {
+    svg =
+      currentFood?.hasPalmOil === "Unknown" ? <QuestionMark /> : <PalmTree />;
+    backgroundColor =
+      currentFood.hasPalmOil === "Yes"
+        ? "#FAD8D5"
+        : currentFood.hasPalmOil === "No"
+        ? "#CAE2C3"
+        : themedColours.secondaryBackground[theme];
+    message = currentFood.hasPalmOil === "No" ? "No palm oil" : "Palm oil";
+  } else if (type === "Nova") {
+    svg = currentFood?.novaScore ? (
+      <InfoCircle color={themedColours.primaryText[theme]} />
+    ) : (
+      <QuestionMark />
+    );
+    backgroundColor = !currentFood?.novaScore
+      ? themedColours.secondaryBackground[theme]
+      : currentFood?.novaScore === 3 || currentFood?.novaScore === 4
+      ? "#FAD8D5"
+      : "#CAE2C3";
+    message = `Nova ${currentFood?.novaScore || ""}`;
   } else if (type === "Ingredients") {
-    svg = (
+    svg = currentFood?.ingredientsCount ? (
       <Text
         style={{
           fontFamily: "Mulish_400Regular",
@@ -41,12 +79,26 @@ const FoodDetailReasonCard = ({ type, currentFood }) => {
           color: themedColours.primaryText[theme],
         }}
       >
-        3
+        {currentFood?.ingredientsCount}
       </Text>
+    ) : (
+      <QuestionMark />
     );
-    backgroundColor = currentFood?.IngredientCount < 3 ? "#FAD8D5" : "#CAE2C3";
+
+    backgroundColor = !currentFood?.ingredientsCount
+      ? themedColours.secondaryBackground[theme]
+      : currentFood?.ingredientsCount >= 3
+      ? "#FAD8D5"
+      : "#CAE2C3";
     message = `Ingredients`;
   }
+
+  console.log(
+    currentFood?.hasPalmOil,
+    currentFood?.ingredientsCount,
+    currentFood?.novaScore,
+    currentFood?.hasVegetableOil
+  );
 
   return (
     <View style={{ gap: 8 }}>
