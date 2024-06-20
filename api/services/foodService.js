@@ -114,17 +114,17 @@ async function fetchOFFWithBarcode({ userId, barcode, date }) {
 
   const knowledgePanels = product?.knowledge_panels || {};
 
-  const ingredients = product.ingredients_text_en || product.ingredients_text || "";
+  const ingredients =
+    product.ingredients_text_en || product.ingredients_text || "";
+
+  console.log(knowledgePanels.additives);
 
   const additives = (knowledgePanels.additives?.elements || []).map((el) => {
-    // Safely navigate to the desired title using optional chaining.
     const title =
       knowledgePanels[el.panel_element?.panel_id]?.title_element?.title;
 
-    // If the title doesn't exist, return a default string.
-    // return title || "Unknown additive found";
-    return title;
-  });
+    return title || undefined;
+  }).filter((title) => title !== undefined) //  empty array if error
 
   // Maybe unknown should be the last one instead of "No"
   // Need to relook at tags!
@@ -137,7 +137,7 @@ async function fetchOFFWithBarcode({ userId, barcode, date }) {
       ? "No"
       : "Unknown";
 
-    return hasPalmOil
+    return hasPalmOil;
   };
 
   const co2Footprint = [
@@ -161,10 +161,11 @@ async function fetchOFFWithBarcode({ userId, barcode, date }) {
 
   // Need to deal with this on frontend and make sure its correct way to find it
   const hasVegetableOil = Array.isArray(product.ingredients_tags)
-    ? product.ingredients_tags.some( tag => tag === "en:vegetable-oil-and-fat" || tag === 'en:vegetable-oil') 
+    ? product.ingredients_tags.some(
+        (tag) =>
+          tag === "en:vegetable-oil-and-fat" || tag === "en:vegetable-oil"
+      )
     : "Unknown";
-
-  console.log(hasVegetableOil, product.ingredients_tags);
 
   const ecoscore =
     knowledgePanels.ecoscore_total?.title_element?.grade?.toUpperCase();

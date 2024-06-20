@@ -1,42 +1,118 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import PotionIcon from "../../svgs/PotionIcon";
 import COLOURS from "../../constants/colours";
 import DangerTriangle from "../../svgs/DangerTriangle";
 import { useColourTheme } from "../../context/Themed";
 import { themedColours } from "../../constants/themedColours";
+import { Path, Svg } from "react-native-svg";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+import ArrowDownShort from "../../svgs/ArrowDownShort";
+import ADDITIVES from "../../constants/additives";
 
 const FoodDetailsLesson = ({ additive }) => {
-  //  THis is the additives card
-  const angle = 122;
-  const {theme} = useColourTheme()
-  const angleRad = (Math.PI * angle) / 180;
-  const start = {
-    x: 0.5 - Math.sin(angleRad) / 2,
-    y: 0.5 + Math.cos(angleRad) / 2,
+  const { theme } = useColourTheme();
+  const rotation = useSharedValue(0); // Rotation for the arrow
+  const [accordianOpen, setAccordianOpen] = useState(false);
+  const [height, setHeight] = useState(0);
+
+  const handleAccordianPress = () => {
+    setAccordianOpen((prev) => !prev);
+    rotation.value = withTiming(accordianOpen ? 0 : 180, {
+      duration: 300,
+      // easing: Easing.inOut,
+    });
   };
-  const end = {
-    x: 0.5 + Math.sin(angleRad) / 2,
-    y: 0.5 - Math.cos(angleRad) / 2,
+
+  const arrowStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ rotateZ: `${rotation.value}deg` }],
+    };
+  });
+
+  const onLayout = (e) => {
+    const layoutHeight = e.nativeEvent.layout.height;
+
+    if (layoutHeight > 0 && layoutHeight !== height) {
+      setHeight(layoutHeight);
+    }
   };
+
+  const openAnimatedStyle = useAnimatedStyle(() => {
+    const animatedHeight = accordianOpen ? withTiming(height) : withTiming(0);
+    return {
+      height: animatedHeight,
+    };
+  });
+
+  const additiveDescription = ADDITIVES[additive.split(" - ")[0]];
 
   return (
-    <View style={[styles.container, {backgroundColor: themedColours.secondaryBackground[theme]}]}>
-      <View style={{ flexDirection: "row", gap: 8, alignItems: 'center',  }}>
-        <DangerTriangle color={themedColours.primaryText[theme]} />
-        <Text style={[styles.chemicalNameText, {color: themedColours.primaryText[theme]}]}>{additive.split(' - ')[1]} ({additive.split(' - ')[0]})</Text>
+    <Pressable
+      onPress={handleAccordianPress}
+      style={[
+        styles.container,
+        {
+          backgroundColor: themedColours.primaryBackground[theme],
+          borderWidth: 1,
+          borderColor: themedColours.stroke[theme],
+        },
+      ]}
+    >
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flex: 1,
+          gap: 20,
+        }}
+      >
+        <View
+          style={{
+            flexDirection: "row",
+            gap: 8,
+            alignItems: "center",
+            flex: 1,
+          }}
+        >
+          <DangerTriangle color={themedColours.primaryText[theme]} />
+          <Text
+            style={[
+              styles.chemicalNameText,
+              { color: themedColours.primaryText[theme] },
+            ]}
+          >
+            {additive.split(" - ")[1]} ({additive.split(" - ")[0]})
+          </Text>
+        </View>
+        <Animated.View style={arrowStyle}>
+          <ArrowDownShort color={themedColours.primaryText[theme]} />
+        </Animated.View>
       </View>
-
-      {/* <Text style={styles.chemicalDescription}>
-        Extracted using chemical processes which alter their natural form.
-      </Text> */}
-      {/* <Pressable style={styles.lessonButton}>
-        <BadgeIcon />
-        <Text style={styles.lessonButtonText}>
-          Take lesson
-        </Text>
-      </Pressable> */}
-    </View>
+      {additiveDescription && <Animated.View style={[openAnimatedStyle, { overflow: "hidden" }]}>
+        <View
+          onLayout={onLayout}
+          style={{ position: "absolute", width: "100%" }}
+        >
+          <Text
+            style={{
+              fontSize: 14,
+              marginTop: 14,
+              fontFamily: "Mulish_400Regular",
+              color: themedColours.secondaryText[theme],
+            }}
+          >
+            {additiveDescription}
+          </Text>
+        </View>
+      </Animated.View>}
+    </Pressable>
   );
 };
 
@@ -46,9 +122,10 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
     paddingHorizontal: 20,
+
     paddingVertical: 14,
     borderRadius: 12,
-    gap: 12,
+    // gap: 12,
   },
   chemicalNameText: { fontFamily: "Mulish_600SemiBold", fontSize: 16 },
   chemicalDescription: { fontFamily: "Mulish_400Regular", fontSize: 14 },

@@ -22,6 +22,7 @@ import { toastConfig } from "./toastConfig";
 import { themedColours } from "./constants/themedColours";
 import { useColourTheme } from "./context/Themed";
 import Paywall from "./screens/Paywall";
+import Disclaimer from "./screens/Disclaimer";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -70,6 +71,15 @@ function MainComponent({ loggedIn }) {
               contentStyle: { borderRadius: 20 },
             }}
             component={FoodDetails}
+          />
+          <Stack.Screen
+            name="Disclaimer"
+            options={{
+              headerShown: false,
+              presentation: "modal",
+              contentStyle: { borderRadius: 20 },
+            }}
+            component={Disclaimer}
           />
           <Stack.Screen
             name="Paywall"

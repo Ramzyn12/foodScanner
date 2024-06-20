@@ -38,11 +38,11 @@ const DayAccordian = ({ dayData, day }) => {
   const { theme } = useColourTheme();
   const [notes, setNotes] = useState("");
   const userId = auth().currentUser?.uid;
+  
 
   const isPresent = today.toISOString() === dateOfEntry.toISOString();
   const isFuture = dateOfEntry > today;
 
-  console.log(notes, dateOfEntry, "ACCORIDNA");
 
   const isSuccess =
     dayData.diaryDetails.fastedState === true ||
@@ -117,6 +117,8 @@ const DayAccordian = ({ dayData, day }) => {
   useFocusEffect(() => {
     getNotesFromStorage();
   });
+
+  
 
   return (
     <Pressable
