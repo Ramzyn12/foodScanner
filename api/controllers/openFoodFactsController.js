@@ -5,7 +5,6 @@ const { NotFoundError } = require("../utils/error");
 const fetchFoodWithBarcode = async (req, res) => {
   const { barcode, date } = req.params;
   const userId = req.user._id; // Assuming you have user information from authentication middleware
-
   try {
     const foodData = await foodService.fetchOFFWithBarcode({
       barcode,
@@ -23,7 +22,7 @@ const fetchFoodWithBarcode = async (req, res) => {
 
 const fetchFoodWithSearch = async (req, res) => {
   const search_term = req.params.search_term;
-
+throw new Error('')
   const foodList = await foodService.fetchOFFWithSearch({ search_term });
 
   res.json(foodList);

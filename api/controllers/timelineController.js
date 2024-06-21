@@ -22,6 +22,7 @@ const getRecentTimelineWeek = async (req, res) => {
 
 const getAllTimelineWeeks = async (req, res) => {
   const userId = req.user._id;
+  // throw new Error('')
 
   const timelineWeeks = await timelineService.getAllTimelineWeeks({ userId });
 

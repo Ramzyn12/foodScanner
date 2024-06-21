@@ -9,6 +9,7 @@ import {
   Dimensions,
   Keyboard,
   TouchableWithoutFeedback,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -65,6 +66,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useCustomerInfo } from "../hooks/useCustomerInfo";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import { format, isToday } from "date-fns";
+import ErrorPage from "./ErrorPage";
 
 const screenWidth = Dimensions.get("screen").width;
 
@@ -82,8 +84,20 @@ const monthAbbr = [
   "Nov",
   "Dec",
 ];
-const fullMonthNames = ["January", "February", "March", "April", "May", "June", 
-                    "July", "August", "September", "October", "November", "December"];
+const fullMonthNames = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
 const convertWeightValue = (value, fromUnit, toUnit) => {
   if (value === 0) return 0;
@@ -136,6 +150,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
     data,
     isLoading,
     isError: isErrorGraphData,
+    refetch,
     error: errorGraphData,
   } = useQuery({
     // Should be called get graph data
@@ -182,7 +197,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
         date: firstDate,
         metricValue: average ? parseFloat(average.toFixed(1)) : average,
         metric: route.params.metricType,
-        unitOfMeasure: weightUnit === 'imperial' ? 'lbs' : 'kg'
+        unitOfMeasure: weightUnit === "imperial" ? "lbs" : "kg",
       };
     });
 
@@ -238,9 +253,9 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
   const formatDate = (dateString) => {
     if (!dateString) return ""; // safeguard against undefined input
     const date = new Date(dateString);
-    if (selectedTimeFrame === 'Year') {
-      const date = new Date(dateString)
-      return `${fullMonthNames[date.getMonth()]} ${date.getFullYear()}` 
+    if (selectedTimeFrame === "Year") {
+      const date = new Date(dateString);
+      return `${fullMonthNames[date.getMonth()]} ${date.getFullYear()}`;
     }
     if (isToday(date)) {
       return "Today";
@@ -257,7 +272,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
 
   const updateDisplay = (datum) => {
     if (datum.metricValue === "null") return;
-    console.log(datum, 'DATUM');
+    console.log(datum, "DATUM");
     if (isWeight) {
       setDisplayMetric(`${datum.metricValue}${datum.unitOfMeasure}`);
     } else {
@@ -380,21 +395,17 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
             </Text>
 
             {isErrorGraphData && (
-              <Text
-                style={{
-                  position: "absolute",
-                  left: "50%",
-                  top: "50%",
-                  zIndex: 3000,
-                  color: "yellow",
-                  fontSize: 20,
-                }}
-              >
-                Error
-              </Text>
+              <View style={{ height: 300 }}>
+                <ErrorPage onPress={() => refetch()} />
+              </View>
+            )}
+            {isLoading &&  (
+              <View style={{ height: 300, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator />
+              </View>
             )}
             {/* GRAPH */}
-            <VictoryChart
+            {!isErrorGraphData && !isLoading  &&  <VictoryChart
               padding={{ left: 20, right: 20, bottom: 40 }}
               height={300}
               // domain={{y: [0, 10]}}
@@ -490,7 +501,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                   if (isErrorGraphData) return "";
                   // Array of month abbreviations
                   const d = new Date(date);
-                  const dayAbbr = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+                  const dayAbbr = ["S", "M", "T", "W", "T", "F", "S"];
                   if (selectedTimeFrame === "Year") {
                     return monthAbbr[d.getMonth()]; // Get abbreviation based on month index
                   }
@@ -507,7 +518,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                 name="bar2"
                 data={adjustedData.map((d) => ({
                   ...d,
-                  metricValue: maxMetric || 10 ,
+                  metricValue: maxMetric || 10,
                 }))}
                 x="date"
                 barRatio={0.45}
@@ -566,7 +577,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
                   },
                 }}
               />
-            </VictoryChart>
+            </VictoryChart>}
           </View>
           <ScientificDescription
             metricType={route.params.metricType}

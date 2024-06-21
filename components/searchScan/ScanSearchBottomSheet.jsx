@@ -171,7 +171,7 @@ const ScanSearchBottomSheet = ({ setSheetIndex }) => {
       {!isLoading && (DataOFF?.length > 0 || DataIvy?.length > 0) && (
         <SearchResultsList DataOFF={DataOFF} DataIvy={DataIvy} />
       )}
-      {isErrorOFF && isErrorIvy && <Text>Error! Please try again later</Text>}
+      {isErrorOFF && isErrorIvy && <Text></Text>}
       {noResults && <NoResultsSearch />}
     </BottomSheet>
   );

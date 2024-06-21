@@ -51,7 +51,7 @@ const NameInput = ({name, setName, text}) => {
         />
       </View>
       {isNameFocused && (
-        <Pressable onPress={() => setName("")} style={{ alignSelf: "center" }}>
+        <Pressable hitSlop={8} onPress={() => setName("")} style={{ alignSelf: "center" }}>
           <ClearIcon background={themedColours.secondaryBackground[theme]} crossColor={themedColours.secondaryText[theme]} />
         </Pressable>
       )}

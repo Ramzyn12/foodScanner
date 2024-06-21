@@ -69,6 +69,7 @@ const FoodDetailsSimpleInfo = ({ foodItem, expectedId }) => {
             {currentFood?.name}
           </Text>
           <Pressable
+          hitSlop={8}
             onPress={() => navigation.navigate("Disclaimer")}
             style={[styles.scoreBackground, { backgroundColor: background }]}
           >
@@ -80,6 +81,7 @@ const FoodDetailsSimpleInfo = ({ foodItem, expectedId }) => {
         </View>
         {/* exit svg */}
         <Pressable
+        hitSlop={15}
           style={{ alignSelf: "flex-start" }}
           onPress={() => navigation.goBack()}
         >

@@ -80,10 +80,13 @@ const HealthCard = ({ onLog, metricType, leftLable, rightLable }) => {
     queryKey: ["RecentMetric", metricType], //Second param is the metric
   });
 
+
   const { barOneProgress, barTwoProgress, barThreeProgress } =
     calculateBarProgress(data?.metricValue ? data?.metricValue * 10 : 0);
   const lastLoggedText = getLastLoggedText(data?.date);
   const isLastLoggedToday = lastLoggedText === "Today";
+  const cardTitle = isError ? 'Error' : metricType
+  const cardTitleColor = isError ? themedColours.danger[theme] : themedColours.primaryText[theme]
 
   return (
     <Pressable
@@ -107,11 +110,11 @@ const HealthCard = ({ onLog, metricType, leftLable, rightLable }) => {
           <Text
             style={{
               fontFamily: "Mulish_700Bold",
-              color: themedColours.primaryText[theme],
+              color: cardTitleColor,
               fontSize: 16,
             }}
           >
-            {metricType}
+            {cardTitle}
           </Text>
           <ArrowRight color={themedColours.primaryText[theme]} />
         </View>
@@ -206,13 +209,7 @@ const HealthCard = ({ onLog, metricType, leftLable, rightLable }) => {
           </View>
         </View>
       )}
-      {isError && (
-        <Text
-          style={{ fontSize: 12, fontFamily: "Mulish_700Bold", color: "red" }}
-        >
-          Error getting data
-        </Text>
-      )}
+     
       <Pressable
         onPress={() => onLog(metricType)}
         style={{

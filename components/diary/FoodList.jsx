@@ -27,6 +27,7 @@ import Toast from "react-native-toast-message";
 import { useColourTheme } from "../../context/Themed";
 import { themedColours } from "../../constants/themedColours";
 import { color } from "@rneui/base";
+import ErrorPage from "../../screens/ErrorPage";
 
 const FoodList = ({
   diaryFoodItems,
@@ -140,8 +141,8 @@ const FoodList = ({
     );
   };
 
-  if (isErrorFoodDiary)
-    return <Text>Error Fetching Food Diary, please try again later</Text>;
+  // if (isErrorFoodDiary)
+  //   return <ErrorPage />;
 
   if (loadingFoodDiary || isLoadingFasted) {
     return (

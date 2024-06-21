@@ -20,7 +20,8 @@ const BottomAuthText = ({ authState, onPress }) => {
           ? `Don't have an account yet?`
           : "Already have an account?"}
       </Text>
-      <Pressable onPress={onPress}>
+      <Pressable         hitSlop={10}
+ onPress={onPress}>
         <Text style={[styles.actionText, {color: themedColours.primaryText[theme]}]}>
           {authState == AuthState.SIGN_IN ? `Sign up` : "Sign in"}
         </Text>

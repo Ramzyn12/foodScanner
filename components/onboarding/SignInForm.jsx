@@ -100,7 +100,7 @@ const SignInForm = () => {
             {errorMessage}
           </Text>
         )}
-        <Pressable onPress={handleForgotPassword}>
+        <Pressable hitSlop={{bottom: 8}} onPress={handleForgotPassword}>
           <Text
             style={{
               textAlign: "center",

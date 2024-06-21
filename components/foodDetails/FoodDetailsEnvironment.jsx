@@ -55,7 +55,7 @@ const Feature = ({ feature }) => {
 const FoodDetailsEnvironment = () => {
   const currentFood = useSelector((state) => state.food.currentFood);
   const { theme } = useColourTheme();
-  const showCarbonFootprint = currentFood.co2Footprint[0] && currentFood.co2Footprint[1]
+  const showCarbonFootprint = currentFood?.co2Footprint?.[0] && currentFood?.co2Footprint?.[1]
 
   const [isSubscribed, setIsSubscribed] = useState(undefined);
 

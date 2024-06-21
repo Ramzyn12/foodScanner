@@ -89,7 +89,10 @@ const FoodDetailsPackaing = () => {
     }
   }, [customerInfo]);
 
-  // console.log(currentFood?.packagingData);
+
+  if (!currentFood?.packagingData) {
+    return null
+  }
 
   return (
     <View

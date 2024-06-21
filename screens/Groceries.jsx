@@ -38,7 +38,7 @@ const Groceries = ({ navigation }) => {
     (groceryItem) => groceryItem.checked === true
   );
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["Groceries"],
     queryFn: getGroceryList,
     retry: 1,
@@ -48,7 +48,7 @@ const Groceries = ({ navigation }) => {
     useGrocerySortPreference(data);
 
   if (isLoading) return <LoadingGroceries />;
-  if (isError) return <ErrorPage />
+  if (isError) return <ErrorPage onPress={() => refetch()} />
 
   return (
     <SafeAreaView style={[styles.container, {backgroundColor: themedColours.primaryBackground[theme]}]}>

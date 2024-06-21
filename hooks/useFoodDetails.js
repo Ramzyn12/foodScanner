@@ -53,6 +53,7 @@ export const useFoodDetails = (foodDetails, singleFoodDetails) => {
         description: singleFoodDetails.description,
         barcode: "",
         ingredientsCount: 1,
+        hasPalmOil: 'No',
         novaScore: 1,
         hasVegetableOil: false,
         ingredients: [singleFoodDetails.name],

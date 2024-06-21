@@ -28,7 +28,7 @@ const authMiddleware = async (req, res, next) => {
       // frontend should retry? 
       //Maybe just create user here if not work
       // return
-      return res.status(401).json("No user created yet");
+      throw new UnauthorizedError('no user created yet')
     }
 
     req.user = user;

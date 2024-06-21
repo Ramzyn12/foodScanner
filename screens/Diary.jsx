@@ -33,6 +33,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme } from "../hooks/useTheme";
 import { useColourTheme } from "../context/Themed";
 import { themedColours } from "../constants/themedColours";
+import ErrorPage from "./ErrorPage";
 
 const Diary = ({ navigation }) => {
   const userCreated = useSelector((state) => state.auth.userCreated);
@@ -96,9 +97,7 @@ const Diary = ({ navigation }) => {
 
   if (isErrorAllDiaryDays) {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Text>Server error, try again later</Text>
-      </View>
+      <ErrorPage onPress={() => refetchAllDiaryDays()} />
     );
   }
 

@@ -8,6 +8,7 @@ import { themedColours } from "../../constants/themedColours";
 import { useColourTheme } from "../../context/Themed";
 import InfoCircle from "../../svgs/InfoCircle";
 import { Log } from "victory-native";
+import WarningSquare from "../../svgs/WarningSquare";
 
 const QuestionMark = () => {
   const { theme } = useColourTheme();
@@ -60,7 +61,7 @@ const FoodDetailReasonCard = ({ type, currentFood }) => {
     message = currentFood.hasPalmOil === "No" ? "No palm oil" : "Palm oil";
   } else if (type === "Nova") {
     svg = currentFood?.novaScore ? (
-      <InfoCircle color={themedColours.primaryText[theme]} />
+      <WarningSquare/>
     ) : (
       <QuestionMark />
     );

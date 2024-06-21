@@ -7,6 +7,7 @@ import { getAllTimelineWeeks } from "../axiosAPI/timelineAPI";
 import LoadingHealth from "../components/health/LoadingHealth";
 import { useColourTheme } from "../context/Themed";
 import { themedColours } from "../constants/themedColours";
+import ErrorPage from "./ErrorPage";
 
 const calculateWeekStatus = (daysSinceStart, weekIndex) => {
   const daysPassed = daysSinceStart - weekIndex * 7;
@@ -30,6 +31,7 @@ const Health = () => {
   const {
     data: timelineWeeks,
     isLoading,
+    refetch,
     isError,
   } = useQuery({
     queryFn: getAllTimelineWeeks,
@@ -42,9 +44,7 @@ const Health = () => {
   if (isLoading) return <LoadingHealth />;
   if (isError)
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Text>Server Error, please try again later</Text>
-      </View>
+      <ErrorPage onPress={() => refetch()} />
     );
 
   return (

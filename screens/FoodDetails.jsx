@@ -39,6 +39,7 @@ import { useNavigation } from "@react-navigation/native";
 import Purchases from "react-native-purchases";
 import TryProButton from "../components/foodDetails/TryProButton";
 import FoodDetailsPackaing from "../components/foodDetails/FoodDetailsPackaing";
+import ErrorPage from "./ErrorPage";
 
 const FoodDetails = ({ navigation, route }) => {
   const barcode = route?.params?.barcodeId;
@@ -54,6 +55,7 @@ const FoodDetails = ({ navigation, route }) => {
     isLoading: isLoadingFoodDetails, // isPending made it pend when not enabled?
     isError: isErrorOFF,
     isFetching,
+    refetch: refetchOFF,
     error: errorOFF,
   } = useQuery({
     queryKey: ["FoodDetails", barcode, chosenDate],
@@ -67,6 +69,7 @@ const FoodDetails = ({ navigation, route }) => {
     data: singleFoodDetails,
     isError: isErrorIvy,
     error: errorIvy,
+    refetch: refetchIvy,
     isLoading: isLoadingSingleFood,
   } = useQuery({
     queryKey: ["FoodDetailsIvy", singleFoodId, chosenDate],
@@ -80,8 +83,21 @@ const FoodDetails = ({ navigation, route }) => {
   // handle the normalisation
   const readyToShow = useFoodDetails(foodDetails, singleFoodDetails);
 
+  const handleRefetch = () => {
+    if (isErrorOFF) {
+      refetchOFF()
+    } else if (isErrorIvy) {
+      refetchIvy()
+    }
+  }
+
   if (isErrorOFF || isErrorIvy) {
-    return <Text>Product doesnt exist...</Text>;
+    if (errorOFF?.response && errorOFF.response.data.statusCode === 404) {
+      return <Text>Product doesn't exist...</Text>
+    } else {
+      return <ErrorPage onPress={handleRefetch} />
+    }
+    
   }
 
   if (isLoadingFoodDetails || isLoadingSingleFood || !readyToShow) {

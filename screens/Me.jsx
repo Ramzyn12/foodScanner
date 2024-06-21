@@ -167,33 +167,5 @@ const Me = ({ navigation }) => {
   );
 };
 
-const StockChart = ({ points, chartBounds }) => {
-  const { path: areaPath } = useAreaPath(points.highTmp, chartBounds.bottom, {
-    curveType: "natural",
-  });
-  const { path: linePath } = useLinePath(points.highTmp, {
-    curveType: "natural",
-  });
-
-  return (
-    <>
-      <Group>
-        <Path path={areaPath} style="fill">
-          <LinearGradient
-            start={vec(0, 0)}
-            end={vec(chartBounds.top, chartBounds.bottom)}
-            colors={["#CFDACC", "white"]}
-          />
-        </Path>
-        <Path
-          path={linePath}
-          style="stroke"
-          strokeWidth={4}
-          color={COLOURS.darkGreen}
-        />
-      </Group>
-    </>
-  );
-};
 
 export default Me;

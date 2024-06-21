@@ -37,7 +37,6 @@ const removeFoodFromDiaryDay = async (req, res) => {
 const getDiaryDay = async (req, res) => {
   const userId = req.user._id;
   const { date } = req.params;
-
   const diaryDay = await diaryService.getDiaryDay({ date, userId });
   res.status(200).json(diaryDay);
 };

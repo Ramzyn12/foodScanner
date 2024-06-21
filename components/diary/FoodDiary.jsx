@@ -17,18 +17,23 @@ import { storage } from "../../utils/MMKVStorage";
 import { setCurrentDiaryDay } from "../../redux/diarySlice";
 import { getCurrentDateLocal } from "../../utils/dateHelpers";
 import LoadingDiary from "./LoadingDiary";
+import ErrorPage from "../../screens/ErrorPage";
+import { themedColours } from "../../constants/themedColours";
+import { useColourTheme } from "../../context/Themed";
 
 const FoodDiary = ({}) => {
   // const token = useSelector(state => state.auth.token)
   const token = storage.getString("firebaseToken");
   const userCreated = useSelector((state) => state.auth.userCreated);
-  const chosenDate = useSelector((state) => state.diary.chosenDate) || getCurrentDateLocal()
+  const chosenDate =
+    useSelector((state) => state.diary.chosenDate) || getCurrentDateLocal();
   const waitingForBackendApple = useSelector(
     (state) => state.auth.waitingForBackend
   );
   const dispatch = useDispatch();
+  const { theme } = useColourTheme();
 
-  // Do we still need this when use waitingForBackend in mainComponent? 
+  // Do we still need this when use waitingForBackend in mainComponent?
   useEffect(() => {
     if (userCreated) {
       refetch();
@@ -56,7 +61,10 @@ const FoodDiary = ({}) => {
     1 * diaryFoodItems?.consumedFoods.length +
       1 * diaryFoodItems?.consumedSingleFoods.length ===
     0;
-  
+
+  if (isError) {
+    return <ErrorPage onPress={() => refetch()} />;
+  }
 
   return (
     <View style={{ width: "100%", marginTop: 25, paddingBottom: 200 }}>

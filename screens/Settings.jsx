@@ -70,7 +70,7 @@ const Settings = ({ navigation }) => {
             Settings
           </Text>
           <ProBanner />
-          <Pressable hitSlop={10} onPress={restorePurchases}>
+          <Pressable hitSlop={8} onPress={restorePurchases}>
             <Text
               style={{
                 fontSize: 14,

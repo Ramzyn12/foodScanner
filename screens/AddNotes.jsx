@@ -25,6 +25,7 @@ import { useKeyboardVisible } from "../hooks/useKeyboardVisible";
 import auth from "@react-native-firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { storage } from "../utils/MMKVStorage";
+import ErrorPage from "./ErrorPage";
 
 const AddNotes = ({ route }) => {
   const insets = useSafeAreaInsets();
@@ -123,9 +124,7 @@ const AddNotes = ({ route }) => {
   if (isLoading || isLoadingLocal) return <ActivityIndicator />; // NEED BETTER LOADING HERE?
   if (isError)
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Text>Error loading notes, please try again later</Text>
-      </View>
+     <ErrorPage message={'There appears to have been an error whilst fetching your notes. Please try again later.'} onPress={() => refetch()} />
     );
 
   return (

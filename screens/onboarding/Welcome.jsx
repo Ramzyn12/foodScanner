@@ -7,10 +7,15 @@ import { useColourTheme } from "../../context/Themed";
 import { themedColours } from "../../constants/themedColours";
 
 const Welcome = ({ navigation }) => {
-  const {theme} = useColourTheme()
+  const { theme } = useColourTheme();
 
   return (
-    <SafeAreaView style={[styles.container, {backgroundColor: themedColours.primaryBackground[theme]}]}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        { backgroundColor: themedColours.primaryBackground[theme] },
+      ]}
+    >
       <View style={styles.contentContainer}>
         <Svg width="120" height="121" viewBox="0 0 120 121" fill="none">
           <Path
@@ -60,16 +65,38 @@ const Welcome = ({ navigation }) => {
             fill={themedColours.primaryText[theme]}
           />
         </Svg>
-        <Text style={[styles.titleText, {color: themedColours.primaryText[theme]}]}>Welcome To Ivy</Text>
-        <Text style={[styles.descriptionText, {color: themedColours.primaryText[theme]}]}>
+        <Text
+          style={[
+            styles.titleText,
+            { color: themedColours.primaryText[theme] },
+          ]}
+        >
+          Welcome To Ivy
+        </Text>
+        <Text
+          style={[
+            styles.descriptionText,
+            { color: themedColours.primaryText[theme] },
+          ]}
+        >
           Scan and search for foods to check if they are processed, educate
           yourself, see statistical health improvements and more.
         </Text>
         <Pressable
           onPress={() => navigation.navigate("Notifications")}
-          style={[styles.button, {backgroundColor: themedColours.primary[theme]}]}
+          style={[
+            styles.button,
+            { backgroundColor: themedColours.primary[theme] },
+          ]}
         >
-          <Text style={[styles.buttonText, {color: themedColours.primaryBackground[theme]}]}>Begin</Text>
+          <Text
+            style={[
+              styles.buttonText,
+              { color: themedColours.primaryBackground[theme] },
+            ]}
+          >
+            Begin
+          </Text>
           <Svg
             xmlns="http://www.w3.org/2000/svg"
             width="14"
@@ -94,7 +121,12 @@ const Welcome = ({ navigation }) => {
         >
           Already have an account?
         </Text>
-        <Pressable onPress={() => navigation.navigate('AuthScreen', {authType: 'Log In'})}>
+        <Pressable
+          hitSlop={20}
+          onPress={() =>
+            navigation.navigate("AuthScreen", { authType: "Log In" })
+          }
+        >
           <Text
             style={{
               fontSize: 14,

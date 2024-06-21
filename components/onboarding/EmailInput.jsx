@@ -63,7 +63,7 @@ const EmailInput = ({ email, setEmail, message }) => {
       </View>
 
       {isEmailFocused && (
-        <Pressable onPress={() => setEmail("")} style={{ alignSelf: "center" }}>
+        <Pressable hitSlop={8} onPress={() => setEmail("")} style={{ alignSelf: "center" }}>
           <ClearIcon background={themedColours.secondaryBackground[theme]} crossColor={themedColours.secondaryText[theme]} />
         </Pressable>
       )}

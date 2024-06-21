@@ -19,6 +19,8 @@ import LoadingWeeklyOverview from "../components/WeeklyOverview/LoadingWeeklyOve
 import { useColourTheme } from "../context/Themed";
 import { themedColours } from "../constants/themedColours";
 import { useCustomerInfo } from "../hooks/useCustomerInfo";
+import ErrorPage from "./ErrorPage";
+import { isPending } from "@reduxjs/toolkit";
 
 const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
 <g clip-path="url(#clip0_1126_4878)">
@@ -58,6 +60,8 @@ const WeeklyOverview = ({ route, navigation }) => {
     data: weekData,
     isLoading,
     isError,
+    isPending,
+    refetch
   } = useQuery({
     queryFn: () => getTimelineWeek({ week }),
     queryKey: ["TimelineWeek", week],
@@ -79,14 +83,13 @@ const WeeklyOverview = ({ route, navigation }) => {
 
 
   if (isLoading || LoadingCustomerInfo) return <LoadingWeeklyOverview route={route} />;
+
+
   if (isError)
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Text>Error loading weekly overview</Text>
-      </View>
+      <ErrorPage onPress={() => refetch()} />
     );
 
-  
 
   return (
     <View style={{ paddingTop: insets.top, flex: 1, backgroundColor: themedColours.primaryBackground[theme] }}>

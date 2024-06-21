@@ -127,7 +127,8 @@ const Notifications = ({ navigation }) => {
           {/* </SharedElement> */}
         </View>
         <View style={styles.ActionContainer}>
-          <Pressable onPress={handleSkipNotifications}>
+          <Pressable         hitSlop={20}
+ onPress={handleSkipNotifications}>
             <Text
               style={{
                 fontSize: 14,

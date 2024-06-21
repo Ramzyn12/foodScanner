@@ -55,7 +55,8 @@ const NameInput = forwardRef(({ name, setName, text }, ref) => {
         />
       </View>
       {isNameFocused && name && (
-        <Pressable onPress={() => setName("")} style={{ alignSelf: "center" }}>
+        <Pressable          hitSlop={10}
+        onPress={() => setName("")} style={{ alignSelf: "center" }}>
           <ClearIcon background={themedColours.secondaryBackground[theme]} crossColor={themedColours.secondaryText[theme]} />
         </Pressable>
       )}

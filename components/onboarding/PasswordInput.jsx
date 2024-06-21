@@ -54,7 +54,7 @@ const PasswordInput = ({password, setPassword}) => {
         />
       </View>
       {isPasswordFocused && (
-        <Pressable onPress={() => setPassword("")} style={{ alignSelf: "center" }}>
+        <Pressable hitSlop={8} onPress={() => setPassword("")} style={{ alignSelf: "center" }}>
           <ClearIcon background={themedColours.secondaryBackground[theme]} crossColor={themedColours.secondaryText[theme]} />
         </Pressable>
       )}

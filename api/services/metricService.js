@@ -37,6 +37,7 @@ async function updateHealthMetric({ date, metric, userId, metricValue, unitOfMea
 //Gets the most recent metric value for the metric e.g Sleep Quality
 async function getRecentMetric({ metric, userId }) {
 
+  // throw new Error('')
   // DONT need to return everything e.g userId etc...
 
   const recentMetric = await HealthMetric.findOne({ userId, metric })
@@ -53,6 +54,8 @@ async function getAllDataForMetric({ metric, userId, timeFrame }) {
   if (!['Week', 'Month', 'Year'].includes(timeFrame)) {
     throw new BadRequestError('Invalid time frame value', { timeFrame });
   }
+
+  // throw new Error('')
 
   const user = await User.findById(userId);
 
