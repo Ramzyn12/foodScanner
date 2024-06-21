@@ -38,6 +38,7 @@ import { useCustomerInfo } from "../hooks/useCustomerInfo";
 import { useNavigation } from "@react-navigation/native";
 import Purchases from "react-native-purchases";
 import TryProButton from "../components/foodDetails/TryProButton";
+import FoodDetailsPackaing from "../components/foodDetails/FoodDetailsPackaing";
 
 const FoodDetails = ({ navigation, route }) => {
   const barcode = route?.params?.barcodeId;
@@ -140,10 +141,11 @@ const FoodDetails = ({ navigation, route }) => {
         {currentFood?.processedScore && <FoodDetailsScoreStrip />}
         {/* {currentFood?.additives?.length > 0 && <FoodDetailsLessonCarousel />} */}
         {/* {currentFood?.description && <Text>{currentFood?.description}</Text>} */}
-        <View style={{ paddingHorizontal: 20 }}>
+        <View style={{ paddingHorizontal: 20, paddingBottom: 60 }}>
           <FoodDetailsIngredientsList />
           <FoodDetailsMainInfo />
           <FoodDetailsEnvironment />
+          <FoodDetailsPackaing />
           <TryProButton />
         </View>
       </ScrollView>

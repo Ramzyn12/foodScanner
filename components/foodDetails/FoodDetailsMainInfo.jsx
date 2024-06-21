@@ -123,6 +123,9 @@ const FoodDetailsMainInfo = () => {
   //   return null;
   // }
 
+
+
+
   return (
     <View
       style={[styles.container, { borderColor: themedColours.stroke[theme] }]}
@@ -153,7 +156,7 @@ const FoodDetailsMainInfo = () => {
           >
             {message}
           </Text>
-          <ScrollView showsHorizontalScrollIndicator={false} horizontal>
+          <ScrollView showsHorizontalScrollIndicator={false} style={{marginRight: -20}} horizontal>
             <View style={styles.foodDetailReasonContainer}>
               {currentFood.additives.length > 0 && (
                 <FoodDetailReasonCard
@@ -220,6 +223,7 @@ const styles = StyleSheet.create({
   foodDetailReasonContainer: {
     flexDirection: "row",
     gap: 20,
+    paddingRight: 20
     // justifyContent: "space-between",
   },
   tryProButtonContainer: {

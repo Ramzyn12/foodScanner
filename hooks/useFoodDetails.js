@@ -27,6 +27,7 @@ export const useFoodDetails = (foodDetails, singleFoodDetails) => {
         hasPalmOil: foodDetails.hasPalmOil,
         co2Footprint: foodDetails.co2Footprint,
         ingredients: foodDetails?.ingredients,
+        packagingData: foodDetails?.packagingData,
         ingredientsCount: foodDetails?.ingredientsCount,
         additives: foodDetails.additives || [],
         ecoscore: foodDetails.ecoscore,

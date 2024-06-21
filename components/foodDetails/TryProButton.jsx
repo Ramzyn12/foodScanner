@@ -59,7 +59,7 @@ const TryProButton = () => {
   return (
     <>
       {!isSubscribed && (
-        <Pressable onPress={() => navigation.navigate("Paywall")}>
+        <Pressable style={{marginTop: 20}} onPress={() => navigation.navigate("Paywall")}>
           <LinearGradient
             colors={["#0B5253", "#19999C"]}
             start={start}

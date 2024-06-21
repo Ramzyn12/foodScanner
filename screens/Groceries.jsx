@@ -27,6 +27,7 @@ import { useGrocerySortPreference } from "../hooks/useGrocerySortPreference";
 import LoadingGroceries from "../components/groceries/LoadingGroceries";
 import { useColourTheme } from "../context/Themed";
 import { themedColours } from "../constants/themedColours";
+import ErrorPage from "./ErrorPage";
 
 const Groceries = ({ navigation }) => {
   const {theme} = useColourTheme()
@@ -47,7 +48,7 @@ const Groceries = ({ navigation }) => {
     useGrocerySortPreference(data);
 
   if (isLoading) return <LoadingGroceries />;
-  if (isError) return <Text>Couldnt fetch grocery list</Text>
+  if (isError) return <ErrorPage />
 
   return (
     <SafeAreaView style={[styles.container, {backgroundColor: themedColours.primaryBackground[theme]}]}>

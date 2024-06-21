@@ -93,15 +93,8 @@ const FoodDetailReasonCard = ({ type, currentFood }) => {
     message = `Ingredients`;
   }
 
-  console.log(
-    currentFood?.hasPalmOil,
-    currentFood?.ingredientsCount,
-    currentFood?.novaScore,
-    currentFood?.hasVegetableOil
-  );
-
   return (
-    <View style={{ gap: 8 }}>
+    <View style={{ gap: 8, alignItems: 'center',}}>
       <View
         style={{
           width: 44,

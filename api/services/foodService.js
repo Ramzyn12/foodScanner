@@ -102,7 +102,7 @@ async function fetchOFFWithBarcode({ userId, barcode, date }) {
     checkIsInGroceryList(userId, barcode, true),
     checkIsConsumedToday(userId, barcode, true, date),
     openFoodFactsAPI.get(
-      `/api/v3/product/${barcode}?fields=knowledge_panels,ingredients_text_en,ingredients_n,ingredients_tags,ingredients_text,ingredients_analysis_tags,nova_group,ingredients_hierarchy,brands,image_url,product_name`
+      `/api/v3/product/${barcode}?fields=knowledge_panels,ingredients_text_en,packagings,ingredients_n,ingredients_tags,ingredients_text,ingredients_analysis_tags,nova_group,ingredients_hierarchy,brands,image_url,product_name`
     ),
   ]);
 
@@ -119,12 +119,14 @@ async function fetchOFFWithBarcode({ userId, barcode, date }) {
 
   console.log(knowledgePanels.additives);
 
-  const additives = (knowledgePanels.additives?.elements || []).map((el) => {
-    const title =
-      knowledgePanels[el.panel_element?.panel_id]?.title_element?.title;
+  const additives = (knowledgePanels.additives?.elements || [])
+    .map((el) => {
+      const title =
+        knowledgePanels[el.panel_element?.panel_id]?.title_element?.title;
 
-    return title || undefined;
-  }).filter((title) => title !== undefined) //  empty array if error
+      return title || undefined;
+    })
+    .filter((title) => title !== undefined); //  empty array if error
 
   // Maybe unknown should be the last one instead of "No"
   // Need to relook at tags!
@@ -170,6 +172,24 @@ async function fetchOFFWithBarcode({ userId, barcode, date }) {
   const ecoscore =
     knowledgePanels.ecoscore_total?.title_element?.grade?.toUpperCase();
 
+  const transformPackagingData = (packagings) => {
+    return packagings.map((packaging) => {
+      const shape = packaging.shape?.id
+        ? packaging.shape.id.split(":").pop()
+        : "Unknown shape";
+      const material = packaging.material?.id
+        ? packaging.material.id.split(":").pop()
+        : "Unknown material";
+      return { shape, material };
+    });
+  };
+
+  console.log(product.packagings);
+
+  const packagingData = product.packagings
+    ? transformPackagingData(product.packagings)
+    : [];
+
   return {
     name: product.product_name,
     processedScore: 100,
@@ -182,6 +202,7 @@ async function fetchOFFWithBarcode({ userId, barcode, date }) {
     novaScore: product.nova_group,
     isConsumedToday,
     isInGroceryList,
+    packagingData,
     hasPalmOil: getPalmOilContent(product),
     hasVegetableOil,
     co2Footprint,

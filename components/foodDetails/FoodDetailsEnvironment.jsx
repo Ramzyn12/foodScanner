@@ -78,9 +78,9 @@ const FoodDetailsEnvironment = () => {
   );
 
   const palmOilString = currentFood?.hasPalmOil === 'Yes' ? 'Contains Palm Oil' : 'Palm Oil Free'
-
+  const ecoscoreBackground = (currentFood?.ecoscore === 'A' || currentFood?.ecoscore === 'B') ? themedColours.success[theme] : themedColours.danger[theme]
   const noDataAvailable = currentFood?.hasPalmOil === 'Unknown' && !showCarbonFootprint && !detectedImpact
-  const subtitle = noDataAvailable ? 'Environment data missing for this product' : 'How this affects the environment'
+  const subtitle = noDataAvailable ? 'Environment data missing for this product' : isSubscribed ? 'How this affects the environment' : 'See how this affects the environment'
 
   return (
     <View
@@ -90,7 +90,7 @@ const FoodDetailsEnvironment = () => {
         borderWidth: 1,
         borderColor: themedColours.stroke[theme],
         borderRadius: 20,
-        marginBottom: isSubscribed ? 60:  20,
+        marginBottom: 20,
         gap: 20,
       }}
     >
@@ -121,10 +121,10 @@ const FoodDetailsEnvironment = () => {
           >
             Environment
           </Text>
-          {currentFood.ecoscore && isSubscribed &&  (
+          {currentFood?.ecoscore && isSubscribed &&  (
             <View
               style={{
-                backgroundColor: "#DB1200",
+                backgroundColor: ecoscoreBackground,
                 paddingHorizontal: 14,
                 paddingVertical: 6,
                 borderRadius: 6,
@@ -138,7 +138,7 @@ const FoodDetailsEnvironment = () => {
                   color: "white",
                 }}
               >
-                {currentFood.ecoscore}
+                {currentFood?.ecoscore}
               </Text>
             </View>
           )}
