@@ -10,25 +10,49 @@ const authMiddleware = require("../middleware/authMiddleware");
 const { auth } = require("firebase-admin");
 const { addFoodValidator } = require("../middleware/validators/diaryValidator");
 const router = express.Router();
-const rateLimit = require('express-rate-limit')
+const rateLimit = require('express-rate-limit');
+const { TooManyRequestsError } = require("../utils/error");
 
 // Could define these all in a seperate file to keep it clean
-const diaryLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 15 minutes
-  max: 500000, // limit each IP to 100 requests per windowMs
-  message: "Too many requests from this IP For diary, try again in 5 mins",
+const addOrRemoveDiaryLimiter = rateLimit({
+  windowMs: 1 * 60 * 500, // 30 secs
+  limit: 20,
+  handler: (req, res, next, options) => {
+    throw new TooManyRequestsError('Too many requests adding or removing diary', {limit: options.limit, window: options.windowMs})
+  },
 });
 
-router.use(diaryLimiter) // Or add it as a middleware in a specific route
+const getAllDiaryLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 mins
+  limit: 200,
+  handler: (req, res, next, options) => {
+    throw new TooManyRequestsError('Too many requests getting all diary days', {limit: options.limit, window: options.windowMs})
+  },
+});
+
+const getDiaryDayLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 mins
+  limit: 120,
+  handler: (req, res, next, options) => {
+    throw new TooManyRequestsError('Too many requests getting all diary days', {limit: options.limit, window: options.windowMs})
+  },
+});
+
+const updatedFastedLimiter = rateLimit({
+  windowMs: 1 * 60 * 50, // 30 sec
+  limit: 20,
+  handler: (req, res, next, options) => {
+    throw new TooManyRequestsError('Too many requests getting all diary days', {limit: options.limit, window: options.windowMs})
+  },
+});
 
 router
   .route("/")
-  .post(authMiddleware, addFoodValidator, addFoodToDiaryDay)
-  .delete(authMiddleware, removeFoodFromDiaryDay);
+  .post(authMiddleware, addOrRemoveDiaryLimiter, addFoodValidator, addFoodToDiaryDay)
 
-router.route("/all").get(authMiddleware, getAllDiaryDays);
-router.route("/remove").post(authMiddleware, removeFoodFromDiaryDay);
-router.route("/:date").get(authMiddleware, getDiaryDay);
-router.route("/toggle-fasting").post(authMiddleware, updateFastedState);
+router.route("/all").get(authMiddleware, getAllDiaryLimiter, getAllDiaryDays);
+router.route("/remove").post(authMiddleware, addOrRemoveDiaryLimiter, removeFoodFromDiaryDay);
+router.route("/:date").get(authMiddleware, getDiaryDayLimiter, getDiaryDay);
+router.route("/toggle-fasting").post(authMiddleware, updatedFastedLimiter, updateFastedState);
 
 module.exports = router;

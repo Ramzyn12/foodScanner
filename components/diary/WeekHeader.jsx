@@ -66,26 +66,26 @@ const transformCurrentDate = (date) => {
 const WeekHeader = ({ diaryData, daysFinished }) => {
   const [weeksData, setWeeksData] = useState([]);
   const carouselRef = useRef(null);
-  const navigation = useNavigation()
+  const navigation = useNavigation();
   const dispatch = useDispatch();
   const { theme } = useColourTheme();
   const insets = useSafeAreaInsets();
   const nowDateString = getCurrentDateLocal();
   const chosenDateString = useSelector((state) => state.diary.chosenDate);
   const chosenDiaryDay = useSelector((state) => state.diary.currentDiaryDay);
-  const [isSubscribed, setIsSubscribed] = useState(false)
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
-  const {customerInfo, error, loading} = useCustomerInfo()
+  const { customerInfo, error, loading } = useCustomerInfo();
 
   useEffect(() => {
-    if (!customerInfo) return 
-    
-    if(typeof customerInfo.entitlements.active['Pro'] !== "undefined") {
-      setIsSubscribed(true)
+    if (!customerInfo) return;
+
+    if (typeof customerInfo.entitlements.active["Pro"] !== "undefined") {
+      setIsSubscribed(true);
     } else {
-      setIsSubscribed(false)
+      setIsSubscribed(false);
     }
-  }, [customerInfo])
+  }, [customerInfo]);
 
   // Has to be date for date-fns to work below
   const chosenDate = chosenDateString
@@ -201,7 +201,6 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
         earliestDate: diaryDays[0].date.split("T")[0],
       });
 
-
       // Proceed to the next week
       currentWeekStartLocal = getAnyDateLocal(
         addDays(currentWeekStartLocal, 7)
@@ -215,7 +214,7 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
     if (!isSubscribed) {
       return [weeks[weeks.length - 1]];
     } else {
-      console.log('RETURNING ALL WEEKS', JSON.stringify(weeks, null, 2));
+      console.log("RETURNING ALL WEEKS", JSON.stringify(weeks, null, 2));
       return weeks;
     }
   };
@@ -284,7 +283,6 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
   );
 
   function findWeekIndexByDate(weeksArray, targetDate) {
-
     // Loop through the array of weeks
     const index = weeksArray.findIndex((week) => {
       // Check if any day in the 'days' array of this week matches the target date
@@ -361,18 +359,19 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
         ref={carouselRef}
         width={windowWidth}
         height={100}
-        // onScrollBegin={(e) => {
-        //   console.log('hey');
-        //   console.log(e);
+        // onProgressChange={(offest) => {
+        //   if (!isSubscribed && Object.is(offest, -0)) {
+        //     // IF swipe right on zero index it shows 0
+        //     // If swipe left it shows -0
+        //     navigation.navigate("Paywall");
+        //   }
         // }}
         onSnapToItem={(index) => {
-          console.log(index);
           if (!isSubscribed && index === 0) {
             // TRY MAKE THIS LESS ANNOYING? more scroll pixels needed to trigger
-            navigation.navigate('Paywall')
-          } 
-          // carouselRef.current.scrollTo({ index: weeksData.length - 1 });
-          // setCurrentIndex(weeksData.length - 1);
+            navigation.navigate("Paywall");
+          }
+          
         }}
       />
     </BlurView>
