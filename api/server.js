@@ -25,13 +25,27 @@ const timelineRoutes = require("./routes/timelineRoutes");
 const noteRoutes = require("./routes/noteRoutes");
 const webhookRoutes = require("./routes/webhookRoutes");
 const errorHandler = require("./middleware/errorHandler");
-const { UnauthorizedError } = require("./utils/error");
+const { UnauthorizedError, TooManyRequestsError } = require("./utils/error");
+const { default: rateLimit } = require("express-rate-limit");
 // const authMiddleware = require("./middleware/authMiddleware");
+
+const globalLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  limit: 800, // limit each IP to 1000 requests per windowMs
+  handler: (req, res, next, options) => {
+    throw new TooManyRequestsError(
+      "Too many requests, please try again later",
+      { limit: options.limit, window: options.windowMs }
+    );
+  },
+});
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
+
+app.use(globalLimiter);
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/open-food-facts", openFoodFactsRoutes);
@@ -43,7 +57,6 @@ app.use("/api/v1/health-metrics", metricRoutes);
 app.use("/api/v1/timeline-weeks", timelineRoutes);
 app.use("/api/v1/notes", noteRoutes);
 app.use("/api/v1/webhooks", webhookRoutes);
-
 
 // Error Handlers
 app.use("*", (req, res) => {

@@ -102,7 +102,8 @@ const SettingOption = ({
         paddingHorizontal: 20,
       }}
     >
-      {optionSvg}
+      {optionSvg && <View style={{ width: 18, height: 18 }}>{optionSvg}</View>}
+
       <Text
         style={{
           fontSize: 16,
@@ -119,7 +120,6 @@ const SettingOption = ({
           thumbColor={themedColours.primaryBackground[theme]}
           ios_backgroundColor={themedColours.fillSecondary[theme]}
           trackColor={{ true: themedColours.primary[theme] }}
-          
           value={isHapticsEnabled}
           onValueChange={toggleSwitch}
         />
@@ -144,7 +144,11 @@ const SettingOption = ({
             >
               {themePreference}
             </Text>
-            <ArrowDownShort color={themedColours.secondaryText[theme]} width={11.5} height={5.5} />
+            <ArrowDownShort
+              color={themedColours.secondaryText[theme]}
+              width={11.5}
+              height={5.5}
+            />
           </View>
         </ContextMenu>
       )}

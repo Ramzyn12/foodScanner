@@ -47,10 +47,21 @@ export const useEmailAuth = (password) => {
         }
       );
     } catch (err) {
-      Toast.show({
-        type: "customErrorToast",
-        text1: "Failed to delete account, please try again later",
-      });
+      if (
+        err.code === "auth/invalid-credential" ||
+        err.code === "auth/wrong-password"
+      ) {
+        Toast.show({
+          type: "customErrorToast",
+          text1: "Incorrect password, please try again.",
+        });
+      } else {
+        Toast.show({
+          type: "customErrorToast",
+          text1: "Failed to delete account, please try again later",
+        });
+      }
+
       console.log(err, "Error deleting email account");
     }
   };

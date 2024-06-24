@@ -20,8 +20,10 @@ const FormSubmissionButton = ({
   isLoading,
 }) => {
   const isEnabled =
-    (email && password && password.length > 6) || (firstName && lastName);
+    (email && password && password.length >= 6) || (firstName && lastName);
+
 const {theme} = useColourTheme()
+
   return (
     <Pressable
       onPress={isEnabled && !isLoading ? onPress : undefined} // Directly apply condition within onPress prop

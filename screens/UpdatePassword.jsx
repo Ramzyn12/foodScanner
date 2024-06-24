@@ -13,7 +13,7 @@ const UpdatePassword = ({ navigation }) => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordRepeat, setNewPasswordRepeat] = useState("");
-  const {theme} = useColourTheme()
+  const { theme } = useColourTheme();
 
   const handleChangePassword = async () => {
     const user = auth().currentUser;
@@ -23,11 +23,19 @@ const UpdatePassword = ({ navigation }) => {
       currentPassword
     );
 
+    if (newPassword.length < 6 || newPasswordRepeat.length < 6) {
+      Toast.show({
+        type: "customErrorToast",
+        text1: "Password must include at least 6 characters",
+      });
+      return;
+    }
+
     try {
       await user.reauthenticateWithCredential(credential);
 
       if (newPassword.trim() === newPasswordRepeat.trim()) {
-        user.updatePassword(newPassword);
+        await user.updatePassword(newPassword);
         if (auth().currentUser) {
           auth().signOut();
         }
@@ -38,26 +46,38 @@ const UpdatePassword = ({ navigation }) => {
       } else {
         Toast.show({
           type: "customErrorToast",
-          text1: "Passwords not matching, try again",
+          text1: "Passwords not matching, try again.",
         });
       }
     } catch (err) {
+      console.log(err.code);
       if (err.code === "auth/invalid-credential") {
         Toast.show({
           type: "customErrorToast",
-          text1: "Incorrect password, try again",
+          text1: "Incorrect current password, try again.",
+        });
+      } else  if (err.code === "auth/weak-password") {
+        Toast.show({
+          type: "customErrorToast",
+          text1: "Password too weak, please try again.",
         });
       } else {
         Toast.show({
           type: "customErrorToast",
-          text1: "Something went wrong, please try again later",
+          text1: "Something went wrong, please try again later.",
         });
       }
     }
   };
 
   return (
-    <View style={{ paddingTop: insets.top, flex: 1, backgroundColor: themedColours.primaryBackground[theme] }}>
+    <View
+      style={{
+        paddingTop: insets.top,
+        flex: 1,
+        backgroundColor: themedColours.primaryBackground[theme],
+      }}
+    >
       <Header
         onNavigate={() => navigation.goBack()}
         headerText={"Change Password"}
@@ -79,7 +99,13 @@ const UpdatePassword = ({ navigation }) => {
           value={currentPassword}
           placeholderTextColor={themedColours.secondaryText[theme]}
           onChangeText={setCurrentPassword}
-          style={[styles.input, {color: themedColours.primaryText[theme], borderColor: themedColours.stroke[theme]}]}
+          style={[
+            styles.input,
+            {
+              color: themedColours.primaryText[theme],
+              borderColor: themedColours.stroke[theme],
+            },
+          ]}
           placeholder="Current password"
         />
         <TextInput
@@ -87,9 +113,14 @@ const UpdatePassword = ({ navigation }) => {
           autoCorrect={false}
           value={newPassword}
           placeholderTextColor={themedColours.secondaryText[theme]}
-
           onChangeText={setNewPassword}
-          style={[styles.input, {color: themedColours.primaryText[theme], borderColor: themedColours.stroke[theme]}]}
+          style={[
+            styles.input,
+            {
+              color: themedColours.primaryText[theme],
+              borderColor: themedColours.stroke[theme],
+            },
+          ]}
           placeholder="New password"
         />
         <TextInput
@@ -98,7 +129,13 @@ const UpdatePassword = ({ navigation }) => {
           value={newPasswordRepeat}
           onChangeText={setNewPasswordRepeat}
           placeholderTextColor={themedColours.secondaryText[theme]}
-          style={[styles.input, {color: themedColours.primaryText[theme], borderColor: themedColours.stroke[theme]}]}
+          style={[
+            styles.input,
+            {
+              color: themedColours.primaryText[theme],
+              borderColor: themedColours.stroke[theme],
+            },
+          ]}
           placeholder="Re-enter your new Password"
         />
         <Pressable

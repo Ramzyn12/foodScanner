@@ -22,7 +22,8 @@ const ForgotPassword = ({ navigation }) => {
   const [showContinueMessage, setShowContinueMessage] = useState(false);
   const insets = useSafeAreaInsets();
   const [isLoading, setIsLoading] = useState(false);
-  const {theme} = useColourTheme()
+  const { theme } = useColourTheme();
+
   const handleSendVerificationCode = () => {
     setShowContinueMessage(false);
     setIsLoading(true);
@@ -32,15 +33,28 @@ const ForgotPassword = ({ navigation }) => {
         setShowContinueMessage(true);
       })
       .catch((err) => {
-        Toast.show({
-          type: "customErrorToast",
-          text1: "Failed to send email, try again",
-        });
+        if (err.code === "auth/invalid-email") {
+          Toast.show({
+            type: "customErrorToast",
+            text1: "Invalid email, please try again.",
+          });
+        } else if (err.code === "auth/user-not-found") {
+          Toast.show({
+            type: "customErrorToast",
+            text1: "User not found with this email address. Please try again.",
+          });
+        } else {
+          Toast.show({
+            type: "customErrorToast",
+            text1: "Failed to send email, please try again later.",
+          });
+        }
       })
       .finally(() => {
         setIsLoading(false);
       });
   };
+  
   return (
     <View
       style={{

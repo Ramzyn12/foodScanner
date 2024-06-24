@@ -27,7 +27,7 @@ const handleErrorSigningIn = (err) => {
       });
   }
   if (err.code === "1001") {
-    return
+    return;
   }
   Toast.show({
     type: "customErrorToast",
@@ -50,7 +50,7 @@ export const useAppleAuth = () => {
       dispatch(setWaitingForBackend(false));
     },
     onError: (err) => {
-      console.log('Error in signUpApple');
+      console.log("Error in signUpApple");
       // console.log(err.response.data, "Error in signUpAppleMutation"); //Can remove in prod
       handleErrorSigningIn(err);
       dispatch(setWaitingForBackend(false));
@@ -111,6 +111,7 @@ export const useAppleAuth = () => {
         userInformation,
       });
     } catch (error) {
+      console.log(error);
       handleErrorSigningIn(error);
     }
   };
@@ -165,11 +166,13 @@ export const useAppleAuth = () => {
         storage.delete("firebaseToken");
       }
     } catch (err) {
-      Toast.show({
-        type: "customErrorToast",
-        bottomOffset: 45,
-        text1: "Error deleting account, Please contact customer support",
-      });
+      if (err.code !== "1001") {
+        Toast.show({
+          type: "customErrorToast",
+          bottomOffset: 45,
+          text1: "Error deleting account, Please contact customer support",
+        });
+      }
     }
   };
 

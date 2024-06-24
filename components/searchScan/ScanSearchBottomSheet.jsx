@@ -67,14 +67,14 @@ const ScanSearchBottomSheet = ({ setSheetIndex }) => {
     queryKey: ["SearchIvy", triggerSearch],
     queryFn: () => fetchFoodWithSearchIvy(triggerSearch),
     retry: false,
-    enabled: triggerSearch.trim().length > 2,
+    enabled: triggerSearch.trim().length > 2  && triggerSearch.trim().length < 40,
   });
 
   const { data: DataOFF, isLoading: isLoadingOFF, isError: isErrorOFF, error: errorOFF } = useQuery({
     queryKey: ["SearchOFF", triggerSearch],
     queryFn: () => fetchFoodWithSearch(triggerSearch),
     retry: false,
-    enabled: triggerSearch.trim().length > 2,
+    enabled: triggerSearch.trim().length > 2 && triggerSearch.trim().length < 40,
   });
 
   const isLoading = isLoadingIvy || isLoadingOFF;

@@ -25,7 +25,7 @@ const Account = ({ navigation }) => {
   const queryClient = useQueryClient();
   const firstNameInputRef = useRef(null);
   const lastNameInputRef = useRef(null);
-  const {theme} = useColourTheme()
+  const { theme } = useColourTheme();
 
   const { data, isLoading, isError, error } = useQuery({
     queryFn: getUserNames,
@@ -86,7 +86,14 @@ const Account = ({ navigation }) => {
 
   const handleSaveNames = () => {
     // Maybe only let them save names if value changes in one input?
-    addNamesMutation.mutate({ firstName, lastName });
+    if (firstName.length > 30 || lastName.length > 30) {
+      Toast.show({
+        type: "foodDetailToast",
+        text1: "Names too long, please try again.",
+      });
+    } else {
+      addNamesMutation.mutate({ firstName, lastName });
+    }
   };
 
   const { handleAppleAccountRevoke } = useAppleAuth();
@@ -109,7 +116,7 @@ const Account = ({ navigation }) => {
         console.log("Signed out!");
       })
       .catch((error) => {
-        console.log(error, 'Error signing out');
+        console.log(error, "Error signing out");
       });
   };
 
@@ -127,14 +134,14 @@ const Account = ({ navigation }) => {
         <NameInput
           ref={firstNameInputRef}
           name={firstName}
-          text={isError ? 'Failed to fetch first name' : "First name"}
+          text={isError ? "Failed to fetch first name" : "First name"}
           setName={setFirstName}
         />
         <NameInput
           ref={lastNameInputRef}
           name={lastName}
           // Change this error idea later maybe
-          text={isError ? 'Failed to fetch last name' : "Last name"}
+          text={isError ? "Failed to fetch last name" : "Last name"}
           setName={setLastName}
         />
         <InformationInput
@@ -154,7 +161,7 @@ const Account = ({ navigation }) => {
         >
           <Text
             style={{
-              color: 'white',
+              color: "white",
               fontSize: 14,
               fontFamily: "Mulish_700Bold",
             }}
