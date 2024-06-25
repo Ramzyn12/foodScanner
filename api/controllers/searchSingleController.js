@@ -5,7 +5,6 @@ const foodService = require('../services/foodService')
 const searchSingleFood = async (req, res) => {
   const searchTerm = req.params.search_term;
 
-  throw new Error('')
   if (!searchTerm) return;
 
   const results = await foodService.fetchSingleFoodsWithSearch({searchTerm})

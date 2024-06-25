@@ -4,7 +4,8 @@ const HealthMetric = require("../models/HealthMetric");
 const { differenceInCalendarDays, addWeeks, addDays } = require("date-fns");
 const { getCurrentDateLocal } = require("../utils/dateHelper");
 const Note = require("../models/Note");
-const { NotFoundError } = require("../utils/error");
+const { NotFoundError, BadRequestError, UnauthorizedError } = require("../utils/error");
+const User = require("../models/User");
 
 async function getRecentTimelineWeek({ userId }) {
   const recentDiaryDay = await DiaryDay.findOne({ userId: userId }).sort({
@@ -51,6 +52,16 @@ async function getAllTimelineWeeks({ userId }) {
 }
 
 async function getTimelineWeek({ userId, week }) {
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new NotFoundError("Could not find user with this userId", { userId });
+  }
+
+  if (!user.isSubscribed) {
+    throw new UnauthorizedError('Subscription Required to access timeline week!')
+  }
+
   const recentDiaryDay = await DiaryDay.findOne({ userId: userId }).sort({
     date: 1,
   });

@@ -35,7 +35,7 @@ async function handleInitialPurchase(event) {
 
   if (!user)
     throw new NotFoundError("User not found with this firebaseId", {
-      firebaseId,
+      firebaseId: event.app_user_id,
     });
 
   if (event.period_type === "TRIAL") {
@@ -55,11 +55,10 @@ async function handleRenewalPurchase(event) {
 
   if (!user)
     throw new NotFoundError("User not found with this firebaseId", {
-      firebaseId,
+      firebaseId: event.app_user_id,
     });
 
   const customerInfo = await getAndStoreCustomerReceipts(event);
-  console.log(customerInfo);
 
   // Send confirmation email or notification about renewal
   // Log the transaction
@@ -109,7 +108,7 @@ async function handleExpiration(event) {
 
   if (!user)
     throw new NotFoundError("User not found with this firebaseId", {
-      firebaseId,
+      firebaseId: event.app_user_id,
     });
 
     const customerInfo = await getAndStoreCustomerReceipts(event);
@@ -197,7 +196,7 @@ async function handleTemporaryEntitlementGrant(event) {
 
   if (!user)
     throw new NotFoundError("User not found with this firebaseId", {
-      firebaseId,
+      firebaseId: event.app_user_id,
     });
 }
 

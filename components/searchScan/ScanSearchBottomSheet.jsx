@@ -124,6 +124,7 @@ const ScanSearchBottomSheet = ({ setSheetIndex }) => {
     };
   });
 
+  console.log(isLoading, hideRecent, isErrorIvy, isErrorOFF, DataOFF?.length, DataIvy);
 
   return (
     <BottomSheet

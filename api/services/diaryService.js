@@ -88,6 +88,8 @@ async function removeFoodFromDiaryDay({ userId, barcode, singleFoodId, date }) {
   if (barcode) {
     const foodItem = await FoodItem.findOne({ barcode });
 
+    console.log(foodItem);
+
     if (!foodItem) {
       throw new NotFoundError("Food item not found in database", { barcode });
     }
@@ -177,8 +179,11 @@ async function getAllDiaryDays({ userId }) {
     diaryDays.reverse();
   }
 
+  console.log(diaryDays, 'DDD');
+
   if (!diaryDays.length) {
     // Create a diary day and send it in array!?
+    // Could cause duplicates?
     const newDiaryDay = await DiaryDay.create({ userId, date: localDate });
     diaryDays = [newDiaryDay];
   }

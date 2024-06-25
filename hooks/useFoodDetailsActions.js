@@ -292,29 +292,37 @@ export const useFoodDetailsActions = (expectedId) => {
   const debouncedGroceryHandler = useCallback(debounce(groceryHandler, 0), []);
 
   const handleAddToDiaryFinal = () => {
-    setAddedToDiary(true);
-    debouncedDiaryHandler("add");
+    if (!removeFoodFromDiaryMutation.isPending) {
+      debouncedDiaryHandler("add");
+      setAddedToDiary(true);
+    }
   };
 
   const handleRemoveFromDiaryFinal = () => {
-    setAddedToDiary(false);
-    debouncedDiaryHandler("remove");
+    if (!addFoodToDiaryMutation.isPending) {
+      setAddedToDiary(false);
+      debouncedDiaryHandler("remove");
+    }
   };
 
   const handleAddToGroceryFinal = () => {
-    debouncedGroceryHandler("add");
-    SetAddedToGroceries(true);
-    Toast.show({
-      type: "foodDetailToast",
-      text1: "Item added to grocery list",
-      text2: "View",
-    });
+    if (!removeFromGroceryListMutation.isPending) {
+      debouncedGroceryHandler("add");
+      SetAddedToGroceries(true);
+      Toast.show({
+        type: "foodDetailToast",
+        text1: "Item added to grocery list",
+        text2: "View",
+      });
+    }
   };
 
   const handleRemoveFromGroceryFinal = () => {
-    debouncedGroceryHandler("remove");
-    SetAddedToGroceries(false);
-    // Toast.hide();
+    if (!addToGroceryListMutation.isPending) {
+      debouncedGroceryHandler("remove");
+      SetAddedToGroceries(false);
+      // Toast.hide();
+    }
   };
 
   return {

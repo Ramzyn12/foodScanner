@@ -16,44 +16,13 @@ import { themedColours } from "../../constants/themedColours";
 // import { SharedElement } from "react-navigation-shared-element";
 import * as Device from "expo-device";
 import * as NotificationsObj from "expo-notifications";
-import auth from "@react-native-firebase/auth";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Notifications = ({ navigation }) => {
   //ONLY SHOW THIS PAGE IF NOTIFCAITIONS NOT ENABLED?
   const { theme } = useColourTheme();
-  const UID = auth().currentUser.uid
 
   const handleSkipNotifications = () => {
     navigation.navigate("InfoOne");
-  };
-
-  const handleSaveTime = async () => {
-    const time = new Date(2020, 0, 1, 12, 0)
-    const title = 'Food tracking'
-    try {
-      await AsyncStorage.setItem(
-        `notification-${title}-${UID}`,
-        time.toISOString()
-      );
-    } catch (error) {
-      console.error("Error saving notification time:", error);
-    }
-   
-    await NotificationsObj.scheduleNotificationAsync({
-      content: {
-        title,
-        body: "Test From notifications",
-        data: { data: "goes here" }, // Probs dont need
-      },
-      // trigger: {
-      //   hour: time.getHours(),
-      //   minute: time.getMinutes(),
-      //   repeats: true,
-      // },
-      trigger: {seconds: 2}
-    });
-
   };
 
   const handleAllowNotificationPress = async () => {
@@ -62,7 +31,6 @@ const Notifications = ({ navigation }) => {
     const { status: existingStatus, ios } =
       await NotificationsObj.getPermissionsAsync();
     let finalStatus = existingStatus;
-    
     let firstTime =
       NotificationsObj.IosAuthorizationStatus[ios.status] === "NOT_DETERMINED";
     if (existingStatus !== "granted") {
@@ -84,13 +52,7 @@ const Notifications = ({ navigation }) => {
           { text: "Cancel", onPress: () => navigation.navigate("InfoOne") },
         ]
       );
-    } else if (finalStatus === "granted" && firstTime) {
-      // set up notifications
-      handleSaveTime()
     } else {
-      // granted and not first time
-      // not granted and first time
-      console.log("move on");
       navigation.navigate("InfoOne");
     }
   };
@@ -165,7 +127,8 @@ const Notifications = ({ navigation }) => {
           {/* </SharedElement> */}
         </View>
         <View style={styles.ActionContainer}>
-          <Pressable hitSlop={20} onPress={handleSkipNotifications}>
+          <Pressable         hitSlop={20}
+ onPress={handleSkipNotifications}>
             <Text
               style={{
                 fontSize: 14,
