@@ -38,7 +38,7 @@ import ErrorPage from "./ErrorPage";
 const Diary = ({ navigation }) => {
   const userCreated = useSelector((state) => state.auth.userCreated);
   // const token = useSelector((state) => state.auth.token);
-  const {theme} = useColourTheme()
+  const { theme } = useColourTheme();
   const token = storage.getString("firebaseToken");
   const firstTimeRef = useRef(true);
   const waitingForBackendApple = useSelector(
@@ -67,7 +67,7 @@ const Diary = ({ navigation }) => {
     data: recentTimelineWeekData,
     isPending: isLoadingRecentTimeline,
     isError: isErrorRecentWeek,
-    refetch: refetchRecentWeek
+    refetch: refetchRecentWeek,
   } = useQuery({
     queryKey: ["RecentTimelineWeek"],
     queryFn: getRecentTimelineWeek,
@@ -80,7 +80,7 @@ const Diary = ({ navigation }) => {
   useEffect(() => {
     if (userCreated) {
       refetchAllDiaryDays();
-      refetchRecentWeek()
+      refetchRecentWeek();
     }
   }, [userCreated]);
 
@@ -99,17 +99,27 @@ const Diary = ({ navigation }) => {
 
   if (isErrorAllDiaryDays) {
     return (
-      <ErrorPage onPress={() => refetchAllDiaryDays()} />
+      <ErrorPage
+        onPress={() => {
+          refetchAllDiaryDays();
+          refetchRecentWeek();
+        }}
+      />
     );
   }
 
-  console.log(isLoadingAllDiaryDays, 'DIARY DAYS', isLoadingRecentTimeline, 'TIMELINE');
+  console.log(
+    isLoadingAllDiaryDays,
+    "DIARY DAYS",
+    isLoadingRecentTimeline,
+    "TIMELINE"
+  );
 
   return (
     <SafeAreaView
       style={[
         styles.container,
-        {backgroundColor: themedColours.primaryBackground[theme]}
+        { backgroundColor: themedColours.primaryBackground[theme] },
       ]}
     >
       <WeekHeader

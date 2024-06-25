@@ -97,10 +97,10 @@ const Account = ({ navigation }) => {
         lastNameInputRef.current.blur();
       }
 
-      Toast.show({
-        type: "foodDetailToast",
-        text1: "Names have been saved!",
-      });
+      // Toast.show({
+      //   type: "foodDetailToast",
+      //   text1: "Names have been saved!",
+      // });
     },
     onError: (err) => {
       if (Array.isArray(err.response.data?.errors)) {
@@ -159,6 +159,7 @@ const Account = ({ navigation }) => {
       .signOut()
       .then(async () => {
         storage.delete("firebaseToken");
+        queryClient.clear()
         console.log("Signed out!");
       })
       .catch((error) => {

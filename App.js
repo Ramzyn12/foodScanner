@@ -34,11 +34,13 @@ const queryClient = new QueryClient();
 const App = () => {
   return (
     <>
-      <Provider store={store}>
-        {/* Only necessary if want to use redux in App, else remove. */}
-        <AppInitializer />
-      </Provider>
-      <Toast position="bottom" bottomOffset={95} config={toastConfig} />
+      <QueryClientProvider client={queryClient}>
+        <Provider store={store}>
+          {/* Only necessary if want to use redux in App, else remove. */}
+          <AppInitializer />
+        </Provider>
+        <Toast position="bottom" bottomOffset={95} config={toastConfig} />
+      </QueryClientProvider>
     </>
   );
 };
@@ -94,18 +96,16 @@ const AppInitializer = () => {
   return (
     <>
       <ThemeProvider>
-        <QueryClientProvider client={queryClient}>
-          <Provider store={store}>
-            <GestureHandlerRootView
-              onLayout={onLayoutRootView}
-              style={{ flex: 1 }}
-            >
-              <BottomSheetModalProvider>
-                <MainComponent loggedIn={isLoggedIn} />
-              </BottomSheetModalProvider>
-            </GestureHandlerRootView>
-          </Provider>
-        </QueryClientProvider>
+        <Provider store={store}>
+          <GestureHandlerRootView
+            onLayout={onLayoutRootView}
+            style={{ flex: 1 }}
+          >
+            <BottomSheetModalProvider>
+              <MainComponent loggedIn={isLoggedIn} />
+            </BottomSheetModalProvider>
+          </GestureHandlerRootView>
+        </Provider>
       </ThemeProvider>
     </>
   );

@@ -11,7 +11,7 @@ import ClearIcon from "../../svgs/ClearIcon";
 import NameInput from "./NameInput";
 import FormSubmissionButton from "./FormSubmissionButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addFirstLastName } from "../../axiosAPI/authAPI";
 import { addUserNames } from "../../axiosAPI/userAPI";
 import auth from "@react-native-firebase/auth";
@@ -26,6 +26,7 @@ const CreateAccount = ({ navigation, route }) => {
   const {theme} = useColourTheme()
   // const token = route?.params?.token;
   // const firebaseId = route?.params?.firebaseId;
+  const queryClient = useQueryClient()
 
   const addNamesMutation = useMutation({
     mutationFn: addUserNames,

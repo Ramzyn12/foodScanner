@@ -5,19 +5,23 @@ import { setToken } from "../redux/authSlice";
 import { storage } from "../utils/MMKVStorage";
 import { Log } from "victory-native";
 import Toast from "react-native-toast-message";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const useAuthentication = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [firebaseUid, setFirebaseUid] = useState(null); // Add this line
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
 
+  
   const handleSignOut = (message) => {
     storage.delete("firebaseToken");
     setIsLoggedIn(false);
     setFirebaseUid(null);
     if (auth().currentUser) {
       auth().signOut();
+      queryClient.clear();
     }
     Toast.show({
       type: "customErrorToast",
@@ -42,7 +46,7 @@ export const useAuthentication = () => {
       } else {
         storage.delete("firebaseToken");
         setIsLoggedIn(false);
-        console.log('USER NO LONGER FOUND, unsubscribeAuthChange');
+        console.log("USER NO LONGER FOUND, unsubscribeAuthChange");
         setFirebaseUid(null);
       }
       setIsLoading(false);
@@ -61,8 +65,9 @@ export const useAuthentication = () => {
             handleSignOut("Session expired. Please log in again.");
           });
       } else {
-        console.log('USER NO LONGER FOUND, tokenChanged function useAuthentication');
-
+        console.log(
+          "USER NO LONGER FOUND, tokenChanged function useAuthentication"
+        );
       }
     });
 
