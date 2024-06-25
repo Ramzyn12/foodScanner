@@ -69,6 +69,7 @@ const AddNotes = ({ route }) => {
     let timer;
 
     const fetchLocalNotes = async () => {
+      // Do we need await before the getDataFromBackend function?
       try {
         const localNotes = storage.getString(`${userId}_${date}`);
         if (localNotes !== undefined) {

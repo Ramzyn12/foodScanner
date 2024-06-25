@@ -21,28 +21,63 @@ const Account = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const [firstName, setFirstName] = useState(""); // Get first name here for inital state
   const [lastName, setLastName] = useState(""); // Get last name here for inital state
+  const [initialFirstName, setInitialFirstName] = useState(""); // Store initial state
+  const [initialLastName, setInitialLastName] = useState(""); // Store initial state
   const signInWith = auth()?.currentUser?.providerData[0]?.providerId;
   const queryClient = useQueryClient();
   const firstNameInputRef = useRef(null);
   const lastNameInputRef = useRef(null);
   const { theme } = useColourTheme();
+  const userId = auth().currentUser?.uid;
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryFn: getUserNames,
     retry: false,
     queryKey: ["UserNames"],
+    enabled: false,
   });
 
   useEffect(() => {
-    if (data) {
-      setFirstName(data?.firstName);
-      setLastName(data?.lastName);
-    }
-  }, [data]);
+    const fetchNames = async () => {
+      const storedFirstName = storage.getString(`${userId}_firstName`);
+      const storedLastName = storage.getString(`${userId}_lastName`);
+      // Could split this up individually?
+      if (!storedFirstName && !storedLastName) {
+        
+        try {
+          const backendNames = await refetch();
+          if (backendNames.data) {
+            console.log('LOADING FROM BACKEND');
+            setFirstName(backendNames.data.firstName);
+            setLastName(backendNames.data.lastName);
+            setInitialFirstName(backendNames.data.firstName);
+            setInitialLastName(backendNames.data.lastName);
+            storage.set(`${userId}_firstName`, backendNames.data.firstName);
+            storage.set(`${userId}_lastName`, backendNames.data.lastName);
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      } else {
+        console.log('LOADING FROM STORAGE');
+        if (storedFirstName) {
+          setFirstName(storedFirstName);
+          setInitialFirstName(storedFirstName);
+        }
+        if (storedLastName) {
+          setLastName(storedLastName);
+          setInitialLastName(storedLastName);
+        }
+      }
+    };
+
+    fetchNames();
+  }, []);
 
   const addNamesMutation = useMutation({
     mutationFn: addUserNames,
     onSuccess: async () => {
+      // do we need this now we use storage?
       queryClient.invalidateQueries({ queryKey: ["UserNames"] });
 
       const user = auth().currentUser;
@@ -85,6 +120,13 @@ const Account = ({ navigation }) => {
   });
 
   const handleSaveNames = () => {
+    console.log('SAVING NAMES');
+
+    // Check if names have changed
+    if (firstName === initialFirstName && lastName === initialLastName) {
+      return;
+    }
+
     // Maybe only let them save names if value changes in one input?
     if (firstName.length > 30 || lastName.length > 30) {
       Toast.show({
@@ -93,6 +135,10 @@ const Account = ({ navigation }) => {
       });
     } else {
       addNamesMutation.mutate({ firstName, lastName });
+      storage.set(`${userId}_firstName`, firstName);
+      storage.set(`${userId}_lastName`, lastName);
+      setInitialFirstName(firstName);
+      setInitialLastName(lastName);
     }
   };
 
@@ -119,6 +165,8 @@ const Account = ({ navigation }) => {
         console.log(error, "Error signing out");
       });
   };
+
+  const opacity = (firstName === initialFirstName && lastName === initialLastName) ? 0.4 : 1
 
   return (
     <View
@@ -156,7 +204,7 @@ const Account = ({ navigation }) => {
             justifyContent: "center",
             alignItems: "center",
             borderRadius: 12,
-            // opacity: 0.4,
+            opacity: opacity,
           }}
         >
           <Text

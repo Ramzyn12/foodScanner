@@ -44,29 +44,11 @@ const getUserNames = async (req, res) => {
   res.json(namesObject);
 };
 
-const toggleUserHaptics = async (req, res) => {
-  const userId = req.user._id;
 
-  const user = await User.findById(userId);
-
-  user.hapticsEnabled = !user.hapticsEnabled;
-  await user.save();
-
-  res.json(user);
-};
-
-const getUserHaptics = async (req, res) => {
-  const userId = req.user._id;
-
-  const user = await User.findById(userId).lean();
-
-  res.json(user.hapticsEnabled);
-};
 
 module.exports = {
   addUserNames,
   removeUser,
   getUserNames,
-  toggleUserHaptics,
-  getUserHaptics,
+
 };

@@ -23,9 +23,22 @@ import { themedColours } from "./constants/themedColours";
 import { useColourTheme } from "./context/Themed";
 import Paywall from "./screens/Paywall";
 import Disclaimer from "./screens/Disclaimer";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
+const getHapticsPreference = async () => {
+  try {
+    const value = await AsyncStorage.getItem("hapticsPreference");
+    if (value !== null) {
+      return JSON.parse(value);
+    }
+    return false; // default value
+  } catch (error) {
+    console.error("Failed to fetch the haptics preference from storage", error);
+    return false;
+  }
+};
 
 function MainComponent({ loggedIn }) {
   const dispatch = useDispatch();
@@ -35,17 +48,16 @@ function MainComponent({ loggedIn }) {
   );
   const {theme} = useColourTheme()
 
-  const { data: hapticsEnabledData } = useQuery({
-    queryFn: getUserHaptics,
-    queryKey: ["HapticsEnabled"],
-    enabled: !!token && !waitingForBackendApple,
-    // staleTime: Infinity,
-    // gcTime: 100000
-  });
+  console.log(waitingForBackendApple, 'BACKEND APPLE LOADING');
 
   useEffect(() => {
-    dispatch(setHapticSetting(hapticsEnabledData));
-  }, [hapticsEnabledData]);
+    const fetchHapticsPreference = async () => {
+      const storedPreference = await getHapticsPreference();
+      dispatch(setHapticSetting(storedPreference));
+    };
+    fetchHapticsPreference();
+  }, []);
+
 
   return (
     <NavigationContainer theme={{colors: {

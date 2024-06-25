@@ -23,10 +23,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true
     },
-    hapticsEnabled: {
-      type: Boolean,
-      default: true
-    },
     isSubscribed: {
       type: Boolean,
       default: false

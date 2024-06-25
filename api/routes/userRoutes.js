@@ -10,8 +10,6 @@ const {
   addUserNames,
   removeUser,
   getUserNames,
-  toggleUserHaptics,
-  getUserHaptics,
 } = require("../controllers/userController");
 const {
   nameUpdateValidator,
@@ -59,8 +57,6 @@ router
   .post(authMiddleware, addUserNameLimiter, nameUpdateValidator, addUserNames)
   .get(authMiddleware, getUserNameLimiter, getUserNames);
 
-router.route("/haptics/toggle").post(authMiddleware, toggleUserHaptics);
-router.route("/haptics").get(authMiddleware, getUserHaptics);
 router
   .route("/removeUser/:firebaseId")
   .delete(authMiddleware, deleteUserLimiter, removeUser);

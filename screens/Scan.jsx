@@ -3,7 +3,7 @@ import {
   useBarcodeScanner,
 } from "@mgcrea/vision-camera-barcode-scanner";
 import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
 import {
   Camera,
   useCameraDevice,
@@ -16,6 +16,9 @@ import * as Haptics from "expo-haptics";
 import { useReducedMotion, useSharedValue } from "react-native-reanimated";
 import ScanSearchBottomSheet from "../components/searchScan/ScanSearchBottomSheet";
 import ScannerOverlay from "../components/searchScan/ScannerOverlay";
+import { themedColours } from "../constants/themedColours";
+import { useColourTheme } from "../context/Themed";
+import ArrowLeft from "../svgs/ArrowLeft";
 
 export const Scan = ({ navigation }) => {
   const device = useCameraDevice("back");
@@ -28,7 +31,8 @@ export const Scan = ({ navigation }) => {
   const state = useNavigationState((state) => state);
   const currentRouteName = state.routes[state.index].name;
   const isActive = isFocused || currentRouteName === "FoodDetails";
-  const { hasPermission, requestPermission } = useCameraPermission();
+  const [permissionStatus, setPermissionStatus] = useState("");
+  const { theme } = useColourTheme();
 
   const format = useCameraFormat(device, [
     { videoResolution: { width: 1280, height: 720 } },
@@ -42,11 +46,20 @@ export const Scan = ({ navigation }) => {
     currentRouteNameShared.value = currentRouteName;
   }, [currentRouteName]);
 
-  useEffect(() => {
-    if (!hasPermission) {
-      requestPermission();
+  const getPermissionStatus = async () => {
+    const permission = Camera.getCameraPermissionStatus();
+    setPermissionStatus(permission);
+    if (permission === "not-determined") {
+      const newCameraPermission = await Camera.requestCameraPermission();
+      setPermissionStatus(newCameraPermission);
+    } else {
+      setPermissionStatus(permission);
     }
-  }, [hasPermission]);
+  };
+
+  useEffect(() => {
+    getPermissionStatus();
+  }, []);
 
   const onBarcodeDetected = Worklets.createRunInJsFn((barcodes) => {
     if (
@@ -89,13 +102,61 @@ export const Scan = ({ navigation }) => {
 
   return (
     <View style={[styles.container]}>
-      {!hasPermission && (
+      {(permissionStatus === "denied" || permissionStatus === "restricted") && (
         //REMEBER TO MAKE THIS BETTER
-        <View style={{ flex: 1, justifyContent: "center" }}>
-          <Text>Grant Permission to use scanner settings</Text>
+        <View
+          style={{
+            flex: 1,
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: 50,
+          }}
+        >
+          <Text
+            style={{ textAlign: "center", fontFamily: "Mulish_600SemiBold" }}
+          >
+            Camera access is required to use the barcode scanner. Please enable
+            camera permissions in your device settings.
+          </Text>
+          <Pressable
+            onPress={() => Linking.openSettings()}
+            style={{
+              height: 44,
+              justifyContent: "center",
+              alignItems: "center",
+              borderRadius: 12,
+              marginTop: 20,
+              width: "100%",
+              backgroundColor: themedColours.primary[theme],
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 14,
+                fontFamily: "Mulish_700Bold",
+                color: "white",
+              }}
+            >
+              Go to settings
+            </Text>
+          </Pressable>
         </View>
       )}
-      {hasPermission && (
+      {permissionStatus === "not-determined" && (
+        //REMEBER TO MAKE THIS BETTER
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100%",
+            backgroundColor: 'black',
+          }}
+        >
+        </View>
+      )}
+      {permissionStatus === "granted" && (
         <>
           <Camera
             style={StyleSheet.absoluteFill}

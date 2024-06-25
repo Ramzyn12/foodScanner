@@ -8,13 +8,13 @@ import { themedColours } from "../../constants/themedColours";
 
 const NameInput = forwardRef(({ name, setName, text }, ref) => {
   const [isNameFocused, setIsNameFocused] = useState(false);
-  const {theme} = useColourTheme()
+  const { theme } = useColourTheme();
   const FocusedOrNonEmptyText = isNameFocused || name;
 
   return (
     <View
       style={[
-        [styles.input, {borderColor: themedColours.stroke[theme]}],
+        [styles.input, { borderColor: themedColours.stroke[theme] }],
         isNameFocused && {
           borderColor: themedColours.primaryText[theme],
         },
@@ -27,7 +27,13 @@ const NameInput = forwardRef(({ name, setName, text }, ref) => {
         }}
       >
         {FocusedOrNonEmptyText && (
-          <Text style={{ fontSize: 11, fontFamily: "Mulish_700Bold" , color: themedColours.primaryText[theme] }}>
+          <Text
+            style={{
+              fontSize: 11,
+              fontFamily: "Mulish_700Bold",
+              color: themedColours.primaryText[theme],
+            }}
+          >
             {text}
           </Text>
         )}
@@ -55,9 +61,15 @@ const NameInput = forwardRef(({ name, setName, text }, ref) => {
         />
       </View>
       {isNameFocused && name && (
-        <Pressable          hitSlop={10}
-        onPress={() => setName("")} style={{ alignSelf: "center" }}>
-          <ClearIcon background={themedColours.secondaryBackground[theme]} crossColor={themedColours.secondaryText[theme]} />
+        <Pressable
+          hitSlop={10}
+          onPress={() => setName("")}
+          style={{ alignSelf: "center" }}
+        >
+          <ClearIcon
+            background={themedColours.secondaryBackground[theme]}
+            crossColor={themedColours.secondaryText[theme]}
+          />
         </Pressable>
       )}
     </View>

@@ -15,11 +15,17 @@ import { useTheme } from "../../hooks/useTheme";
 import { useColourTheme } from "../../context/Themed";
 import { themedColours } from "../../constants/themedColours";
 
-const storeDarkModePreference = async (preference) => {
+
+const getHapticsPreference = async () => {
   try {
-    await AsyncStorage.setItem("darkModePreference", preference);
+    const value = await AsyncStorage.getItem("hapticsPreference");
+    if (value !== null) {
+      return JSON.parse(value);
+    }
+    return false; // default value
   } catch (error) {
-    console.error("Failed to save the data to the storage", error);
+    console.error("Failed to fetch the haptics preference from storage", error);
+    return false;
   }
 };
 
@@ -30,53 +36,29 @@ const SettingOption = ({
   onPress,
   showDropdown,
 }) => {
-  // const [isEnabled, setIsEnabled] = useState(false);
-  const isHapticsEnabled = useSelector((state) => state.user.hapticsEnabled);
   const dispatch = useDispatch();
 
   const { theme, setTheme, themePreference } = useColourTheme();
+  const [hapticEnabled, setHapticEnabled] = useState(false)
 
-  const toggleHaptics = useMutation({
-    mutationFn: toggleUserHaptics,
-    onMutate: (newSetting) => {
-      // Make sure isEnabled is the correct value??
-      const previousValue = isHapticsEnabled;
-
-      dispatch(setHapticSetting(newSetting));
-
-      return { previousValue };
-    },
-    onError: (err, newSetting, context) => {
-      // Roll back to the previous setting if the mutation fails
-
-      if (context?.previousValue !== undefined) {
-        dispatch(setHapticSetting(context.previousValue));
-      }
-      Toast.show({
-        type: "customErrorToast",
-        text1: "Failed to set haptics, please try again later",
-      });
-    },
-  });
-
-  const { data: hapticsEnabledData, isError: isErrorFetchHaptics } = useQuery({
-    queryFn: getUserHaptics,
-    queryKey: ["HapticsEnabled"],
-  });
+  const storeHapticsPreference = async (preference) => {
+    try {
+      await AsyncStorage.setItem("hapticsPreference", JSON.stringify(preference));
+      setHapticEnabled(preference)
+      dispatch(setHapticSetting(preference));
+    } catch (error) {
+      console.error("Failed to save the haptics preference to storage", error);
+    }
+  };
 
   useEffect(() => {
-    if (
-      hapticsEnabledData !== undefined &&
-      hapticsEnabledData !== isHapticsEnabled
-    ) {
-      dispatch(setHapticSetting(hapticsEnabledData));
-    }
-  }, [hapticsEnabledData]);
-
-  const toggleSwitch = (val) => {
-    // setIsEnabled(val);
-    toggleHaptics.mutate(val);
-  };
+    const fetchHapticsPreference = async () => {
+      const storedPreference = await getHapticsPreference();
+      setHapticEnabled(storedPreference)
+      dispatch(setHapticSetting(storedPreference));
+    };
+    fetchHapticsPreference();
+  }, []);
 
   const handleMenuPress = (e) => {
     if (e.nativeEvent.index === 0) {
@@ -120,8 +102,8 @@ const SettingOption = ({
           thumbColor={themedColours.primaryBackground[theme]}
           ios_backgroundColor={themedColours.fillSecondary[theme]}
           trackColor={{ true: themedColours.primary[theme] }}
-          value={isHapticsEnabled}
-          onValueChange={toggleSwitch}
+          value={hapticEnabled}
+          onValueChange={storeHapticsPreference}
         />
       )}
       {!showArrow && showDropdown && (

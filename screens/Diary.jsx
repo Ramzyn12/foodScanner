@@ -67,6 +67,7 @@ const Diary = ({ navigation }) => {
     data: recentTimelineWeekData,
     isPending: isLoadingRecentTimeline,
     isError: isErrorRecentWeek,
+    refetch: refetchRecentWeek
   } = useQuery({
     queryKey: ["RecentTimelineWeek"],
     queryFn: getRecentTimelineWeek,
@@ -79,6 +80,7 @@ const Diary = ({ navigation }) => {
   useEffect(() => {
     if (userCreated) {
       refetchAllDiaryDays();
+      refetchRecentWeek()
     }
   }, [userCreated]);
 
@@ -101,6 +103,7 @@ const Diary = ({ navigation }) => {
     );
   }
 
+  console.log(isLoadingAllDiaryDays, 'DIARY DAYS', isLoadingRecentTimeline, 'TIMELINE');
 
   return (
     <SafeAreaView
