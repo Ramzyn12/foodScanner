@@ -68,7 +68,7 @@ const Notifications = ({ navigation }) => {
         <View style={{ padding: 14, gap: 14 }}>
           <NotificationOption
             granted={granted}
-            title={"Health Tracking"}
+            title={"Health tracking"}
             description={"Remind me to log how I'm feeling today"}
           />
           <NotificationOption

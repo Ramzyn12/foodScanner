@@ -1,5 +1,5 @@
 import { View, Text, Pressable, Alert } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { Path, Svg } from "react-native-svg";
 import { useColourTheme } from "../../context/Themed";
 import { themedColours } from "../../constants/themedColours";
@@ -8,9 +8,11 @@ import { ENTITLEMENT_ID } from "../../constants/rcConstants";
 
 const BottomButtons = () => {
   const { theme } = useColourTheme();
+  const [restoreLoading, setRestoreLoading] = useState(false)
 
   const restorePurchases = async () => {
     try {
+      setRestoreLoading(true)
       const restore = await Purchases.restorePurchases();
       if (typeof restore.entitlements.active[ENTITLEMENT_ID] !== "undefined") {
         Alert.alert(
@@ -25,6 +27,8 @@ const BottomButtons = () => {
       }
     } catch (e) {
       Alert.alert("Error restoring purchases", e.message);
+    } finally {
+      setRestoreLoading(false)
     }
   };
 
@@ -48,7 +52,7 @@ const BottomButtons = () => {
             color: themedColours.secondaryText[theme],
           }}
         >
-          Restore Purchase
+          {restoreLoading ? 'Restoring Purchase...' : 'Restore Purchase'}
         </Text>
       </Pressable>
       <View

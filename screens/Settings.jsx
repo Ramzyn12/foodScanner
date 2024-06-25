@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, Pressable, Alert } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ArrowLeft from "../svgs/ArrowLeft";
 import COLOURS from "../constants/colours";
@@ -27,8 +27,10 @@ import Purchases from "react-native-purchases";
 const Settings = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const { theme } = useColourTheme();
+  const [restoreLoading, setRestoreLoading] = useState(false);
 
   const restorePurchases = async () => {
+    setRestoreLoading(true);
     try {
       const restore = await Purchases.restorePurchases();
       if (typeof restore.entitlements.active["Pro"] !== "undefined") {
@@ -44,6 +46,8 @@ const Settings = ({ navigation }) => {
       }
     } catch (e) {
       Alert.alert("Error restoring purchases", e.message);
+    } finally {
+      setRestoreLoading(false);
     }
   };
 
@@ -80,7 +84,7 @@ const Settings = ({ navigation }) => {
                 textAlign: "center",
               }}
             >
-              Restore Purchases
+              {restoreLoading ? "Restoring Purchase..." : "Restore Purchase"}
             </Text>
           </Pressable>
         </View>

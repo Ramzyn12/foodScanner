@@ -14,12 +14,13 @@ import auth from "@react-native-firebase/auth";
 
 // WHY AM I USING BOTH Notificaitons and NotificaitonsOBj????
 const NotificationOption = ({ title, description, time, granted }) => {
-  const [timeSet, setTimeSet] = useState(new Date(2020, 0, 1, 12, 0)); // initial time set to 09:00
+  const [timeSet, setTimeSet] = useState(new Date(2020, 0, 1, 12, 0)); // initial time set to 12:00
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [shouldNotify, setShouldNotify] = useState(false);
   const notificationRef = useRef();
   const { theme } = useColourTheme();
   const UID = auth().currentUser.uid;
+  console.log(title, timeSet);
 
   useEffect(() => {
     if (!UID) {
