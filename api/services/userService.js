@@ -85,6 +85,8 @@ async function createUser(email, password, userInfo) {
 
 async function createAppleUser(email, uid, idToken, userInformation) {
 
+  const localDate = getCurrentDateLocal()
+
   try {
     await verifyAppleToken(idToken);
   } catch (error) {
@@ -97,6 +99,16 @@ async function createAppleUser(email, uid, idToken, userInformation) {
     { $setOnInsert: { email, firebaseId: uid, userInformation } },
     { new: true, upsert: true, runValidators: true }
   );
+
+  // This works becuase we wait for backend to finish on frontend
+  const existingDiaryDay = await DiaryDay.findOne({ userId: user._id });
+
+  if (!existingDiaryDay) {
+    await DiaryDay.create({
+      userId: user._id,
+      date: localDate,
+    });
+  }
 
   return user;
 }

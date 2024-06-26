@@ -1,7 +1,6 @@
 import { View, Text } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native";
-import COLOURS from "../../constants/colours";
 import { Skeleton } from "moti/skeleton";
 import { themedColours } from "../../constants/themedColours";
 import { useColourTheme } from "../../context/Themed";

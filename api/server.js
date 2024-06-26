@@ -5,6 +5,8 @@ const mongoose = require("mongoose");
 const morgan = require("morgan");
 const cors = require("cors");
 const app = express();
+require('../api/utils/logger')
+const winston = require("winston");
 
 //catching all synchronous errors not caught
 process.on("uncaughtException", (err) => {
@@ -12,6 +14,12 @@ process.on("uncaughtException", (err) => {
   console.log(err.name, err.message);
   process.exit(1);
 });
+
+const paymentLogger = winston.loggers.get('PaymentLogger')
+const orderLogger = winston.loggers.get('OrderLogger')
+
+// paymentLogger.info('Payment recieved')
+// orderLogger.error('Order recieved')
 
 // Import routes and middlewares
 const authRoutes = require("./routes/authRoutes");

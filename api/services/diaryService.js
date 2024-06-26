@@ -179,13 +179,23 @@ async function getAllDiaryDays({ userId }) {
     diaryDays.reverse();
   }
 
-  console.log(diaryDays, 'DDD');
-
   if (!diaryDays.length) {
     // Create a diary day and send it in array!?
-    // Could cause duplicates?
-    const newDiaryDay = await DiaryDay.create({ userId, date: localDate });
-    diaryDays = [newDiaryDay];
+    // Could cause duplicates? // probs not since check !diaryDays.length
+    const existingDiaryDay = await DiaryDay.findOne({ userId: user._id });
+
+    if (!existingDiaryDay) {
+      const newDiaryDay = await DiaryDay.create({
+        userId: user._id,
+        date: localDate,
+      });
+      diaryDays = [newDiaryDay];
+    } else {
+      // if all diary days are empty but there is a diary day available (ERROR)
+      throw new NotFoundError("Something went wrong fetching all diary days", {
+        diaryDays,
+      });
+    }
   }
 
   return diaryDays;

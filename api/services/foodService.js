@@ -15,25 +15,25 @@ const openFoodFactsSearchAPI = axios.create({
 
 // We need try catch here to make sure it doesn't just exit and bubble up...
 async function fetchProductWithFallback(searchTerm) {
-  try {
-    // First try to fetch using the search API
-    const response = await openFoodFactsSearchAPI.get("/searc", {
-      params: {
-        // q: `states_tags:"en:photos-uploaded" brands_tags:"aldi" ${searchTerm}`,
-        q: `states_tags:"en:front-photo-selected" AND states_tags:"en:photos-uploaded" AND states_tags:"en:product-name-completed" AND states_tags:"en:ingredients-completed" AND states_tags:"en:brands-completed" AND countries_tags:"en:united-kingdom" ${searchTerm}`,
-        // q: searchTerm,
-        fields: "brands,code,image_url,product_name,nova_group",
-        page_size: 30,
-        countries: "united-kingdom",
-      },
-    });
-    // Check if data is valid
-    if (response.data) {
-      return response.data.hits;
-    }
-  } catch (error) {
-    console.error("Error with openFoodFactsSearchAPI:", error.message);
-  }
+  // try {
+  //   // First try to fetch using the search API
+  //   const response = await openFoodFactsSearchAPI.get("/searc", {
+  //     params: {
+  //       // q: `states_tags:"en:photos-uploaded" brands_tags:"aldi" ${searchTerm}`,
+  //       q: `states_tags:"en:front-photo-selected" AND states_tags:"en:photos-uploaded" AND states_tags:"en:product-name-completed" AND states_tags:"en:ingredients-completed" AND states_tags:"en:brands-completed" AND countries_tags:"en:united-kingdom" ${searchTerm}`,
+  //       // q: searchTerm,
+  //       fields: "brands,code,image_url,product_name,nova_group",
+  //       page_size: 30,
+  //       countries: "united-kingdom",
+  //     },
+  //   });
+  //   // Check if data is valid
+  //   if (response.data) {
+  //     return response.data.hits;
+  //   }
+  // } catch (error) {
+  //   console.error("Error with openFoodFactsSearchAPI:", error.message);
+  // }
 
   // Attempt fallback to the second API
   try {
@@ -41,11 +41,12 @@ async function fetchProductWithFallback(searchTerm) {
       params: {
         action: "process",
         search_terms: searchTerm,
-        sort_by: "popularity_key", // CHANGE THIS??
+        // sort_by: "popularity_key", // left out since default popularity
         page_size: 30,
+        states_tags: 'en:product-name-completed,brands-completed',
         fields: "brands,code,image_url,product_name,nova_group",
-        countries_tags: "united-kingdom",
-        json: 1,
+        countries_tags_en: "united-kingdom", // This is correct
+        json: 1, //correct
       },
     });
     if (fallbackResponse.data && fallbackResponse.data.products) {

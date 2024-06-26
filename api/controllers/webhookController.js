@@ -10,7 +10,7 @@ const {
 const webhookService = require("../services/webhookService");
 const { validationResult } = require("express-validator");
 
-const handleRcEvents = (req, res) => {
+const handleRcEvents = async (req, res) => {
   // Check if the incoming webhook is authorized
   if (req.headers.authorization !== `Bearer ${process.env.WEBHOOK_KEY}`) {
     throw new UnauthorizedError(
@@ -26,55 +26,63 @@ const handleRcEvents = (req, res) => {
   const event = req.body.event;
 
   // Maybe here log the event? or call the rest API as they say to then log response
-
+  processWebhookEvent(event);
   // Might need to make this Asyncronous!? to make sure doesnt block main thread?
-  switch (event.type) {
-    case "INITIAL_PURCHASE":
-      webhookService.handleInitialPurchase(event);
-      console.log(event);
-      break;
-    case "RENEWAL":
-      webhookService.handleRenewalPurchase(event);
-      console.log(event);
-      break;
-    case "CANCELLATION":
-      webhookService.handleCancellation(event);
-      console.log(event);
-      break;
-    case "UNCANCELLATION":
-      webhookService.handleUncancellation(event);
-      console.log(event);
-      break;
-    case "NON_RENEWING_PURCHASE":
-      webhookService.handleNonRenewingPurchase(event);
-      console.log(event);
-      break;
-    case "EXPIRATION":
-      webhookService.handleExpiration(event);
-      console.log(event);
-      break;
-    case "BILLING_ISSUE":
-      webhookService.handleBillingIssue(event);
-      console.log(event);
-      break;
-    case "PRODUCT_CHANGE":
-      webhookService.handleProductChange(event);
-      console.log(event);
-      break;
-    case "TRANSFER":
-      webhookService.handleTransfer(event);
-      console.log(event);
-      break;
-    case "SUBSCRIPTION_EXTENDED":
-      webhookService.handleSubscriptionExtended(event);
-      console.log(event);
-      break;
-    case "TEMPORARY_ENTITLEMENT_GRANT":
-      webhookService.handleTemporaryEntitlementGrant(event);
-      console.log(event);
-      break;
-    default:
-      console.log("Unhandled event type:", event);
+};
+
+const processWebhookEvent = async (event) => {
+  try {
+    switch (event.type) {
+      case "INITIAL_PURCHASE":
+        await webhookService.handleInitialPurchase(event);
+        console.log(event);
+        break;
+      case "RENEWAL":
+        await webhookService.handleRenewalPurchase(event);
+        console.log(event);
+        break;
+      case "CANCELLATION":
+        await webhookService.handleCancellation(event);
+        console.log(event);
+        break;
+      case "UNCANCELLATION":
+        await webhookService.handleUncancellation(event);
+        console.log(event);
+        break;
+      case "NON_RENEWING_PURCHASE":
+        await webhookService.handleNonRenewingPurchase(event);
+        console.log(event);
+        break;
+      case "EXPIRATION":
+        await webhookService.handleExpiration(event);
+        console.log(event);
+        break;
+      case "BILLING_ISSUE":
+        await webhookService.handleBillingIssue(event);
+        console.log(event);
+        break;
+      case "PRODUCT_CHANGE":
+        await webhookService.handleProductChange(event);
+        console.log(event);
+        break;
+      case "TRANSFER":
+        await webhookService.handleTransfer(event);
+        console.log(event);
+        break;
+      case "SUBSCRIPTION_EXTENDED":
+        await webhookService.handleSubscriptionExtended(event);
+        console.log(event);
+        break;
+      case "TEMPORARY_ENTITLEMENT_GRANT":
+        await webhookService.handleTemporaryEntitlementGrant(event);
+        console.log(event);
+        break;
+      default:
+        console.log("Unhandled event type:", event);
+    }
+  } catch (error) {
+    console.error("Error processing webhook event", error);
+    // Optionally, handle specific error logging or notifications
   }
 };
 

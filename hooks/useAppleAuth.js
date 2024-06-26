@@ -89,6 +89,7 @@ export const useAppleAuth = () => {
 
       // Create a Firebase credential
       const { identityToken, nonce } = appleAuthResponse;
+      
       const appleCredential = auth.AppleAuthProvider.credential(
         identityToken,
         nonce
