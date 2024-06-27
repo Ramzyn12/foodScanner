@@ -43,7 +43,7 @@ async function fetchProductWithFallback(searchTerm) {
         search_terms: searchTerm,
         // sort_by: "popularity_key", // left out since default popularity
         page_size: 30,
-        states_tags: 'en:product-name-completed,brands-completed',
+        states_tags: 'product-name-completed',
         fields: "brands,code,image_url,product_name,nova_group",
         countries_tags_en: "united-kingdom", // This is correct
         json: 1, //correct

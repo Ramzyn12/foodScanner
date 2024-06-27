@@ -67,16 +67,19 @@ const AppInitializer = () => {
   }, [fontsLoaded, isLoading]);
 
   useEffect(() => {
+
     if (Platform.OS === "ios" && RC_API_KEY && firebaseUid) {
+      console.log(RC_API_KEY, firebaseUid);
+
       // USE THIS ONE AGAIN, Was just testing
       // Remove usesStoreKit2...
       Purchases.configure({
         apiKey: RC_API_KEY,
         appUserID: firebaseUid,
-        usesStoreKit2IfAvailable: true, // REMOVE THIS
+        usesStoreKit2IfAvailable: true, // REMOVE THIS BEFORE PRODUCTION
       });
       // Purchases.configure({ apiKey: RC_API_KEY });
-    }
+    } 
   }, [firebaseUid, RC_API_KEY]);
 
   useNotifications();

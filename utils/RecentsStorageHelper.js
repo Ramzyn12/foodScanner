@@ -6,6 +6,7 @@ const RECENTS_STORAGE_KEY = "RECENT_SCANS";
 export async function saveRecentScan(foodItem) {
   if (!foodItem.singleFoodId && !foodItem.barcode) return;
 
+
   try {
     const existingRecents = await getRecentScans();
 
@@ -21,7 +22,7 @@ export async function saveRecentScan(foodItem) {
       )
     ) {
       const index = existingRecents.findIndex(
-        (item) => item.name === foodItem.name
+        (item) =>( item.singleFoodId && item.singleFoodId === foodItem.singleFoodId) || (item.barcode && item.barcode === foodItem.barcode)
       );
       existingRecents.splice(index, 1);
       const updatedRecents = [foodItem, ...existingRecents].slice(0, 10); // Keep only the most recent 10 items

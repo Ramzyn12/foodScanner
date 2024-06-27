@@ -20,6 +20,7 @@ import unknown from "../../assets/unknown.webp";
 import { useColourTheme } from "../../context/Themed";
 import { themedColours } from "../../constants/themedColours";
 import InfoCircle from "../../svgs/InfoCircle";
+import NoImage from "../../svgs/NoImage";
 
 const FoodDetailsSimpleInfo = ({ foodItem, expectedId }) => {
   const navigation = useNavigation();
@@ -43,14 +44,16 @@ const FoodDetailsSimpleInfo = ({ foodItem, expectedId }) => {
   return (
     <View style={styles.container}>
       <View style={styles.simpleInfoContainer}>
-        <TouchableOpacity onPress={() => setModalVisible(true)}>
+        {currentFood?.image_url ? <TouchableOpacity onPress={() => setModalVisible(true)}>
           <Image
             style={styles.image}
             source={
               currentFood?.image_url ? { uri: currentFood.image_url } : unknown
             }
           />
-        </TouchableOpacity>
+        </TouchableOpacity> : <View style={{width: 48, backgroundColor: themedColours.secondaryBackground[theme],borderRadius: 12,  height: 48, justifyContent: 'center', alignItems: 'center'}}>
+          <NoImage size={24} />
+        </View>}
         <View style={{ flex: 1 }}>
           <Text
             style={[

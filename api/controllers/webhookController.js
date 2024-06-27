@@ -9,6 +9,64 @@ const {
 } = require("../utils/error");
 const webhookService = require("../services/webhookService");
 const { validationResult } = require("express-validator");
+const { default: axios } = require("axios");
+const CustomerReceipt = require("../models/CustomerReceipt");
+
+const REVENUECAT_API_KEY = process.env.RC_IOS_KEY;
+
+const syncSubscriptionStatus = async (event) => {
+  console.log(event, 'EVENT!!');
+
+  // maybe event.transferred_to[0] is wrong since could be transfered to two people?
+  const appUserId = event.type === 'TRANSFER' ? event.transferred_to?.[0] : event.app_user_id
+
+  try {
+    const customerInfoRes = await axios.get(
+      `https://api.revenuecat.com/v1/subscribers/${appUserId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${REVENUECAT_API_KEY}`,
+        },
+      }
+    );
+
+    const customerInfo = customerInfoRes.data;
+    // IF ever have different entitlement name, need to change!
+    const proEntitlement = customerInfo.subscriber.entitlements.Pro;
+    const expiresDate = new Date(proEntitlement.expires_date);
+    // grace handles billing issues
+    const gracePeriodExpiresDate = proEntitlement.grace_period_expires_date ? new Date(proEntitlement.grace_period_expires_date) : null;
+
+    const currentDate = new Date();
+
+    const isSubscribed = (expiresDate > currentDate) || (gracePeriodExpiresDate && gracePeriodExpiresDate > currentDate);
+    console.log(proEntitlement, expiresDate, currentDate, isSubscribed, gracePeriodExpiresDate);
+
+
+    await User.findOneAndUpdate(
+      { firebaseId: appUserId },
+      { $set: { isSubscribed: isSubscribed, activeSubscription: null } }, // could change activeSub
+    );
+
+    if (event?.transferred_from) {
+      await User.findOneAndUpdate(
+      { firebaseId: event.transferred_from?.[0] },
+      { $set: { isSubscribed: false, activeSubscription: null } }, // could change activeSub
+    );
+    }
+    
+
+    // Could remove if too much data? but probs fine
+    await CustomerReceipt.create(customerInfo.subscriber)
+
+    // await CustomerReceipt.create(customerInfo)
+  } catch (error) {
+    console.error("Error checking subscription status from RevenueCat", error);
+    // maybe add a retry if 429 in future?
+    throw error // throw to global error handler
+    // return null; // Handle error appropriately
+  }
+};
 
 const handleRcEvents = async (req, res) => {
   // Check if the incoming webhook is authorized
@@ -25,8 +83,9 @@ const handleRcEvents = async (req, res) => {
   // Handle different types of webhook events
   const event = req.body.event;
 
-  // Maybe here log the event? or call the rest API as they say to then log response
-  processWebhookEvent(event);
+  await syncSubscriptionStatus(event);
+
+  // await processWebhookEvent(event); // maybe will use in future when send emails
   // Might need to make this Asyncronous!? to make sure doesnt block main thread?
 };
 

@@ -3,40 +3,9 @@ const User = require("../models/User");
 const { NotFoundError } = require("../utils/error");
 const CustomerReceipt = require("../models/CustomerReceipt");
 
-const REVENUECAT_API_KEY = process.env.RC_IOS_KEY;
 
-const getAndStoreCustomerReceipts = async (event) => {
-  try {
-    const customerInfoRes = await axios.get(
-      `https://api.revenuecat.com/v1/subscribers/${event.app_user_id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${REVENUECAT_API_KEY}`,
-        },
-      }
-    );
-
-    const customerInfo = customerInfoRes.data.subscriber
-
-    await CustomerReceipt.create(customerInfo)
-  } catch (error) {
-    console.error("Error checking subscription status from RevenueCat", error);
-    return null; // Handle error appropriately
-  }
-};
 
 async function handleInitialPurchase(event) {
-  // Update user subscription state
-  const user = await User.findOneAndUpdate(
-    { firebaseId: event.app_user_id },
-    { $set: { isSubscribed: true, activeSubscription: event.product_id } },
-    { new: true }
-  );
-
-  if (!user)
-    throw new NotFoundError("User not found with this firebaseId", {
-      firebaseId: event.app_user_id,
-    });
 
   if (event.period_type === "TRIAL") {
     // Send email in 5 days as reminder
@@ -47,24 +16,14 @@ async function handleInitialPurchase(event) {
 }
 
 async function handleRenewalPurchase(event) {
-  const user = await User.findOneAndUpdate(
-    { firebaseId: event.app_user_id },
-    { $set: { isSubscribed: true, activeSubscription: event.product_id } },
-    { new: true }
-  );
 
-  if (!user)
-    throw new NotFoundError("User not found with this firebaseId", {
-      firebaseId: event.app_user_id,
-    });
-
-  const customerInfo = await getAndStoreCustomerReceipts(event);
 
   // Send confirmation email or notification about renewal
   // Log the transaction
 }
 
 async function handleCancellation(event) {
+
   // Look at and handle the differnet cancel reasons!
   if (event.cancel_reason === "UNSUBSCRIBE") {
     // Send sorry gone email and setup retention offer?
@@ -82,9 +41,6 @@ async function handleCancellation(event) {
     // CUSTOMER_SUPPORT || UNKNOWN
     // Do something else
   }
-  // Log to database
-  const customerInfo = await getAndStoreCustomerReceipts(event);
-  console.log(customerInfo);
 }
 
 async function handleUncancellation(event) {
@@ -100,19 +56,6 @@ async function handleNonRenewingPurchase() {
 async function handleExpiration(event) {
   // Update the user's subscription status
 
-  const user = await User.findOneAndUpdate(
-    { firebaseId: event.app_user_id },
-    { $set: { isSubscribed: false, activeSubscription: null } },
-    { new: true }
-  );
-
-  if (!user)
-    throw new NotFoundError("User not found with this firebaseId", {
-      firebaseId: event.app_user_id,
-    });
-
-    const customerInfo = await getAndStoreCustomerReceipts(event);
-    console.log(customerInfo);
   // Email sad to see you go - offer rentention maybe?
   // Log event
 }
@@ -125,58 +68,13 @@ async function handleProductChange(event) {
   // Update the user's subscription details to reflect the new product
   // MAY NOT WANT TO UPDATE PRODUCT AS IT ONLY CHANGES AFTER LAST ONE ENDS
 
-  // const user = await User.findOneAndUpdate(
-  //   { firebaseId: event.app_user_id },
-  //   { $set: { activeSubscription: event.new_product_id } },
-  //   { new: true }
-  // );
-
-  // if (!user)
-  //   throw new NotFoundError("User not found with this firebaseId", {
-  //     firebaseId,
-  //   });
-
-  console.log(event);
   // Send email explaining what will happen now product change
   // E.g if changed from year to month, will need to wait for year to expire
   // Log the change and adjust entitlements if necessary
 }
 async function handleTransfer(event) {
-  // Update both the transferring and receiving user's subscription status
-  // This might involve revoking access from one user and granting it to another
-  // MAY NEED TO ADD transactions here as important both dont fail
+  
 
-  const transfererFirebaseId = event.transferred_from;
-  const recipientFirebaseId = event.transferred_to;
-
-  // Returns previous document so we can use the activeSubscription
-  const transferringUser = await User.findOneAndUpdate(
-    { firebaseId: transfererFirebaseId },
-    { $set: { isSubscribed: false, activeSubscription: null } }
-  );
-
-  if (!transferringUser) {
-    throw new NotFoundError("Transferring user not found", {
-      firebaseId: transfererFirebaseId,
-    });
-  }
-
-  const receivingUser = await User.findOneAndUpdate(
-    { firebaseId: recipientFirebaseId },
-    {
-      $set: {
-        isSubscribed: true,
-        activeSubscription: transferringUser.activeSubscription,
-      },
-    },
-    { new: true } // Include session to make this part of the transaction
-  );
-
-  if (!receivingUser) {
-    throw new NotFoundError("Recieving user not found", {
-      firebaseId: transfererFirebaseId,
-    });
-  }
 }
 async function handleSubscriptionExtended() {
   // Extend the user's subscription end date
@@ -188,16 +86,7 @@ async function handleTemporaryEntitlementGrant(event) {
   // Ensure to track the start and end dates of this entitlement
   // This event is sent in exceptional situations (for example, a partial app store outage)
   // and is used to avoid customers making a purchase but not getting access to their entitlement.
-  const user = await User.findOneAndUpdate(
-    { firebaseId: event.app_user_id },
-    { $set: { isSubscribed: true, activeSubscription: event.product_id } },
-    { new: true }
-  );
 
-  if (!user)
-    throw new NotFoundError("User not found with this firebaseId", {
-      firebaseId: event.app_user_id,
-    });
 }
 
 module.exports = {
