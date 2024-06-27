@@ -15,6 +15,7 @@ const CustomerReceipt = require("../models/CustomerReceipt");
 const REVENUECAT_API_KEY = process.env.RC_IOS_KEY;
 
 const syncSubscriptionStatus = async (event) => {
+  console.log(event);
 
   // maybe event.transferred_to[0] is wrong since could be transfered to two people?
   const appUserId =
@@ -34,7 +35,12 @@ const syncSubscriptionStatus = async (event) => {
 
     const customerInfo = customerInfoRes.data;
     // IF ever have different entitlement name, need to change!
-    const proEntitlement = customerInfo.subscriber.entitlements.Pro;
+    const proEntitlement = customerInfo.subscriber.entitlements?.Pro;
+
+    if (!proEntitlement) {
+      console.log("Pro entitlement is undefined", customerInfo);
+      return;
+    }
     const expiresDate = new Date(proEntitlement.expires_date);
     // grace handles billing issues
     const gracePeriodExpiresDate = proEntitlement.grace_period_expires_date
@@ -61,6 +67,7 @@ const syncSubscriptionStatus = async (event) => {
     );
 
     if (event?.transferred_from) {
+      // wont update if cant find one so its fine if deleted account
       await User.findOneAndUpdate(
         { firebaseId: event.transferred_from?.[0] },
         { $set: { isSubscribed: false, activeSubscription: null } } // could change activeSub

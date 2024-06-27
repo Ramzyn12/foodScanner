@@ -122,6 +122,7 @@ const Paywall = ({ navigation }) => {
   const handleStartTrial = () => {
     if (offering.availablePackages.length > 0) {
       // Make sure you pick the trial offer and not any other one!
+      // is there better way to do this than pick first one?
       onPurchase(offering.availablePackages[0]);
     }
   };
@@ -130,7 +131,7 @@ const Paywall = ({ navigation }) => {
 
   if (elegibleFreeTrial === false) {
     // change to false
-    return <PaywallNoTrial offering={offering} />;
+    return <PaywallNoTrial isPurchasing={isPurchasing} offering={offering} />;
   }
 
   const handleScrollToPlans = () => {
@@ -197,7 +198,7 @@ const Paywall = ({ navigation }) => {
           <BottomButtons />
         </View>
       </ScrollView>
-      {/* {isPurchasing && (
+      {isPurchasing && (
         <View
           style={{
             flex: 1,
@@ -205,12 +206,16 @@ const Paywall = ({ navigation }) => {
             left: 0,
             top: 0,
             right: 0,
+            alignItems: "center",
+            justifyContent: "center",
             bottom: 0,
             opacity: 0.3,
             backgroundColor: "black",
           }}
-        />
-      )} */}
+        >
+          <ActivityIndicator />
+        </View>
+      )}
     </View>
   );
 };

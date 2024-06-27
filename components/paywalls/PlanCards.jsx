@@ -10,8 +10,8 @@ const PlanCards = ({ freeTrial, offerings, setIsPurchasing }) => {
   const getPercentSaved = () => {
     const decimalSaved =
       1 - offerings[0].product.price / (offerings[1].product.price * 12);
-    return decimalSaved.toFixed(2) * 100;
-  };
+      return Math.round(decimalSaved * 100);
+    };
   const navigation = useNavigation();
 
   const getElegibilityStatus = async (item) => {

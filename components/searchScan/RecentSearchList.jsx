@@ -36,10 +36,10 @@ const RecentSearchList = () => {
     }, [])
   );
 
-  // const handleClearRecent = async () => {
-  //   setRecentList([]);
-  //   await clearRecentScans(); // From storage
-  // };
+  const handleClearRecent = async () => {
+    setRecentList([]);
+    await clearRecentScans(); // From storage
+  };
 
   const handleListItemPress = (item) => {
     navigation.navigate("FoodDetails", {
@@ -54,9 +54,9 @@ const RecentSearchList = () => {
     <>
       <View style={styles.container}>
         <Text style={[styles.recentText, {color: themedColours.primaryText[theme]}]}>Recent</Text>
-        {/* <Pressable onPress={handleClearRecent}>
-          <Text style={{fontFamily: 'Mulish_500Medium'}}>Clear</Text>
-        </Pressable> */}
+        <Pressable onPress={handleClearRecent}>
+          <Text style={{fontFamily: 'Mulish_500Medium', color: themedColours.primary[theme]}}>Clear</Text>
+        </Pressable>
       </View>
       <BottomSheetScrollView
         showsVerticalScrollIndicator={false}

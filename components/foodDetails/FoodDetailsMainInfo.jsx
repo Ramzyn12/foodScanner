@@ -77,6 +77,7 @@ const FoodDetailsMainInfo = () => {
 
   const { customerInfo, error, loading } = useCustomerInfo();
 
+
   useEffect(() => {
 
     if (error) {
@@ -86,6 +87,8 @@ const FoodDetailsMainInfo = () => {
         text1: 'Error fetching subscription. Please try again later.'
       })
     }
+    console.log(customerInfo);
+
 
     if (!customerInfo) return;
 

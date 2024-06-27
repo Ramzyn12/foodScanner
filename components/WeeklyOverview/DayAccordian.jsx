@@ -7,7 +7,7 @@ import { Path, Svg } from "react-native-svg";
 import Divider from "../settings/Divider";
 import AccordianMetricLog from "./AccordianMetricLog";
 import ArrowRight from "../../svgs/ArrowRight";
-import { startOfDay } from "date-fns";
+import { format, startOfDay } from "date-fns";
 import GreyFail from "../../svgs/GreyFail";
 import PendingClock from "../../svgs/PendingClock";
 import LogModal from "../me/LogModal";
@@ -27,6 +27,13 @@ import { themedColours } from "../../constants/themedColours";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import auth from "@react-native-firebase/auth";
 import { storage } from "../../utils/MMKVStorage";
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const day = format(date, 'do'); // Formats the day with the appropriate suffix (1st, 2nd, 3rd, etc.)
+  const month = format(date, 'MMMM'); // Formats the month name
+  return `${day} ${month}`;
+};
 
 const DayAccordian = ({ dayData, day }) => {
   const [accordianOpen, setAccordianOpen] = useState(false);
@@ -148,7 +155,8 @@ const DayAccordian = ({ dayData, day }) => {
             color: themedColours.primaryText[theme],
           }}
         >
-          Day {day}
+          {/* {`Day ${day} (${formatDate(dayData.date)})`} */}
+          {`Day ${day}`}
         </Text>
         {!isFuture && (
           <Animated.View style={arrowStyle}>

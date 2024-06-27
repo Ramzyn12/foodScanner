@@ -32,5 +32,5 @@ export function useCustomerInfo() {
     };
   }, []);
 
-  return { customerInfo: undefined, loading, error: 'error' };
+  return { customerInfo, loading, error };
 }
