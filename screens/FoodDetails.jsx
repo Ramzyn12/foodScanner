@@ -36,7 +36,6 @@ import { useColourTheme } from "../context/Themed";
 import { themedColours } from "../constants/themedColours";
 import { useCustomerInfo } from "../hooks/useCustomerInfo";
 import { useNavigation } from "@react-navigation/native";
-import Purchases from "react-native-purchases";
 import TryProButton from "../components/foodDetails/TryProButton";
 import FoodDetailsPackaing from "../components/foodDetails/FoodDetailsPackaing";
 import ErrorPage from "./ErrorPage";

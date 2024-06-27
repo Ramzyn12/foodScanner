@@ -85,7 +85,7 @@ const WeeklyOverview = ({ route, navigation }) => {
   if (isLoading || LoadingCustomerInfo) return <LoadingWeeklyOverview route={route} />;
 
 
-  if (isError)
+  if (isError || error)
     return (
       <ErrorPage onPress={() => refetch()} />
     );

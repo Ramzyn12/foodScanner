@@ -134,9 +134,17 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
 
   const [isSubscribed, setIsSubscribed] = useState(undefined);
 
-  const { customerInfo, error, loading } = useCustomerInfo();
+  const { customerInfo, error } = useCustomerInfo();
 
   useEffect(() => {
+    if (error) {
+      console.log(error);
+      Toast.show({
+        type: 'customErrorToast',
+        text1: 'Error fetching subscription. Please try again later.'
+      })
+    }
+
     if (!customerInfo) return;
 
     if (typeof customerInfo.entitlements.active["Pro"] !== "undefined") {
@@ -144,7 +152,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
     } else {
       setIsSubscribed(false);
     }
-  }, [customerInfo]);
+  }, [customerInfo, error]);
 
   const {
     data,

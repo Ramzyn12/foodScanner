@@ -2,7 +2,6 @@ import { View, Text } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useColourTheme } from '../../context/Themed'
 import { themedColours } from '../../constants/themedColours'
-import { useCustomerInfo } from '../../hooks/useCustomerInfo'
 
 const CancelInfo = () => {
   const {theme} = useColourTheme()

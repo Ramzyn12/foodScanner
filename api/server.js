@@ -8,6 +8,9 @@ const app = express();
 require('../api/utils/logger')
 const winston = require("winston");
 
+app.set('trust proxy', 1) // change if doenst work
+// app.get('/ip', (request, response) => response.send(request.ip + 's'))
+
 //catching all synchronous errors not caught
 process.on("uncaughtException", (err) => {
   console.log("uncaught exception shutting down...");

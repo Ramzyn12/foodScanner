@@ -57,7 +57,8 @@ const Paywall = ({ navigation }) => {
         setOffering(offerings.current);
       }
     } catch (e) {
-      Alert.alert("Error getting offers", e.message);
+      console.log(e);
+      Alert.alert("Paywall Error", 'Please try again later');
     }
   };
 
@@ -80,9 +81,9 @@ const Paywall = ({ navigation }) => {
 
   const onPurchase = async (item) => {
     setIsPurchasing(true);
-    const isFreeTrial = await getElegibilityStatus(item);
 
     try {
+      const isFreeTrial = await getElegibilityStatus(item);
       const { customerInfo } = await Purchases.purchasePackage(item);
       if (
         typeof customerInfo.entitlements.active[ENTITLEMENT_ID] !== "undefined"
@@ -103,11 +104,12 @@ const Paywall = ({ navigation }) => {
       }
     } catch (e) {
       if (!e.userCancelled) {
-        console.log(e);
+        console.log(e); // Log this to central logging system!
+        Alert.alert("Error purchasing", "Please try again later"); // Improve - see what others do
       }
-      if (e.code === Purchases.PURCHASES_ERROR_CODE.PURCHASE_CANCELLED_ERROR) {
-        Alert.alert("Error purchasing package", e.message);
-      }
+      // if (e.code === Purchases.PURCHASES_ERROR_CODE.PURCHASE_CANCELLED_ERROR) {
+      //   Alert.alert("Error purchasing package", "Please try again later");
+      // }
     } finally {
       setIsPurchasing(false);
     }

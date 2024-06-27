@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, Alert } from "react-native";
 import React from "react";
 import SinglePlanCard from "./SinglePlanCard";
 import Purchases from "react-native-purchases";
@@ -12,7 +12,7 @@ const PlanCards = ({ freeTrial, offerings, setIsPurchasing }) => {
       1 - offerings[0].product.price / (offerings[1].product.price * 12);
     return decimalSaved.toFixed(2) * 100;
   };
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   const getElegibilityStatus = async (item) => {
     const trialStatus =
@@ -32,36 +32,38 @@ const PlanCards = ({ freeTrial, offerings, setIsPurchasing }) => {
   };
 
   const onPurchase = async (item) => {
-    setIsPurchasing(true)
-    const isFreeTrial = await getElegibilityStatus(item);
+    setIsPurchasing(true);
 
     try {
+      const isFreeTrial = await getElegibilityStatus(item);
       const { customerInfo } = await Purchases.purchasePackage(item);
-      if (typeof customerInfo.entitlements.active[ENTITLEMENT_ID] !== "undefined") {
-        setIsPurchasing(true)
-        navigation.goBack()
-        Alert.alert("Welcome to Pro", "Your in"); // Improve - see what others do
+      if (
+        typeof customerInfo.entitlements.active[ENTITLEMENT_ID] !== "undefined"
+      ) {
+        setIsPurchasing(true);
+        navigation.goBack();
+        // Alert.alert("Welcome to Pro", "Your in"); // Improve - see what others do
         if (isFreeTrial) {
-          // May need to prompt for notifications now 
+          // May need to prompt for notifications now
           Notifications.scheduleNotificationAsync({
             content: {
               title: "Free trial ending 2 days",
               body: "Trial ending two days ",
             },
             // trigger: { seconds: 2 },
-            trigger: { seconds: 5 * 24 * 60 * 60,}  // 5 days in seconds
+            trigger: { seconds: 5 * 24 * 60 * 60 }, // 5 days in seconds
           });
         }
       }
     } catch (e) {
       if (!e.userCancelled) {
-        console.log(e);
+        console.log(e); // Log this to central logging system!
+        Alert.alert("Error purchasing", "Please try again later"); // Improve - see what others do
       }
     } finally {
-      setIsPurchasing(false)
+      setIsPurchasing(false);
     }
   };
-
 
   return (
     <View style={{ gap: 14 }}>
@@ -69,7 +71,6 @@ const PlanCards = ({ freeTrial, offerings, setIsPurchasing }) => {
         if (offering.product.introPrice) {
           // Conditionally render intro price time
           // Not always 7 Day Free...
-         
         }
         const description =
           offering.packageType === "ANNUAL"

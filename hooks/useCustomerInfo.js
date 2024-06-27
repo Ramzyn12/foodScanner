@@ -13,7 +13,7 @@ export function useCustomerInfo() {
       setCustomerInfo(info);
       setError(null);
     } catch (e) {
-      setError(e);
+      setError(e); //will global log error
       console.log('Error fetching customer info:', e);
     } finally {
       setLoading(false);
@@ -32,5 +32,5 @@ export function useCustomerInfo() {
     };
   }, []);
 
-  return { customerInfo, loading, error };
+  return { customerInfo: undefined, loading, error: 'error' };
 }

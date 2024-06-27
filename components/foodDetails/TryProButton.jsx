@@ -20,12 +20,12 @@ const end = {
 const TryProButton = () => {
   const navigation = useNavigation();
 
-  const { customerInfo, error, loading } = useCustomerInfo();
+  const { customerInfo } = useCustomerInfo();
   const [isSubscribed, setIsSubscribed] = useState(undefined);
   const [offeringDetails, setOfferingDetails] = useState("");
 
   useEffect(() => {
-    if (!customerInfo) return;
+    if (!customerInfo) return; // if error wouldnt have this...
 
     if (typeof customerInfo.entitlements.active["Pro"] !== "undefined") {
       setIsSubscribed(true);
@@ -39,19 +39,23 @@ const TryProButton = () => {
   }, []);
 
   const getAndDisplayOffering = async () => {
-    const offerings = await Purchases.getOfferings();
-
-    if (
-      offerings.current !== null &&
-      offerings.current.availablePackages.length !== 0
-    ) {
-      const price = offerings.current.availablePackages[0].product.priceString;
-      const timeframe =
-        offerings.current.availablePackages[0].packageType === "ANNUAL"
-          ? "year"
-          : "month";
-      setOfferingDetails(`7 days free then just ${price}/${timeframe}`);
-    } else {
+    try {
+      const offerings = await Purchases.getOfferings();
+      if (
+        offerings.current !== null &&
+        offerings.current.availablePackages.length !== 0
+      ) {
+        const price =
+          offerings.current.availablePackages[0].product.priceString;
+        const timeframe =
+          offerings.current.availablePackages[0].packageType === "ANNUAL"
+            ? "year"
+            : "month";
+        setOfferingDetails(`7 days free then just ${price}/${timeframe}`);
+      } else {
+        setOfferingDetails("");
+      }
+    } catch (e) {
       setOfferingDetails("");
     }
   };
@@ -59,7 +63,10 @@ const TryProButton = () => {
   return (
     <>
       {!isSubscribed && (
-        <Pressable style={{marginTop: 20}} onPress={() => navigation.navigate("Paywall")}>
+        <Pressable
+          style={{ marginTop: 20 }}
+          onPress={() => navigation.navigate("Paywall")}
+        >
           <LinearGradient
             colors={["#0B5253", "#19999C"]}
             start={start}
@@ -67,15 +74,17 @@ const TryProButton = () => {
             style={styles.tryProButtonContainer}
           >
             <Text style={styles.tryProText}>Try Pro</Text>
-            <Text
-              style={{
-                color: "#F7F6EF",
-                fontSize: 12,
-                fontFamily: "Mulish_700Bold",
-              }}
-            >
-              {offeringDetails}
-            </Text>
+            {offeringDetails && (
+              <Text
+                style={{
+                  color: "#F7F6EF",
+                  fontSize: 12,
+                  fontFamily: "Mulish_700Bold",
+                }}
+              >
+                {offeringDetails}
+              </Text>
+            )}
           </LinearGradient>
         </Pressable>
       )}

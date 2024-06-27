@@ -26,7 +26,6 @@ import {
 import { Mulish_300Light_Italic } from "@expo-google-fonts/mulish";
 import COLOURS from "../constants/colours";
 import ProBanner from "../components/settings/ProBanner";
-import Purchases from "react-native-purchases";
 import HealthCard from "../components/me/HealthCard";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import SettingsIconNoFill from "../svgs/SettingsIconNoFill";

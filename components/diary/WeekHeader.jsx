@@ -78,6 +78,11 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
   const { customerInfo, error, loading } = useCustomerInfo();
 
   useEffect(() => {
+
+    if (error) {
+      setIsSubscribed(true) // Since were not sure and backend caps data anyway
+    }
+
     if (!customerInfo) return;
 
     if (typeof customerInfo.entitlements.active["Pro"] !== "undefined") {
@@ -85,7 +90,7 @@ const WeekHeader = ({ diaryData, daysFinished }) => {
     } else {
       setIsSubscribed(false);
     }
-  }, [customerInfo]);
+  }, [customerInfo, error]);
 
   // Has to be date for date-fns to work below
   const chosenDate = chosenDateString

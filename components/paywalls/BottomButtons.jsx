@@ -26,7 +26,8 @@ const BottomButtons = () => {
         );
       }
     } catch (e) {
-      Alert.alert("Error restoring purchases", e.message);
+      console.log(e);
+      Alert.alert("Error restoring purchases", 'Please try again later.');
     } finally {
       setRestoreLoading(false)
     }

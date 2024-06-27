@@ -26,6 +26,7 @@ import Purchases from "react-native-purchases";
 import { useCustomerInfo } from "../../hooks/useCustomerInfo";
 import { useNavigation } from "@react-navigation/native";
 import { Path, Svg } from "react-native-svg";
+import Toast from "react-native-toast-message";
 
 const angle = 91;
 const angleRad = (Math.PI * angle) / 180;
@@ -77,6 +78,15 @@ const FoodDetailsMainInfo = () => {
   const { customerInfo, error, loading } = useCustomerInfo();
 
   useEffect(() => {
+
+    if (error) {
+      console.log(error);
+      Toast.show({
+        type: 'customErrorToast',
+        text1: 'Error fetching subscription. Please try again later.'
+      })
+    }
+
     if (!customerInfo) return;
 
     if (typeof customerInfo.entitlements.active["Pro"] !== "undefined") {
@@ -86,45 +96,36 @@ const FoodDetailsMainInfo = () => {
     }
   }, [customerInfo]);
 
-  const getAndDisplayOffering = async () => {
-    const offerings = await Purchases.getOfferings();
+  // const getAndDisplayOffering = async () => {
+  //   try {
+  //     const offerings = await Purchases.getOfferings();
+  //     if (
+  //       offerings.current !== null &&
+  //       offerings.current.availablePackages.length !== 0
+  //     ) {
+  //       const price =
+  //         offerings.current.availablePackages[0].product.priceString;
+  //       const timeframe =
+  //         offerings.current.availablePackages[0].packageType === "ANNUAL"
+  //           ? "year"
+  //           : "month";
+  //       setOfferingDetails(`7 days free then just ${price}/${timeframe}`);
+  //     } else {
+  //       setOfferingDetails("");
+  //     }
+  //   } catch (err) {
+  //     setOfferingDetails("");
+  //   }
+  // };
 
-    if (
-      offerings.current !== null &&
-      offerings.current.availablePackages.length !== 0
-    ) {
-      const price = offerings.current.availablePackages[0].product.priceString;
-      const timeframe =
-        offerings.current.availablePackages[0].packageType === "ANNUAL"
-          ? "year"
-          : "month";
-      setOfferingDetails(`7 days free then just ${price}/${timeframe}`);
-    } else {
-      setOfferingDetails("");
-    }
-  };
-
-  useEffect(() => {
-    getAndDisplayOffering(); // Call this function when the component mounts
-  }, []);
-
-  const isUnknown = currentFood.processedState === "Unknown";
-  const title =
-    currentFood.processedState === "Processed"
-      ? "Why you should avoid this"
-      : `Why it's a great choice`;
+  // useEffect(() => {
+  //   getAndDisplayOffering(); // Call this function when the component mounts
+  // }, []);
 
   const message =
     currentFood.processedState === "Processed"
       ? "We recommend avoiding this product as it is considered highly processed based on the ingredients and additives."
       : "This product is a great choice as it occurs naturally on the earth, is nutrient dense, and does not contain harmful additives or ingredients.";
-
-  // if (isUnknown) {
-  //   return null;
-  // }
-
-
-
 
   return (
     <View
@@ -156,7 +157,11 @@ const FoodDetailsMainInfo = () => {
           >
             {message}
           </Text>
-          <ScrollView showsHorizontalScrollIndicator={false} style={{marginRight: -20}} horizontal>
+          <ScrollView
+            showsHorizontalScrollIndicator={false}
+            style={{ marginRight: -20 }}
+            horizontal
+          >
             <View style={styles.foodDetailReasonContainer}>
               {currentFood.additives.length > 0 && (
                 <FoodDetailReasonCard
@@ -223,7 +228,7 @@ const styles = StyleSheet.create({
   foodDetailReasonContainer: {
     flexDirection: "row",
     gap: 20,
-    paddingRight: 20
+    paddingRight: 20,
     // justifyContent: "space-between",
   },
   tryProButtonContainer: {

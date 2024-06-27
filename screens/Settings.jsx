@@ -45,7 +45,8 @@ const Settings = ({ navigation }) => {
         );
       }
     } catch (e) {
-      Alert.alert("Error restoring purchases", e.message);
+      console.log(e); // Log to central
+      Alert.alert("Error restoring purchases", 'Please try again later.');
     } finally {
       setRestoreLoading(false);
     }

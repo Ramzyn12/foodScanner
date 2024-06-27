@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pressable, Text } from 'react-native';
 import COLOURS from './constants/colours'
+import { themedColours } from './constants/themedColours';
 
 export const toastConfig = {
   groceryToast: ({ text1, text2, props }) => (
@@ -77,7 +78,7 @@ export const toastConfig = {
       style={{
         height: 44,
         width: '90%',
-        backgroundColor: COLOURS.nearBlack,
+        backgroundColor: themedColours.danger['light'],
         borderRadius: 20,
         flexDirection: 'row',
         alignItems: 'center',
