@@ -65,6 +65,8 @@ const WeeklyOverview = ({ route, navigation }) => {
   } = useQuery({
     queryFn: () => getTimelineWeek({ week }),
     queryKey: ["TimelineWeek", week],
+    staleTime: 1000 * 60 * 60,
+    gcTime: 1000 * 60 * 60,
     retry: 1
   });
 

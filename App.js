@@ -67,7 +67,6 @@ const AppInitializer = () => {
   }, [fontsLoaded, isLoading]);
 
   useEffect(() => {
-
     if (Platform.OS === "ios" && RC_API_KEY && firebaseUid) {
       console.log(RC_API_KEY, firebaseUid);
 

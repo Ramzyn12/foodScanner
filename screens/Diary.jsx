@@ -71,8 +71,8 @@ const Diary = ({ navigation }) => {
   } = useQuery({
     queryKey: ["RecentTimelineWeek"],
     queryFn: getRecentTimelineWeek,
-    // gcTime: 1000 * 60 * 60 * 4,
-    staleTime: 1000 * 60 * 60 * 4, // 6 hours
+    staleTime: 1000 * 60 * 60 * 2, // 2 hour
+    gcTime: 1000 * 60 * 60 * 2,
     enabled: !!token,
   });
 
@@ -85,15 +85,15 @@ const Diary = ({ navigation }) => {
   }, [userCreated]);
 
   // Refetches all diary days on each mount
-  useFocusEffect(
-    useCallback(() => {
-      if (firstTimeRef.current) {
-        firstTimeRef.current = false;
-        return;
-      }
-      refetchAllDiaryDays();
-    }, [refetchAllDiaryDays])
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     if (firstTimeRef.current) {
+  //       firstTimeRef.current = false;
+  //       return;
+  //     }
+  //     refetchAllDiaryDays();
+  //   }, [refetchAllDiaryDays])
+  // );
 
   if (isLoadingAllDiaryDays || isLoadingRecentTimeline) return <LoadingDiary />;
 

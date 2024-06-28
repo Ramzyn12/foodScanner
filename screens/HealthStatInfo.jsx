@@ -169,6 +169,8 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
       }),
     retry: 1,
     queryKey: ["MetricGraphData", route.params.metricType, selectedTimeFrame],
+    staleTime: 1000 * 60 * 60,
+    gcTime: 1000 * 60 * 60,
   });
 
   const dataToYearlyAverage = (data) => {

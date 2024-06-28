@@ -47,7 +47,8 @@ const LogModal = forwardRef(({ onClose, metricType, date }, ref) => {
       queryClient.invalidateQueries({
         queryKey: ["RecentMetric", variables.metric],
       });
-      queryClient.invalidateQueries({ queryKey: ["TimelineWeek"] });
+      queryClient.invalidateQueries({ queryKey: ["TimelineWeek"], });
+      queryClient.invalidateQueries({ queryKey: ["MetricGraphData", variables.metric] });
     },
     onError: (err) => {
       Toast.show({

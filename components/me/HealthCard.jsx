@@ -78,6 +78,8 @@ const HealthCard = ({ onLog, metricType, leftLable, rightLable }) => {
     queryFn: () => getRecentMetric({ metric: metricType }),
     retry: false,
     queryKey: ["RecentMetric", metricType], //Second param is the metric
+    staleTime: 1000, // Data is fresh for 10 minutes
+    gcTime: 1000 * 60 * 20, // Data is garbage collected after 20 minutes
   });
 
 

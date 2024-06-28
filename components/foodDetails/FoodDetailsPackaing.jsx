@@ -87,7 +87,7 @@ const FoodDetailsPackaing = () => {
     } else {
       setIsSubscribed(false);
     }
-  }, [customerInfo]);
+  }, [customerInfo, error]);
 
 
   if (!currentFood?.packagingData) {

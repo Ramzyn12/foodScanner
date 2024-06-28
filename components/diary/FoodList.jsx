@@ -66,6 +66,8 @@ const FoodList = ({
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["DiaryDay", variables.date] });
       queryClient.invalidateQueries({ queryKey: ["AllDiaryDays"] });
+      queryClient.invalidateQueries({ queryKey: ["TimelineWeek"] });
+      // DO WE NEED THIS? V
       if (variables.barcode) {
         queryClient.invalidateQueries({
           queryKey: ["FoodDetails", variables.barcode],

@@ -73,7 +73,11 @@ async function addFoodToDiary({ userId, foodDetails }) {
     ? { $addToSet: { consumedFoods: foodItem._id } }
     : { $addToSet: { consumedSingleFoods: foodItem._id } };
 
-  await diaryDay.updateOne(update);
+  diaryDay = await DiaryDay.findOneAndUpdate(
+    { userId: userId, date: localDate },
+    update,
+    { new: true }
+  );
 
   await diaryDay.updateDiaryDayState(); // Processed, Unprocessed, Empty
 
