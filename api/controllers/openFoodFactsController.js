@@ -22,6 +22,7 @@ const fetchFoodWithBarcode = async (req, res) => {
 
 const fetchFoodWithSearch = async (req, res) => {
   const search_term = req.params.search_term;
+  // throw new Error('')
   const foodList = await foodService.fetchOFFWithSearch({ search_term });
 
   res.json(foodList);

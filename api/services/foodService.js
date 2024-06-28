@@ -36,28 +36,22 @@ async function fetchProductWithFallback(searchTerm) {
   // }
 
   // Attempt fallback to the second API
-  try {
-    const fallbackResponse = await openFoodFactsAPI.get("/cgi/search.pl", {
-      params: {
-        action: "process",
-        search_terms: searchTerm,
-        // sort_by: "popularity_key", // left out since default popularity
-        page_size: 30,
-        states_tags: 'product-name-completed',
-        fields: "brands,code,image_url,product_name,nova_group",
-        countries_tags_en: "united-kingdom", // This is correct
-        json: 1, //correct
-      },
-    });
-    if (fallbackResponse.data && fallbackResponse.data.products) {
-      return fallbackResponse.data.products;
-    }
-  } catch (fallbackError) {
-    console.error("Error with openFoodFactsAPI:", fallbackError.message);
+  const fallbackResponse = await openFoodFactsAPI.get("/cgi/search.pl", {
+    params: {
+      action: "process",
+      search_terms: searchTerm,
+      // sort_by: "popularity_key", // left out since default popularity
+      // page: 1,
+      page_size: 30,
+      states_tags: "product-name-completed",
+      fields: "brands,code,image_url,product_name,nova_group",
+      countries_tags_en: "united-kingdom", // This is correct
+      json: 1, //correct
+    },
+  });
+  if (fallbackResponse.data && fallbackResponse.data.products) {
+    return fallbackResponse.data.products;
   }
-
-  // If both attempts fail, then throw an error
-  throw new Error("Both API requests failed");
 }
 
 async function checkIsInGroceryList(userId, identifier, isBarcode = true) {
@@ -214,18 +208,15 @@ async function fetchOFFWithBarcode({ userId, barcode, date }) {
 }
 
 async function fetchOFFWithSearch({ search_term }) {
-  const response = await fetchProductWithFallback(search_term);
-
+  const products = await fetchProductWithFallback(search_term);
   // Maybe return empty array instead so dont need to throw error?
   // Test this to see what happens
-  if (!response)
-    // response = []
+  if (!products) {
     throw new NotFoundError("No search results for this search term");
-
-  const products = response;
+  }
 
   const foodList = products.map((product) => {
-    const processedScore = 100 - (product.nova_group - 1) * 25;
+    // const processedScore = 100 - (product.nova_group - 1) * 25;
     const processedState =
       product.nova_group === 1
         ? "Perfect"
@@ -239,7 +230,7 @@ async function fetchOFFWithSearch({ search_term }) {
 
     return {
       name: product.product_name,
-      processedScore: processedScore,
+      processedScore: 100, // dont use anymore
       processedState,
       brand: product.brands,
       image_url: product.image_url,

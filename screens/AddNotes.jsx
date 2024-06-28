@@ -9,6 +9,7 @@ import {
   PanResponder,
   Platform,
   findNodeHandle,
+  KeyboardAvoidingView,
 } from "react-native";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -151,7 +152,6 @@ const AddNotes = ({ route }) => {
       >
         <TextInput
           ref={notesInputRef}
-          autoCorrect={false}
           style={{
             paddingHorizontal: 20,
             paddingTop: 20,

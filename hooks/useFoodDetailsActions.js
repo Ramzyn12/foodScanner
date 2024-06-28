@@ -36,9 +36,14 @@ export const useFoodDetailsActions = (expectedId) => {
   const mutationCounterGrocery = useRef(0);
   const navigation = useNavigation();
 
-  const debouncedInvalidate = useCallback(debounce(() => {
-    queryClient.invalidateQueries({queryKey: ['AllDiaryDays']});
-  }, 1500), []);
+  const debouncedInvalidate = useCallback(
+    debounce(() => {
+      queryClient.invalidateQueries({
+        queryKey: ["AllDiaryDays"],
+      });
+    }, 1500),
+    []
+  );
 
   const [addedToGroceries, SetAddedToGroceries] = useState(false);
   const chosenDate =
@@ -100,7 +105,7 @@ export const useFoodDetailsActions = (expectedId) => {
       if (mutationCounterDiary.current !== 0) return;
       queryClient.invalidateQueries({ queryKey: ["DiaryDay", variables.date] });
       queryClient.invalidateQueries({ queryKey: ["TimelineWeek"] });
-      debouncedInvalidate()
+      debouncedInvalidate();
     },
     onError: (err, variables, context) => {
       if (err.response.data.message.startsWith("Subscription Required")) {
@@ -147,7 +152,7 @@ export const useFoodDetailsActions = (expectedId) => {
       if (mutationCounterDiary.current !== 0) return;
       queryClient.invalidateQueries({ queryKey: ["DiaryDay", variables.date] });
       queryClient.invalidateQueries({ queryKey: ["TimelineWeek"] });
-      debouncedInvalidate()
+      debouncedInvalidate();
 
       // if (variables.barcode) {
       //   queryClient.invalidateQueries({

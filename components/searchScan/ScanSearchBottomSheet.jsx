@@ -67,6 +67,8 @@ const ScanSearchBottomSheet = ({ setSheetIndex }) => {
     queryKey: ["SearchIvy", triggerSearch],
     queryFn: () => fetchFoodWithSearchIvy(triggerSearch),
     retry: false,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10,   // 10 minutes
     enabled: triggerSearch.trim().length > 2  && triggerSearch.trim().length < 40,
   });
 
@@ -74,6 +76,8 @@ const ScanSearchBottomSheet = ({ setSheetIndex }) => {
     queryKey: ["SearchOFF", triggerSearch],
     queryFn: () => fetchFoodWithSearch(triggerSearch),
     retry: false,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10,   // 10 minutes
     enabled: triggerSearch.trim().length > 2 && triggerSearch.trim().length < 40,
   });
 
@@ -81,16 +85,20 @@ const ScanSearchBottomSheet = ({ setSheetIndex }) => {
   const hideRecent = triggerSearch.trim().length > 2 || isLoading;
   const noResults = DataOFF?.length === 0 && DataIvy?.length === 0 && !isLoading
 
-  const debounceSearch = useCallback(
-    debounce((search) => {
-      setTriggerSearch(search);
-    }, 400),
-    []
-  );
+  // const debounceSearch = useCallback(
+  //   debounce((search) => {
+  //     setTriggerSearch(search);
+  //   }, 400),
+  //   []
+  // );
 
   const updateSearch = (search) => {
     setSearch(search);
-    debounceSearch(search);
+    // debounceSearch(search);
+  };
+  
+  const handleSearchSubmit = () => {
+    setTriggerSearch(search);
   };
 
   const handleClearInput = () => {
@@ -160,6 +168,7 @@ const ScanSearchBottomSheet = ({ setSheetIndex }) => {
         animatedCancelBtnStyle={animatedCancelBtnStyle}
         onCancel={handleCancelPress}
         search={search}
+        onSubmitEditing={handleSearchSubmit} // Trigger search on submit
         ref={inputRef}
         onClearInput={handleClearInput}
         onFocus={handleFocus}

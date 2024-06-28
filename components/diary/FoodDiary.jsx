@@ -49,6 +49,8 @@ const FoodDiary = ({}) => {
   } = useQuery({
     queryFn: () => getDiaryDay({ date: chosenDate }),
     queryKey: ["DiaryDay", chosenDate],
+    staleTime: 1000 * 60 * 60,
+    gcTime: 1000 * 60 * 60,
     enabled: !!token,
     retry: false,
   });

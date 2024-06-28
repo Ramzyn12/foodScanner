@@ -41,6 +41,8 @@ const Groceries = ({ navigation }) => {
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["Groceries"],
     queryFn: getGroceryList,
+    // staleTime: 1000 * 60 * 60,
+    // gcTime: 1000 * 60 * 60,
     retry: 1,
   });
 

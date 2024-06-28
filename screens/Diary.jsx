@@ -61,6 +61,8 @@ const Diary = ({ navigation }) => {
     queryFn: getAllDiaryDays,
     retry: false,
     enabled: !!token,
+    // staleTime: 1000 * 60 * 60 * 2, // 2 hour
+    // gcTime: 1000 * 60 * 60 * 2,
   });
 
   const {

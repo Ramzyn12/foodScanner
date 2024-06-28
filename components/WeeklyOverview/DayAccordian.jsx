@@ -30,8 +30,8 @@ import { storage } from "../../utils/MMKVStorage";
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
-  const day = format(date, 'do'); // Formats the day with the appropriate suffix (1st, 2nd, 3rd, etc.)
-  const month = format(date, 'MMMM'); // Formats the month name
+  const day = format(date, "do"); // Formats the day with the appropriate suffix (1st, 2nd, 3rd, etc.)
+  const month = format(date, "MMMM"); // Formats the month name
   return `${day} ${month}`;
 };
 
@@ -45,11 +45,9 @@ const DayAccordian = ({ dayData, day }) => {
   const { theme } = useColourTheme();
   const [notes, setNotes] = useState("");
   const userId = auth().currentUser?.uid;
-  
 
   const isPresent = today.toISOString() === dateOfEntry.toISOString();
   const isFuture = dateOfEntry > today;
-
 
   const isSuccess =
     dayData.diaryDetails.fastedState === true ||
@@ -117,7 +115,11 @@ const DayAccordian = ({ dayData, day }) => {
     const date = dayData?.date;
 
     const note = storage.getString(`${userId}_${date}`);
-    console.log("NOTE RECIEVED", note, date);
+    console.log(
+      "NOTE RECIEVED",
+      notes?.trim().split("\n").join(". ").length,
+      date
+    );
     setNotes(note);
   };
 
@@ -125,7 +127,8 @@ const DayAccordian = ({ dayData, day }) => {
     getNotesFromStorage();
   });
 
-  
+  const displayNoteInital = notes?.trim().split("\n").join(". ");
+  const displayNoteFallback = dayData?.note?.note.trim().split("\n").join(". ");
 
   return (
     <Pressable
@@ -231,7 +234,7 @@ const DayAccordian = ({ dayData, day }) => {
               </Text>
               <ArrowRight color={themedColours.secondaryText[theme]} />
             </View>
-            {(dayData?.note?.note || notes) && (
+            {notes && (
               <Text
                 numberOfLines={3}
                 ellipsizeMode="tail"
@@ -242,8 +245,7 @@ const DayAccordian = ({ dayData, day }) => {
                   color: themedColours.secondaryText[theme],
                 }}
               >
-                {notes?.trim().split("\n").join(". ") ||
-                  dayData?.note?.note.trim().split("\n").join(". ")}
+                {displayNoteInital}
               </Text>
             )}
           </Pressable>

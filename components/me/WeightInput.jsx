@@ -69,7 +69,7 @@ const WeightInput = ({
 
       {bottomSheetBehaviour ? (
         <BottomSheetTextInput
-          placeholder={`Weight (${isImperial ? 'KG' : 'lbs'})`}
+          placeholder={`Weight (${isImperial ? 'lbs' : 'KG'})`}
           value={value.toString()}
           inputMode="decimal"
           onChangeText={setValue}
@@ -87,7 +87,7 @@ const WeightInput = ({
         />
       ) : (
         <TextInput
-          placeholder={`Weight (${isImperial ? 'KG' : 'lbs'})`}
+          placeholder={`Weight (${isImperial ? 'lbs' : 'KG'})`}
           placeholderTextColor={themedColours.secondaryText[theme]}
           value={value.toString()}
           inputMode="decimal"

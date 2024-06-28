@@ -118,7 +118,7 @@ const HealthStatInfo = ({ route, navigation, isSlider }) => {
   const [adjustedData, setAdjustedData] = useState([]);
   const [selectedTimeFrame, setSelectedTimeFrame] = useState("Week");
   const [isLastLoggedToday, setIsLastLoggedToday] = useState(false);
-  const [weightUnit, setWeightUnit] = useState("metric");
+  const [weightUnit, setWeightUnit] = useState("imperial");
   const [displayMetric, setDisplayMetric] = useState("");
   const [displayDate, setDisplayDate] = useState("");
   const isImperial = weightUnit === "imperial";

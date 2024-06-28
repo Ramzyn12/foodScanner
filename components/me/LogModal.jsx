@@ -63,7 +63,7 @@ const LogModal = forwardRef(({ onClose, metricType, date }, ref) => {
       metric: metricType,
       date: date ? getAnyDateLocal(date) : getCurrentDateLocal(),
       metricValue: isWeight ? weightValue : value,
-      unitOfMeasure: weightUnit === "imperial" ? "kg" : "lbs",
+      unitOfMeasure: weightUnit === "metric" ? "kg" : "lbs",
     });
     ref.current.close();
   };
