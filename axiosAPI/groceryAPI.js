@@ -2,8 +2,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { storage } from "../utils/MMKVStorage";
 
+const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL
+
 const groceryAPI = axios.create({
-  baseURL: "http://192.168.0.145:3000/api/v1/groceries", // Replace with your API's base URL
+  baseURL: BACKEND_URL + "/api/v1/groceries", // Replace with your API's base URL
   // withCredentials: true,
   // You can add more configurations like headers here
 });

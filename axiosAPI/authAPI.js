@@ -4,8 +4,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { storage } from "../utils/MMKVStorage";
 import auth from '@react-native-firebase/auth'
 
+const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL
+const prev = "http://192.168.0.145:3000"
 const authAPI = axios.create({
-  baseURL: "http://192.168.0.145:3000/api/v1/auth/",
+  baseURL: BACKEND_URL + "/api/v1/auth/",
 });
 
 export const signUpApple = async ({ email, uid, idToken, userInformation }) => {

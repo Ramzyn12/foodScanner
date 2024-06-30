@@ -98,7 +98,7 @@ const Diary = ({ navigation }) => {
   // );
 
   if (isLoadingAllDiaryDays || isLoadingRecentTimeline) return <LoadingDiary />;
-
+  console.log(error);
   if (isErrorAllDiaryDays) {
     return (
       <ErrorPage
