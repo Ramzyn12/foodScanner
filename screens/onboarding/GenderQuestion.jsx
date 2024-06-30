@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ProgressBar from "../../components/onboarding/ProgressBar";
 import COLOURS from "../../constants/colours";
 import RadioButton from "../../components/onboarding/RadioButton";
@@ -12,14 +12,24 @@ const GenderQuestion = ({ navigation }) => {
   const [selectedGender, setSelectedGender] = useState(null);
   const dispatch = useDispatch();
   const {theme} = useColourTheme()
+  const timeoutRef = useRef(null);
 
   const handleGenderSelect = (value) => {
     setSelectedGender(value);
     dispatch(setGender(value));
-    setTimeout(() => {
+     timeoutRef.current = setTimeout(() => {
       navigation.navigate("ConsumptionQuestion");
     }, 800);
   };
+
+  useEffect(() => {
+    // Clear timeout if component unmounts
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <View style={[styles.container, {backgroundColor: themedColours.primaryBackground[theme]}]}>

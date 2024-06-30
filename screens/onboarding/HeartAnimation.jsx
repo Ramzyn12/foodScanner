@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { View, SafeAreaView, StyleSheet, Pressable, Text } from "react-native";
 import LeftHalfHeart from "../../svgs/LeftHalfHeart";
 import RightHalfHeart from "../../svgs/RightHalfHeart";
@@ -19,6 +19,7 @@ const HeartAnimation = ({ navigation }) => {
   const leftHeartRotation = useSharedValue(0);
   const rightHeartRotation = useSharedValue(0);
   // const bothHeartScale = useSharedValue(1);
+  const timeoutRef = useRef(null);
 
   // Animated styles for the left heart
   const leftHeartStyle = useAnimatedStyle(() => ({
@@ -41,10 +42,19 @@ const HeartAnimation = ({ navigation }) => {
   // }));
 
   const handleAnimationEnd = () => {
-    setTimeout(() => {
+    timeoutRef.current = setTimeout(() => {
       navigation.navigate("QuestionIntro");
     }, 400);
   };
+
+  useEffect(() => {
+    // Clear timeout if component unmounts
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   const {theme} = useColourTheme()
 

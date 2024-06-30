@@ -51,7 +51,7 @@ const NativeSearchBar = forwardRef(
             }}
           />
           {search.length > 0 && (
-            <Pressable onPress={onClearInput}>
+            <Pressable hitSlop={10} onPress={onClearInput}>
               <ClearIcon
                 background={themedColours.stroke[theme]}
                 crossColor={themedColours.secondaryText[theme]}

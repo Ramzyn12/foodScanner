@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import COLOURS from "../../constants/colours";
 import unknown from "../../assets/unknown.webp";
@@ -6,6 +6,7 @@ import { themedColours } from "../../constants/themedColours";
 import { useColourTheme } from "../../context/Themed";
 import { Path, Svg } from "react-native-svg";
 import NoImage from "../../svgs/NoImage";
+import { Image } from 'expo-image';
 
 const FoodListItem = ({ foodSelected, foodItem }) => {
   // This should be shared component
@@ -27,13 +28,19 @@ const FoodListItem = ({ foodSelected, foodItem }) => {
     <View style={styles.foodListItemContainer}>
       {/* image */}
       {foodItem?.image_url ? (
-        <Image
-          style={styles.image}
-          source={foodItem?.image_url ? { uri: foodItem.image_url } : unknown}
-        />
+        <Image style={styles.image} contentFit="cover" source={{ uri: foodItem.image_url }} />
       ) : (
-        <View style={{width: 36, backgroundColor: themedColours.secondaryBackground[theme],borderRadius: 12,  height: 36, justifyContent: 'center', alignItems: 'center'}}>
-          <NoImage/>
+        <View
+          style={{
+            width: 36,
+            backgroundColor: themedColours.secondaryBackground[theme],
+            borderRadius: 12,
+            height: 36,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <NoImage />
         </View>
       )}
       <View style={styles.foodListItem}>

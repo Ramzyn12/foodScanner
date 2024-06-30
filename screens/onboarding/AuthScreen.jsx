@@ -31,7 +31,6 @@ import { themedColours } from "../../constants/themedColours";
 
 const {height: screenHeight} = Dimensions.get('window')
 
-console.log(screenHeight);
 
 const AuthState = {
   SIGN_IN: "signIn",

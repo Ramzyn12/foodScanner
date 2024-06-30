@@ -1,5 +1,11 @@
-import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
-import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  FlatList,
+} from "react-native";
+import React, { useCallback } from "react";
 import TimelineEvent from "../components/health/TimelineEvent";
 import { ScrollView } from "react-native";
 import { useQuery } from "@tanstack/react-query";
@@ -12,7 +18,6 @@ import ErrorPage from "./ErrorPage";
 const calculateWeekStatus = (daysSinceStart, weekIndex) => {
   const daysPassed = daysSinceStart - weekIndex * 7;
   const remainingDaysToUnlock = weekIndex * 7 - daysSinceStart;
-
 
   if (daysPassed >= 7) {
     return { daysFinished: 7, unlocked: true, remainingDaysToUnlock };
@@ -39,35 +44,44 @@ const Health = () => {
     retry: 1,
   });
 
-  const {theme} = useColourTheme()
+  const { theme } = useColourTheme();
+
+  const renderItem = useCallback(({ item, index }) => {
+    const { daysFinished, unlocked, remainingDaysToUnlock } = calculateWeekStatus(
+      timelineWeeks.daysSinceStart,
+      index
+    );
+    return (
+      <TimelineEvent
+        key={item._id}
+        data={item}
+        daysFinished={daysFinished}
+        unlocked={unlocked}
+        remainingDaysToUnlock={remainingDaysToUnlock}
+      />
+    );
+  }, [timelineWeeks]);
 
   if (isLoading) return <LoadingHealth />;
-  if (isError)
-    return (
-      <ErrorPage onPress={() => refetch()} />
-    );
+  if (isError) return <ErrorPage onPress={() => refetch()} />;
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: themedColours.primaryBackground[theme] }}>
-      <View style={[styles.line, {backgroundColor: themedColours.stroke[theme]}]}></View>
-      {timelineWeeks?.timelineWeeks?.map((week, index) => {
-        const { daysFinished, unlocked, remainingDaysToUnlock } =
-          calculateWeekStatus(
-            timelineWeeks.daysSinceStart,
-            index,
-            timelineWeeks.timelineWeeks.length
-          );
-        return (
-          <TimelineEvent
-            key={week._id}
-            data={week}
-            daysFinished={daysFinished}
-            unlocked={unlocked}
-            remainingDaysToUnlock={remainingDaysToUnlock}
-          />
-        );
-      })}
-    </ScrollView>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: themedColours.primaryBackground[theme],
+      }}
+    >
+      <View
+        style={[styles.line, { backgroundColor: themedColours.stroke[theme] }]}
+      ></View>
+      <FlatList
+        data={timelineWeeks?.timelineWeeks}
+        renderItem={renderItem}
+        keyExtractor={(item) => item._id}
+        contentContainerStyle={{ paddingBottom: 40 }} // Optional: to give some padding at the bottom
+      />
+    </View>
   );
 };
 

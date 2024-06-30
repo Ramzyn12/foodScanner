@@ -8,7 +8,7 @@ import {
   Animated,
   ScrollView,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import ProgressBar from "../../components/onboarding/ProgressBar";
 import COLOURS from "../../constants/colours";
@@ -25,14 +25,24 @@ const ConsumptionQuestion = ({ navigation }) => {
   const [selectedDays, setSelectedDays] = useState(null);
   const dispatch = useDispatch();
   const { theme } = useColourTheme();
+  const timeoutRef = useRef(null);
 
   const handleDaySelect = (value) => {
     setSelectedDays(value); // Set the selected gender
     dispatch(setProcessedFoodConsumption(value));
-    setTimeout(() => {
+    timeoutRef.current = setTimeout(() => {
       navigation.navigate("MedicalQuestion");
     }, 800);
   };
+
+  useEffect(() => {
+    // Clear timeout if component unmounts
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <View

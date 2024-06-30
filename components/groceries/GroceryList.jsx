@@ -87,7 +87,7 @@ const GroceryList = () => {
   };
 
   return (
-    <View style={{ paddingBottom: 120, flex: 1 }}>
+    <View style={{  flex: 1}}>
       {groceries && groceries.length > 0 && (
         <DraggableFlatList
           data={groceries}

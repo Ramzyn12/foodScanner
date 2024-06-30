@@ -25,8 +25,8 @@ import Paywall from "./screens/Paywall";
 import Disclaimer from "./screens/Disclaimer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
+
 const getHapticsPreference = async () => {
   try {
     const value = await AsyncStorage.getItem("hapticsPreference");
@@ -47,8 +47,6 @@ function MainComponent({ loggedIn }) {
     (state) => state.auth.waitingForBackend
   );
   const {theme} = useColourTheme()
-
-  console.log(waitingForBackendApple, 'BACKEND APPLE LOADING');
 
   useEffect(() => {
     const fetchHapticsPreference = async () => {

@@ -51,7 +51,7 @@ const ExcitementQuestion = ({ navigation }) => {
           <ProgressBar percent={90} />
         {/* </Animated.View> */}
         <Text style={[styles.titleText, {color: themedColours.primaryText[theme]}]}>
-          What features are you most excited to use?{" "}
+          What features are you most excited to use?
         </Text>
         {/* Radio Buttons */}
         <View showsVerticalScrollIndicator={false}>

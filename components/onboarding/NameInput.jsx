@@ -8,6 +8,7 @@ import { themedColours } from "../../constants/themedColours";
 const NameInput = ({name, setName, text}) => {
   const [isNameFocused, setIsNameFocused] = useState(false);
   const {theme} = useColourTheme()
+  
   return (
     <View
       style={[
